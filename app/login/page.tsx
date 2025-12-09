@@ -1,7 +1,10 @@
+"use client";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 
 export default function LoginPage() {
+  const [showPassword, setShowPassword] = useState(false);
+  const togglePassword = () => setShowPassword((v) => !v);
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8 p-8 bg-white rounded shadow">
@@ -11,7 +14,7 @@ export default function LoginPage() {
           </h2>
         </div>
         <form className="mt-8 space-y-6">
-          <div className="rounded-md shadow-sm -space-y-px">
+          <div className="rounded-md shadow-sm flex flex-col gap-4">
             <div>
               <label htmlFor="email-address" className="sr-only">
                 Email address
@@ -22,29 +25,86 @@ export default function LoginPage() {
                 type="email"
                 autoComplete="email"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
+                className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
                 placeholder="Email address"
               />
             </div>
-            <div>
+            <div className="relative">
               <label htmlFor="password" className="sr-only">
                 Password
               </label>
               <input
                 id="password"
                 name="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 autoComplete="current-password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
+                minLength={8}
+                maxLength={22}
+                className="appearance-none rounded-full relative block w-full px-3 py-2 pr-10 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
                 placeholder="Password"
               />
+              <button
+                type="button"
+                onClick={togglePassword}
+                tabIndex={-1}
+                className="absolute inset-y-0 right-2 flex items-center text-gray-400 hover:text-gray-700 focus:outline-none"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                style={{ pointerEvents: "auto" }}
+              >
+                {showPassword ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 0-1.657.336-3.236.938-4.675m2.122 2.122A7.963 7.963 0 004 9c0 4.418 3.582 8 8 8 1.657 0 3.236-.336 4.675-.938m2.122-2.122A7.963 7.963 0 0020 15c0-4.418-3.582-8-8-8-1.657 0-3.236.336-4.675.938"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-.336 1.036-.84 2.012-1.482 2.882M15.54 15.54A7.963 7.963 0 0112 17c-4.418 0-8-3.582-8-8 0-1.657.336-3.236.938-4.675"
+                    />
+                  </svg>
+                )}
+              </button>
             </div>
           </div>
 
           <div className="flex items-center justify-between">
             <div className="text-sm">
-              <Link href="/forgot" className="font-medium text-primary hover:text-primary/80">
+              <Link
+                href="/forgot"
+                className="font-medium text-primary hover:text-primary/80"
+              >
                 Forgot your password?
               </Link>
             </div>
@@ -60,8 +120,11 @@ export default function LoginPage() {
           </div>
         </form>
         <div className="text-center text-sm text-gray-600">
-          Don&apos;t have an account?{' '}
-          <Link href="/signup" className="font-medium text-primary hover:text-primary/80">
+          Don&apos;t have an account?{" "}
+          <Link
+            href="/signup"
+            className="font-medium text-primary hover:text-primary/80"
+          >
             Sign up
           </Link>
         </div>

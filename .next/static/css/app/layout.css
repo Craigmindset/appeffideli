@@ -1960,6 +1960,9 @@ video {
 .pt-8 {
   padding-top: 2rem;
 }
+.pr-10 {
+  padding-right: 2.5rem;
+}
 .text-left {
   text-align: left;
 }
@@ -2793,6 +2796,11 @@ video {
 
 .hover\:text-primary\/80:hover {
   color: hsl(var(--primary) / 0.8);
+}
+
+.hover\:text-gray-700:hover {
+  --tw-text-opacity: 1;
+  color: rgb(55 65 81 / var(--tw-text-opacity, 1));
 }
 
 .hover\:underline:hover {
