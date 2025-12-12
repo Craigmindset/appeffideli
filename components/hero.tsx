@@ -106,12 +106,15 @@ export default function Hero() {
 
               {/* Main Heading */}
               <div className="space-y-4">
-                <h1 className="text-3xl md:text-5xl lg:text-[64px] leading-tight lg:leading-none font-bold tracking-tight text-center lg:text-left">
+                <h1 className="text-3xl md:text-3xl lg:text-6xl leading-tight lg:leading-none font-bold tracking-tight text-center lg:text-left">
                   Efficiency Delivered
                 </h1>
-                <p className="text-base md:text-xl text-gray-600 max-w-[500px]">
-                  Your ideal home management platform with top-notch routine
-                  services, ensuring everything is taken care of perfectly.
+                <p className="text-base md:text-lg text-gray-600 max-w-[500px]">
+                  Effideli is the trusted home and kitchen partner for families,
+                  offering intercontinental dishes with African-infused flavors,
+                  customized meal plans, infant and toddler recipes, and smart
+                  household management tips — all designed to make home life
+                  easier, healthier, and more enjoyable.
                 </p>
               </div>
 

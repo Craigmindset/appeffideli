@@ -8,8 +8,17 @@ export default function SignupPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8 p-8 bg-white rounded shadow">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+        <div className="flex flex-col items-center gap-2">
+          <Link href="/">
+            <img
+              src="/logo.png"
+              alt="Effideli Logo"
+              width={60}
+              height={60}
+              className="h-14 w-auto cursor-pointer"
+            />
+          </Link>
+          <h2 className="mt-2 text-center text-3xl font-extrabold text-gray-900">
             Create your account
           </h2>
         </div>
