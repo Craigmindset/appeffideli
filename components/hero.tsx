@@ -7,11 +7,11 @@ import Link from "next/link";
 
 const heroImages = [
   {
-    src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/effideli-slide-1-rq71jtKBUseHnielAaso4Dpyn3js45.png",
+    src: "/images/effideli-img1.png",
     alt: "Professional cleaning service provider in blue sweater showing enthusiasm",
   },
   {
-    src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/effideli-slide-2-F2CDTaeQD8YXVxdMSHiZIQvUuswOrm.png",
+    src: "/images/effideli-img2.png",
     alt: "Professional cleaning service provider in white uniform",
   },
   {
@@ -69,17 +69,6 @@ export default function Hero() {
 
   return (
     <section className="relative min-h-[calc(100vh-4rem)] overflow-hidden">
-      {/* Background Image */}
-      <div
-        className="absolute inset-0 z-0"
-        style={{
-          backgroundImage:
-            'url("https://hebbkx1anhila5yf.public.blob.vercel-storage.com/9888.jpg-19MYBhjvgxpAPRSqKizbyFRC14wWLs.jpeg")',
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          opacity: 0.15,
-        }}
-      />
       <div className="relative z-10 bg-[#F5F7FF]/60">
         <div className="container px-4 md:px-6 mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center py-8 md:py-12">
@@ -141,7 +130,7 @@ export default function Hero() {
                 </Button>
               </div>
 
-              {/* Testimonials Slider */}
+              {/*
               <div className="mt-8 bg-white rounded-xl p-4 shadow-lg relative">
                 <div className="overflow-hidden">
                   <div
@@ -183,7 +172,6 @@ export default function Hero() {
                     ))}
                   </div>
                 </div>
-                {/* Dots indicator */}
                 <div className="flex justify-center gap-2 mt-2">
                   {testimonials.map((_, index) => (
                     <button
@@ -199,6 +187,7 @@ export default function Hero() {
                   ))}
                 </div>
               </div>
+              */}
             </div>
 
             {/* Right Column - Image Slider */}
@@ -220,9 +209,9 @@ export default function Hero() {
                           <Image
                             src={image.src || "/placeholder.svg"}
                             alt={image.alt}
-                            width={600}
-                            height={600}
-                            className={`object-contain scale-110 ${
+                            width={500}
+                            height={500}
+                            className={`object-contain scale-100 ${
                               index === 0 ? "pt-8" : ""
                             }`}
                             priority={index === 0}

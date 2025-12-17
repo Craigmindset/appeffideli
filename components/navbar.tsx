@@ -65,7 +65,7 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="bg-background border-b">
+    <nav className="bg-background border-b sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
@@ -204,7 +204,7 @@ export default function Navbar() {
           <div className="space-y-1 pb-3">
             <Link
               href="/"
-                className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
+              className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
                 pathname === "/"
                   ? "text-red-600"
                   : "text-white hover:text-white/80 hover:bg-white/10"
