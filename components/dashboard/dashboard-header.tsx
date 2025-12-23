@@ -25,13 +25,15 @@ export function DashboardHeader() {
   };
 
   // Get user data from localStorage or context
-  const userName = typeof window !== "undefined" 
-    ? localStorage.getItem("userName") || "User"
-    : "User";
-  
-  const userEmail = typeof window !== "undefined"
-    ? localStorage.getItem("userEmail") || "user@example.com"
-    : "user@example.com";
+  const userName =
+    typeof window !== "undefined"
+      ? localStorage.getItem("userName") || "User"
+      : "User";
+
+  const userEmail =
+    typeof window !== "undefined"
+      ? localStorage.getItem("userEmail") || "user@example.com"
+      : "user@example.com";
 
   const getInitials = (name: string) => {
     return name
@@ -43,7 +45,7 @@ export function DashboardHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 hidden md:block">
       <div className="container flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-2">
           <h2 className="text-xl font-semibold">Dashboard</h2>
@@ -52,7 +54,10 @@ export function DashboardHeader() {
         <div className="flex items-center gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+              <Button
+                variant="ghost"
+                className="relative h-10 w-10 rounded-full"
+              >
                 <Avatar className="h-10 w-10">
                   <AvatarImage src="/images/avatar.png" alt={userName} />
                   <AvatarFallback>{getInitials(userName)}</AvatarFallback>
@@ -69,7 +74,9 @@ export function DashboardHeader() {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => router.push("/dashboard/settings")}>
+              <DropdownMenuItem
+                onClick={() => router.push("/dashboard/settings")}
+              >
                 <User className="mr-2 h-4 w-4" />
                 <span>Settings</span>
               </DropdownMenuItem>

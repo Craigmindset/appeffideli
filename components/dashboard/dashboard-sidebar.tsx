@@ -57,33 +57,52 @@ export function DashboardSidebar() {
 
   return (
     <>
-      {/* Mobile Menu Toggle */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="fixed top-4 left-4 z-50 md:hidden"
-        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-      >
-        <Menu className="h-6 w-6" />
-      </Button>
+      {/* Mobile Header */}
+      <div className="fixed top-0 left-0 right-0 z-[60] flex h-16 items-center justify-between border-b bg-background/95 backdrop-blur px-4 md:hidden">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          <Menu className="h-6 w-6" />
+        </Button>
+        <Link href="/dashboard/overview" className="flex items-center gap-2">
+          <img
+            src="/logo.png"
+            alt="AppEffideli Logo"
+            width={32}
+            height={32}
+            className="h-8 w-auto"
+          />
+        </Link>
+      </div>
 
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed left-0 top-0 z-40 h-screen w-64 border-r bg-background transition-transform md:translate-x-0",
+          "fixed left-0 top-16 z-[55] h-[calc(100vh-4rem)] w-64 border-r bg-background transition-transform md:top-0 md:h-screen md:translate-x-0",
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         <div className="flex h-full flex-col">
           {/* Logo/Brand */}
           <div className="flex h-16 items-center border-b px-6">
-            <Link href="/dashboard/overview" className="flex items-center gap-2">
-              <span className="text-xl font-bold">AppEffideli</span>
+            <Link
+              href="/dashboard/overview"
+              className="flex items-center gap-2"
+            >
+              <img
+                src="/logo.png"
+                alt="AppEffideli Logo"
+                width={40}
+                height={40}
+                className="h-10 w-auto"
+              />
             </Link>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 space-y-1 p-4">
+          <nav className="flex-1 space-y-8 p-4">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
@@ -124,7 +143,7 @@ export function DashboardSidebar() {
       {/* Mobile Overlay */}
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 z-30 bg-black/50 md:hidden"
+          className="fixed inset-0 z-[50] bg-black/50 md:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}

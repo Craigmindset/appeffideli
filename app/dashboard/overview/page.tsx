@@ -1,6 +1,12 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Download, CreditCard, Calendar, FileText } from "lucide-react";
 
 export default function OverviewPage() {
@@ -11,28 +17,29 @@ export default function OverviewPage() {
       value: "12",
       description: "PDFs downloaded this month",
       icon: Download,
-      trend: "+2 from last month",
+      color: "bg-blue-50 border-blue-200",
     },
     {
       title: "Active Subscription",
       value: "Premium",
       description: "Your current plan",
       icon: CreditCard,
-      trend: "Renews in 15 days",
+      color: "bg-green-50 border-green-200",
     },
     {
       title: "Meal Plans",
       value: "4",
       description: "Active meal schedules",
       icon: Calendar,
-      trend: "Updated weekly",
+      color: "bg-orange-50 border-orange-200",
     },
     {
       title: "Articles Read",
       value: "24",
       description: "Educational content",
       icon: FileText,
-      trend: "+8 this week",
+      color: "bg-purple-50 border-purple-200",
+      trend: "",
     },
   ];
 
@@ -49,7 +56,7 @@ export default function OverviewPage() {
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <Card key={stat.title}>
+            <Card key={stat.title} className={stat.color}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
                   {stat.title}
@@ -69,7 +76,7 @@ export default function OverviewPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <Card>
+        <Card className="bg-slate-50 border-slate-200">
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>
             <CardDescription>Your latest actions and updates</CardDescription>
@@ -110,7 +117,7 @@ export default function OverviewPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gray-50 border-gray-200">
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
             <CardDescription>Common tasks and shortcuts</CardDescription>
@@ -136,7 +143,9 @@ export default function OverviewPage() {
                 className="flex items-center gap-2 rounded-lg border p-3 hover:bg-accent transition-colors"
               >
                 <CreditCard className="h-5 w-5" />
-                <span className="text-sm font-medium">Subscription Details</span>
+                <span className="text-sm font-medium">
+                  Subscription Details
+                </span>
               </a>
             </div>
           </CardContent>

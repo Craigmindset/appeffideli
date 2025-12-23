@@ -1,6 +1,12 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Calendar, CreditCard, AlertCircle } from "lucide-react";
@@ -60,7 +66,9 @@ export default function MySubscriptionPage() {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <AlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No Active Subscription</h3>
+            <h3 className="text-lg font-semibold mb-2">
+              No Active Subscription
+            </h3>
             <p className="text-muted-foreground text-center mb-4">
               Subscribe to access premium features and content
             </p>
@@ -93,7 +101,9 @@ export default function MySubscriptionPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm font-medium">Billing Amount</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Billing Amount
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{subscription.amount}</div>
@@ -110,7 +120,9 @@ export default function MySubscriptionPage() {
               {new Date(subscription.nextBillingDate).toLocaleDateString()}
             </div>
             <p className="text-xs text-muted-foreground mt-2">
-              {subscription.autoRenew ? "Auto-renew enabled" : "Auto-renew disabled"}
+              {subscription.autoRenew
+                ? "Auto-renew enabled"
+                : "Auto-renew disabled"}
             </p>
           </CardContent>
         </Card>
@@ -146,7 +158,9 @@ export default function MySubscriptionPage() {
             </div>
 
             <div>
-              <p className="text-sm text-muted-foreground mb-1">Payment Method</p>
+              <p className="text-sm text-muted-foreground mb-1">
+                Payment Method
+              </p>
               <div className="flex items-center gap-2">
                 <CreditCard className="h-4 w-4" />
                 <p className="font-medium">Card ending in ****1234</p>

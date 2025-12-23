@@ -1,6 +1,12 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Plus, Edit, Trash2, Clock } from "lucide-react";
@@ -226,11 +232,16 @@ export default function MealTimetablePage() {
           <ul className="space-y-2 text-sm">
             <li className="flex items-start gap-2">
               <span className="text-primary mt-0.5">•</span>
-              <span>Ensure each meal includes a balance of proteins, carbohydrates, and healthy fats</span>
+              <span>
+                Ensure each meal includes a balance of proteins, carbohydrates,
+                and healthy fats
+              </span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-primary mt-0.5">•</span>
-              <span>Include at least 5 servings of fruits and vegetables daily</span>
+              <span>
+                Include at least 5 servings of fruits and vegetables daily
+              </span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-primary mt-0.5">•</span>
@@ -238,7 +249,10 @@ export default function MealTimetablePage() {
             </li>
             <li className="flex items-start gap-2">
               <span className="text-primary mt-0.5">•</span>
-              <span>Plan meals ahead to maintain consistency and avoid unhealthy choices</span>
+              <span>
+                Plan meals ahead to maintain consistency and avoid unhealthy
+                choices
+              </span>
             </li>
           </ul>
         </CardContent>

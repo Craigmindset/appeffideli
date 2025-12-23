@@ -1,6 +1,12 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, FileText, Calendar } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -75,7 +81,8 @@ export default function MyDownloadsPage() {
         <CardHeader>
           <CardTitle>Download History</CardTitle>
           <CardDescription>
-            {downloads.length} item{downloads.length !== 1 ? "s" : ""} in your download history
+            {downloads.length} item{downloads.length !== 1 ? "s" : ""} in your
+            download history
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -92,34 +99,39 @@ export default function MyDownloadsPage() {
               {downloads.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between border rounded-lg p-4 hover:bg-accent/50 transition-colors"
+                  className="border rounded-lg p-4 hover:bg-accent/50 transition-colors"
                 >
-                  <div className="flex items-start gap-4">
-                    <div className="rounded-lg bg-primary/10 p-3">
-                      <FileText className="h-6 w-6 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">{item.title}</h3>
-                      <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          {new Date(item.downloadedAt).toLocaleDateString()}
-                        </span>
-                        <span>{item.fileSize}</span>
-                        <span className="uppercase text-xs font-medium">
-                          {item.type}
-                        </span>
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div className="flex items-start gap-4">
+                      <div className="rounded-lg bg-primary/10 p-3">
+                        <FileText className="h-6 w-6 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold">{item.title}</h3>
+                        <div className="flex flex-wrap items-center gap-4 mt-1 text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />
+                            {new Date(item.downloadedAt).toLocaleDateString()}
+                          </span>
+                          <span>{item.fileSize}</span>
+                          <span className="uppercase text-xs font-medium">
+                            {item.type}
+                          </span>
+                        </div>
                       </div>
                     </div>
+                    <div className="md:ml-auto">
+                      <Button
+                        onClick={() => handleDownload(item)}
+                        variant="outline"
+                        size="sm"
+                        className="w-full md:w-auto"
+                      >
+                        <Download className="h-4 w-4 mr-2" />
+                        Download Again
+                      </Button>
+                    </div>
                   </div>
-                  <Button
-                    onClick={() => handleDownload(item)}
-                    variant="outline"
-                    size="sm"
-                  >
-                    <Download className="h-4 w-4 mr-2" />
-                    Download Again
-                  </Button>
                 </div>
               ))}
             </div>
