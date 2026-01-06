@@ -74,6 +74,9 @@ export function DashboardSidebar() {
             height={32}
             className="h-8 w-auto"
           />
+          <span className="text-xl font-bold" style={{ color: "#174969" }}>
+            Effideli
+          </span>
         </Link>
       </div>
 
