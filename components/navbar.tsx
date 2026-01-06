@@ -185,29 +185,28 @@ export default function Navbar() {
       {/* Mobile menu */}
       <div
         className={`
-          fixed top-0 right-0 bottom-0 w-[280px] bg-[#174969] border-l z-50
-          transform transition-transform duration-300 ease-in-out md:hidden
-          ${isMenuOpen ? "translate-x-0" : "translate-x-full"}
-          before:content-[''] before:absolute before:inset-0 before:bg-[url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/2148484647.jpg-8L5af8IjroIBCHcT9BagVct7EhcqNu.jpeg')] before:bg-cover before:bg-center before:opacity-10 before:z-[-1]
+          fixed top-0 left-0 bottom-0 w-[280px] bg-[#FFFBF7] border-r border-gray-200 z-50
+          transform transition-transform duration-300 ease-in-out md:hidden shadow-lg
+          ${isMenuOpen ? "translate-x-0" : "-translate-x-full"}
         `}
       >
-        <div className="flex items-center justify-between h-16 px-4 border-b">
-          <span className="text-lg font-semibold text-white">Menu</span>
+        <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
+          <span className="text-lg font-semibold text-gray-900">Menu</span>
           <button
             onClick={toggleMenu}
-            className="inline-flex items-center justify-center p-2 rounded-md text-white hover:text-white/80 hover:bg-white/10 focus:outline-none"
+            className="inline-flex items-center justify-center p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none transition-colors"
           >
             <X className="block h-5 w-5" aria-hidden="true" />
           </button>
         </div>
-        <div className="px-2 py-3 divide-y divide-white/10">
-          <div className="space-y-1 pb-3">
+        <div className="px-2 py-4 space-y-1">
+          <div>
             <Link
               href="/"
-              className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
+              className={`block px-4 py-3 rounded-lg text-base font-medium transition-all ${
                 pathname === "/"
-                  ? "text-red-600"
-                  : "text-white hover:text-white/80 hover:bg-white/10"
+                  ? "bg-amber-100 text-amber-900"
+                  : "text-gray-700 hover:bg-gray-100"
               }`}
               onClick={() => setIsMenuOpen(false)}
             >
@@ -216,10 +215,10 @@ export default function Navbar() {
           </div>
 
           {/* Services section in mobile menu */}
-          <div className="py-3">
+          <div>
             <button
               onClick={() => setIsMobileServicesOpen(!isMobileServicesOpen)}
-              className="flex items-center justify-between w-full px-3 py-2 text-base font-medium text-white hover:text-white/80 hover:bg-white/10 rounded-md"
+              className="flex items-center justify-between w-full px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <span>Services</span>
               <ChevronDown
@@ -230,7 +229,7 @@ export default function Navbar() {
             </button>
             <div
               className={`
-                mt-1 pl-4 space-y-1 overflow-hidden transition-all duration-200 ease-in-out
+                mt-1 space-y-1 overflow-hidden transition-all duration-200 ease-in-out
                 ${
                   isMobileServicesOpen
                     ? "max-h-[500px] opacity-100"
@@ -242,10 +241,10 @@ export default function Navbar() {
                 <Link
                   key={link.name}
                   href={link.href}
-                  className={`flex items-center px-3 py-2 text-sm transition-colors rounded-md ${
+                  className={`flex items-center px-4 py-2 text-sm transition-colors rounded-lg ${
                     pathname === link.href
-                      ? "bg-white/20 text-white"
-                      : "text-white/80 hover:text-white hover:bg-white/10"
+                      ? "bg-amber-100 text-amber-900"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                   }`}
                   onClick={() => {
                     setIsMenuOpen(false);
@@ -259,15 +258,15 @@ export default function Navbar() {
             </div>
           </div>
 
-          <div className="space-y-1 pt-3">
+          <div className="space-y-1 pt-2">
             {navLinks.slice(1).map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
-                className={`flex w-full px-3 py-2 rounded-md text-base font-medium transition-colors items-center justify-between ${
+                className={`flex w-full px-4 py-3 rounded-lg text-base font-medium transition-all items-center justify-between ${
                   pathname === link.href
-                    ? "text-red-600"
-                    : "text-white hover:text-white/80 hover:bg-white/10"
+                    ? "bg-amber-100 text-amber-900"
+                    : "text-gray-700 hover:bg-gray-100"
                 }`}
                 onClick={() => setIsMenuOpen(false)}
               >
@@ -276,9 +275,10 @@ export default function Navbar() {
             ))}
             <Link
               href="/login"
-              className="flex w-full mt-2 px-3 py-2 rounded-md text-base font-semibold text-white bg-primary hover:bg-primary/90 transition-colors items-center justify-center"
+              className="flex w-full mt-4 px-4 py-3 rounded-lg text-base font-semibold text-white bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 transition-all items-center justify-center gap-2 shadow-sm"
               onClick={() => setIsMenuOpen(false)}
             >
+              <UserRound className="h-5 w-5" />
               Login
             </Link>
           </div>
