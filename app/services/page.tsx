@@ -21,7 +21,7 @@ const slides = [
       "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/2148484647.jpg-4Uuop9peBb5eAKu5kP1cE9gDcu6XAF.jpeg",
     title: "Customized Meal Planning",
     description:
-      "Enjoy personalized weekly meal plans tailored to your family's preferences and dietary needs",
+      "Effideli’s Monthly Meal Plan Subscription provides a complete family-friendly menu of intercontinental, African-infused recipes—covering breakfast, snacks, lunch, and dinner—perfect for healthy families, working mums, private chefs, and anyone looking to spice up their home meals",
   },
   {
     image:
@@ -52,7 +52,7 @@ const services = [
       "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/2151156154.jpg-dsEfo1hVCLbi8sDEGYFAgLppUzMKsh.jpeg",
     title: "Monthly Home Meal Subscription ",
     description:
-      "Effideli offers a comprehensive monthly family meal plan featuring intercontinental dishes with African-infused recipes. It includes breakfast, snacks, lunch, dinner, and evening bites perfect for school meal prep and everyday home cooking",
+      "This plan is perfect for families committed to healthy living, busy working mums, parents who feel unsure about what meals to prepare for school or home, private chefs, and mothers looking to bring more variety and balanced nutrition into their kitchens",
     howItWorks: [
       "Subscribe and receive a new meal plan every Friday at 9 PM",
       "Enjoy weekly or monthly curated meals tailored to your dietary needs",

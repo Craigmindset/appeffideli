@@ -5,6 +5,14 @@ import { Button } from "@/components/ui/button";
 export default function Services() {
   const services = [
     {
+      title: "Monthly Home Meal Subscription / Weekly Home Meal Plan",
+      description:
+        "Effideli offers a comprehensive monthly family meal plan featuring intercontinental dishes with African-infused recipes. It includes breakfast, snacks, lunch,  dinner, and evening bites—perfect for school meal prep and everyday home cooking.",
+      image:
+        "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/63326.jpg-NLSFxg9gkYBCAtPn6A80KDasclzgTs.jpeg",
+      href: "/services#meal-planning",
+    },
+    {
       title: "Household Chores Routine Management",
       description:
         "Are you struggling to keep up with house chores? Our structured Household Chores Routine Management plan provides customized cleaning schedules based on your home type, ensuring efficiency and consistency.",
@@ -12,14 +20,7 @@ export default function Services() {
         "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/30286.jpg-vhmf07MH4i4JgOFTn71c3MUUWSC2UJ.jpeg",
       href: "/services#household-chores",
     },
-    {
-      title: "Monthly Home Meal Subscription / Weekly Home Meal Plan",
-      description:
-        "Simplify your cooking routine with our pre-planned, easy-to-follow meal subscription service..",
-      image:
-        "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/63326.jpg-NLSFxg9gkYBCAtPn6A80KDasclzgTs.jpeg",
-      href: "/services#meal-planning",
-    },
+
     {
       title: "6-Month to 1-Year Infant Recipe Plan",
       description:

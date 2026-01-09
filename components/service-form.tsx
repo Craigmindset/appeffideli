@@ -1,29 +1,48 @@
-"use client"
-import { useState, useEffect } from "react"
-import { AlertCircle } from "lucide-react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-import { Button } from "@/components/ui/button"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import { Card, CardContent } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { usePaystack } from "@/hooks/use-paystack"
-import { useRouter } from "next/navigation"
-import { createOrder, verifyPayment } from "@/app/actions/payment"
+"use client";
+import { useState, useEffect } from "react";
+import { AlertCircle } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Card, CardContent } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { usePaystack } from "@/hooks/use-paystack";
+import { useRouter } from "next/navigation";
+import { createOrder, verifyPayment } from "@/app/actions/payment";
 
 // Add Paystack types
 declare global {
   interface Window {
     PaystackPop: {
       setup: (options: PaystackProps) => {
-        openIframe: () => void
-      }
-    }
+        openIframe: () => void;
+      };
+    };
   }
 }
 
@@ -65,7 +84,7 @@ const nigerianStates = [
   "Taraba",
   "Yobe",
   "Zamfara",
-]
+];
 
 const serviceCharges = {
   studio: 15000,
@@ -73,7 +92,7 @@ const serviceCharges = {
   bungalow: 25000,
   "duplex-terrace": 35000,
   "duplex-balcony": 30000,
-} as const
+} as const;
 
 // Format number to Nigerian Naira
 const formatCurrency = (amount: number) => {
@@ -82,8 +101,8 @@ const formatCurrency = (amount: number) => {
     currency: "NGN",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(amount)
-}
+  }).format(amount);
+};
 
 const formSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
@@ -91,46 +110,43 @@ const formSchema = z.object({
   email: z.string().email("Invalid email address"),
   phone: z.string().min(10, "Phone number must be at least 10 digits"),
   state: z.string().min(1, "Please select a state"),
-  apartmentType: z.enum(["studio", "apartment", "bungalow", "duplex-terrace", "duplex-balcony"], {
-    required_error: "Please select an apartment type",
-  }),
+  apartmentType: z.enum(
+    ["studio", "apartment", "bungalow", "duplex-terrace", "duplex-balcony"],
+    {
+      required_error: "Please select an apartment type",
+    }
+  ),
   orderType: z.enum(["download", "print-deliver"], {
     required_error: "Please select an order type",
   }),
-  deliveryAddress: z
-    .string()
-    .optional()
-    .transform((val) => (val === "" ? null : val)),
-  landmark: z
-    .string()
-    .optional()
-    .transform((val) => (val === "" ? null : val)),
-})
+  deliveryAddress: z.string().optional(),
+  landmark: z.string().optional(),
+});
 
 interface PaystackProps {
-  key: string
-  email: string
-  amount: number
-  ref: string
-  currency: string
-  firstname: string
-  lastname: string
-  phone: string
-  metadata: any
-  callback: (response: any) => void
-  onClose: () => void
+  key: string;
+  email: string;
+  amount: number;
+  ref: string;
+  currency: string;
+  firstname: string;
+  lastname: string;
+  phone: string;
+  metadata: any;
+  callback: (response: any) => void;
+  onClose: () => void;
 }
 
 type ServiceFormProps = {
-  onBack: () => void
-}
+  onBack: () => void;
+};
 
 export default function ServiceForm({ onBack }: ServiceFormProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [showDownloadModal, setShowDownloadModal] = useState(false)
-  const [showDeliveryModal, setShowDeliveryModal] = useState(false)
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const router = useRouter()
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [showDeliveryModal, setShowDeliveryModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -145,80 +161,88 @@ export default function ServiceForm({ onBack }: ServiceFormProps) {
       deliveryAddress: "",
       landmark: "",
     },
-  })
+  });
 
-  const watchOrderType = form.watch("orderType")
-  const watchApartmentType = form.watch("apartmentType")
+  const watchOrderType = form.watch("orderType");
+  const watchApartmentType = form.watch("apartmentType");
 
   // Reset delivery address when "download" is selected
   useEffect(() => {
     if (watchOrderType === "download") {
-      form.setValue("deliveryAddress", "")
-      form.setValue("landmark", "")
+      form.setValue("deliveryAddress", "");
+      form.setValue("landmark", "");
     }
-  }, [watchOrderType, form])
+  }, [watchOrderType, form]);
 
   // Show appropriate modal when order type changes
   useEffect(() => {
     if (watchOrderType === "download") {
-      setShowDownloadModal(true)
+      setShowDownloadModal(true);
     } else if (watchOrderType === "print-deliver") {
-      setShowDeliveryModal(true)
+      setShowDeliveryModal(true);
     }
-  }, [watchOrderType])
+  }, [watchOrderType]);
 
   // Add Paystack script
   useEffect(() => {
     // Add Paystack script only on client side
     if (typeof window !== "undefined") {
-      const script = document.createElement("script")
-      script.src = "https://js.paystack.co/v1/inline.js"
-      script.async = true
+      const script = document.createElement("script");
+      script.src = "https://js.paystack.co/v1/inline.js";
+      script.async = true;
 
       // Add an onload handler to ensure the script is fully loaded
       script.onload = () => {
-        console.log("Paystack script loaded successfully")
-      }
+        console.log("Paystack script loaded successfully");
+      };
 
       // Add an error handler
       script.onerror = () => {
-        console.error("Failed to load Paystack script")
-        setErrorMessage("Payment service failed to load. Please refresh the page and try again.")
-      }
+        console.error("Failed to load Paystack script");
+        setErrorMessage(
+          "Payment service failed to load. Please refresh the page and try again."
+        );
+      };
 
-      document.body.appendChild(script)
+      document.body.appendChild(script);
 
       return () => {
         if (document.body.contains(script)) {
-          document.body.removeChild(script)
+          document.body.removeChild(script);
         }
-      }
+      };
     }
-  }, [])
+  }, []);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsSubmitting(true)
-    setErrorMessage(null)
+    setIsSubmitting(true);
+    setErrorMessage(null);
 
     try {
       // Validate required fields
       if (!values.apartmentType) {
-        throw new Error("Please select an apartment type")
+        throw new Error("Please select an apartment type");
       }
 
       if (!values.orderType) {
-        throw new Error("Please select an order type")
+        throw new Error("Please select an order type");
       }
 
       if (values.orderType === "print-deliver" && !values.deliveryAddress) {
-        throw new Error("Delivery address is required for Print & Deliver option")
+        throw new Error(
+          "Delivery address is required for Print & Deliver option"
+        );
       }
 
       // Calculate amount
-      const amount = serviceCharges[values.apartmentType] + (values.orderType === "print-deliver" ? 9000 : 0)
+      const amount =
+        serviceCharges[values.apartmentType] +
+        (values.orderType === "print-deliver" ? 9000 : 0);
 
       // Generate a unique reference
-      const reference = `EFFIDELI_${Math.floor(Math.random() * 1000000000)}_${Date.now()}`
+      const reference = `EFFIDELI_${Math.floor(
+        Math.random() * 1000000000
+      )}_${Date.now()}`;
 
       console.log("Creating order with data:", {
         reference,
@@ -232,7 +256,7 @@ export default function ServiceForm({ onBack }: ServiceFormProps) {
         deliveryAddress: values.deliveryAddress || "",
         landmark: values.landmark || "",
         amount,
-      })
+      });
 
       // First, create the order in the database
       const orderResult = await createOrder({
@@ -247,14 +271,17 @@ export default function ServiceForm({ onBack }: ServiceFormProps) {
         deliveryAddress: values.deliveryAddress || "",
         landmark: values.landmark || "",
         amount,
-      })
+      });
 
       if (!orderResult.success) {
-        console.error("Order creation failed:", orderResult)
-        throw new Error(orderResult.error || "Failed to create order. Please check your database connection.")
+        console.error("Order creation failed:", orderResult);
+        throw new Error(
+          orderResult.error ||
+            "Failed to create order. Please check your database connection."
+        );
       }
 
-      console.log("Order created successfully, initializing payment")
+      console.log("Order created successfully, initializing payment");
 
       // Initialize Paystack payment
       if (typeof window !== "undefined" && window.PaystackPop) {
@@ -283,47 +310,57 @@ export default function ServiceForm({ onBack }: ServiceFormProps) {
               ],
             },
             callback: (response) => {
-              console.log("Payment callback received:", response)
+              console.log("Payment callback received:", response);
               // Use a regular function to avoid 'this' binding issues
               verifyPayment(response.reference)
                 .then((result) => {
-                  console.log("Payment verification result:", result)
+                  console.log("Payment verification result:", result);
                   if (result.success && result.redirectUrl) {
                     // Handle redirect on the client side
-                    window.location.href = result.redirectUrl
+                    window.location.href = result.redirectUrl;
                   } else {
-                    setIsSubmitting(false)
+                    setIsSubmitting(false);
                   }
                 })
                 .catch((verifyError) => {
-                  console.error("Payment verification error:", verifyError)
-                  setErrorMessage("Payment verification failed. Please contact support.")
-                  setIsSubmitting(false)
-                })
+                  console.error("Payment verification error:", verifyError);
+                  setErrorMessage(
+                    "Payment verification failed. Please contact support."
+                  );
+                  setIsSubmitting(false);
+                });
             },
             onClose: () => {
-              console.log("Payment modal closed")
-              setIsSubmitting(false)
+              console.log("Payment modal closed");
+              setIsSubmitting(false);
             },
-          })
+          });
 
-          handler.openIframe()
+          handler.openIframe();
         } catch (paystackError) {
-          console.error("Paystack setup error:", paystackError)
+          console.error("Paystack setup error:", paystackError);
           throw new Error(
             "Failed to initialize payment: " +
-              (paystackError instanceof Error ? paystackError.message : "Unknown error"),
-          )
+              (paystackError instanceof Error
+                ? paystackError.message
+                : "Unknown error")
+          );
         }
       } else {
         // Fallback if Paystack is not available
-        console.error("Paystack not available")
-        throw new Error("Payment service is currently unavailable. Please try again later.")
+        console.error("Paystack not available");
+        throw new Error(
+          "Payment service is currently unavailable. Please try again later."
+        );
       }
     } catch (error) {
-      console.error("Payment error:", error)
-      setErrorMessage(error instanceof Error ? error.message : "Something went wrong. Please try again.")
-      setIsSubmitting(false)
+      console.error("Payment error:", error);
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again."
+      );
+      setIsSubmitting(false);
     }
   }
 
@@ -336,15 +373,15 @@ export default function ServiceForm({ onBack }: ServiceFormProps) {
     orderType: form.watch("orderType") as any,
     onSuccess: async (response) => {
       // Verify the payment on the server
-      await verifyPayment(response.reference)
+      await verifyPayment(response.reference);
 
       // Redirect to success page
-      router.push(`/payment/success?reference=${response.reference}`)
+      router.push(`/payment/success?reference=${response.reference}`);
     },
     onClose: () => {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     },
-  })
+  });
 
   return (
     <div className="space-y-6">
@@ -352,7 +389,9 @@ export default function ServiceForm({ onBack }: ServiceFormProps) {
         <h2 className="text-2xl font-semibold mb-6 text-center">
           Household Chore Routine Management
           <br />
-          <span className="underline text-red-900 dark:text-red-700">Purchased Plan</span>
+          <span className="underline text-red-900 dark:text-red-700">
+            Purchased Plan
+          </span>
         </h2>
 
         {errorMessage && (
@@ -407,7 +446,11 @@ export default function ServiceForm({ onBack }: ServiceFormProps) {
                     Email Address <span className="text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="john.doe@example.com" {...field} />
+                    <Input
+                      type="email"
+                      placeholder="john.doe@example.com"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -462,7 +505,10 @@ export default function ServiceForm({ onBack }: ServiceFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Home Type</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select apartment type" />
@@ -472,8 +518,12 @@ export default function ServiceForm({ onBack }: ServiceFormProps) {
                         <SelectItem value="studio">Studio</SelectItem>
                         <SelectItem value="apartment">Apartment</SelectItem>
                         <SelectItem value="bungalow">Bungalow</SelectItem>
-                        <SelectItem value="duplex-terrace">Duplex with Terrace view</SelectItem>
-                        <SelectItem value="duplex-balcony">Duplex with Balcony</SelectItem>
+                        <SelectItem value="duplex-terrace">
+                          Duplex with Terrace view
+                        </SelectItem>
+                        <SelectItem value="duplex-balcony">
+                          Duplex with Balcony
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -486,10 +536,13 @@ export default function ServiceForm({ onBack }: ServiceFormProps) {
                   <CardContent className="pt-6">
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium">Purchase Plan:</span>
+                        <span className="text-sm font-medium">
+                          Purchase Plan:
+                        </span>
                         <span className="text-lg font-semibold text-primary">
                           {formatCurrency(
-                            serviceCharges[watchApartmentType] + (watchOrderType === "print-deliver" ? 9000 : 0),
+                            serviceCharges[watchApartmentType] +
+                              (watchOrderType === "print-deliver" ? 9000 : 0)
                           )}
                         </span>
                       </div>
@@ -527,13 +580,17 @@ export default function ServiceForm({ onBack }: ServiceFormProps) {
                         <FormControl>
                           <RadioGroupItem value="download" />
                         </FormControl>
-                        <FormLabel className="font-normal">Download PDF</FormLabel>
+                        <FormLabel className="font-normal">
+                          Download PDF
+                        </FormLabel>
                       </FormItem>
                       <FormItem className="flex items-center space-x-3 space-y-0">
                         <FormControl>
                           <RadioGroupItem value="print-deliver" />
                         </FormControl>
-                        <FormLabel className="font-normal">Print & Deliver</FormLabel>
+                        <FormLabel className="font-normal">
+                          Print & Deliver
+                        </FormLabel>
                       </FormItem>
                     </RadioGroup>
                   </FormControl>
@@ -550,10 +607,15 @@ export default function ServiceForm({ onBack }: ServiceFormProps) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>
-                        Delivery Address <span className="text-destructive">*</span>
+                        Delivery Address{" "}
+                        <span className="text-destructive">*</span>
                       </FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter your complete delivery address" {...field} required />
+                        <Input
+                          placeholder="Enter your complete delivery address"
+                          {...field}
+                          required
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -566,7 +628,10 @@ export default function ServiceForm({ onBack }: ServiceFormProps) {
                     <FormItem>
                       <FormLabel>Landmark</FormLabel>
                       <FormControl>
-                        <Input placeholder="Make delivery easy, identify any landmark here" {...field} />
+                        <Input
+                          placeholder="Make delivery easy, identify any landmark here"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -578,7 +643,14 @@ export default function ServiceForm({ onBack }: ServiceFormProps) {
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting
                 ? "Processing Payment..."
-                : `Pay Now ${watchApartmentType ? formatCurrency(serviceCharges[watchApartmentType] + (watchOrderType === "print-deliver" ? 9000 : 0)) : ""}`}
+                : `Pay Now ${
+                    watchApartmentType
+                      ? formatCurrency(
+                          serviceCharges[watchApartmentType] +
+                            (watchOrderType === "print-deliver" ? 9000 : 0)
+                        )
+                      : ""
+                  }`}
             </Button>
           </form>
         </Form>
@@ -588,12 +660,15 @@ export default function ServiceForm({ onBack }: ServiceFormProps) {
           <DialogHeader>
             <DialogTitle>Download Information</DialogTitle>
             <DialogDescription>
-              Thank you for choosing Effideli, your Household Chore Routine Management will be sent to your email upon
-              payment.
+              Thank you for choosing Effideli, your Household Chore Routine
+              Management will be sent to your email upon payment.
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end">
-            <Button variant="secondary" onClick={() => setShowDownloadModal(false)}>
+            <Button
+              variant="secondary"
+              onClick={() => setShowDownloadModal(false)}
+            >
               Close
             </Button>
           </div>
@@ -605,21 +680,25 @@ export default function ServiceForm({ onBack }: ServiceFormProps) {
           <DialogHeader>
             <DialogTitle>Delivery Information</DialogTitle>
             <DialogDescription>
-              Thank you for choosing Effideli. Please note an additional cost for the Printing and the delivery cost
-              will be added to the request.
+              Thank you for choosing Effideli. Please note an additional cost
+              for the Printing and the delivery cost will be added to the
+              request.
             </DialogDescription>
             <div className="font-semibold text-destructive mt-2">
-              Important: Our delivery services are currently only available within Lagos State.
+              Important: Our delivery services are currently only available
+              within Lagos State.
             </div>
           </DialogHeader>
           <div className="flex justify-end">
-            <Button variant="secondary" onClick={() => setShowDeliveryModal(false)}>
+            <Button
+              variant="secondary"
+              onClick={() => setShowDeliveryModal(false)}
+            >
               Close
             </Button>
           </div>
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }
-

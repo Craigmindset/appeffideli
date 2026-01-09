@@ -1,5 +1,13 @@
-import Link from "next/link"
-import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin } from "lucide-react"
+import Link from "next/link";
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+} from "lucide-react";
 
 export default function Footer() {
   return (
@@ -9,23 +17,35 @@ export default function Footer() {
           <div>
             <h3 className="text-xl font-bold text-white mb-4">Effideli</h3>
             <p className="mb-4">
-              Your perfect home management solution, providing comprehensive services to keep your home in perfect
-              condition.
+              Your perfect home management solution, providing comprehensive
+              services to keep your home in perfect condition.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a
+                href="#"
+                className="text-gray-400 hover:text-white transition-colors"
+              >
                 <Facebook className="h-5 w-5" />
                 <span className="sr-only">Facebook</span>
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a
+                href="#"
+                className="text-gray-400 hover:text-white transition-colors"
+              >
                 <Twitter className="h-5 w-5" />
                 <span className="sr-only">Twitter</span>
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a
+                href="#"
+                className="text-gray-400 hover:text-white transition-colors"
+              >
                 <Instagram className="h-5 w-5" />
                 <span className="sr-only">Instagram</span>
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a
+                href="#"
+                className="text-gray-400 hover:text-white transition-colors"
+              >
                 <Linkedin className="h-5 w-5" />
                 <span className="sr-only">LinkedIn</span>
               </a>
@@ -41,27 +61,35 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/services" className="hover:text-white transition-colors">
+                <Link
+                  href="/services"
+                  className="hover:text-white transition-colors"
+                >
                   Services
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="hover:text-white transition-colors">
+                <Link
+                  href="/about"
+                  className="hover:text-white transition-colors"
+                >
                   About Us
                 </Link>
               </li>
+
               <li>
-                <Link href="/hire-maid" className="hover:text-white transition-colors">
-                  Hire a Maid
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="hover:text-white transition-colors">
+                <Link
+                  href="/contact"
+                  className="hover:text-white transition-colors"
+                >
                   Contact Us
                 </Link>
               </li>
               <li>
-                <Link href="/subscription/login" className="hover:text-white transition-colors">
+                <Link
+                  href="/subscription/login"
+                  className="hover:text-white transition-colors"
+                >
                   Subscription Access
                 </Link>
               </li>
@@ -72,22 +100,34 @@ export default function Footer() {
             <h3 className="text-xl font-bold text-white mb-4">Services</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/services#household-chores" className="hover:text-white transition-colors">
+                <Link
+                  href="/services#household-chores"
+                  className="hover:text-white transition-colors"
+                >
                   Household Chores Routine Management
                 </Link>
               </li>
               <li>
-                <Link href="/services#meal-planning" className="hover:text-white transition-colors">
+                <Link
+                  href="/services#meal-planning"
+                  className="hover:text-white transition-colors"
+                >
                   Monthly Home Meal Subscription
                 </Link>
               </li>
               <li>
-                <Link href="/services#infant-recipe" className="hover:text-white transition-colors">
+                <Link
+                  href="/services#infant-recipe"
+                  className="hover:text-white transition-colors"
+                >
                   Infant Recipe Plan
                 </Link>
               </li>
               <li>
-                <Link href="/services#tiger-nuts" className="hover:text-white transition-colors">
+                <Link
+                  href="/services#tiger-nuts"
+                  className="hover:text-white transition-colors"
+                >
                   Tiger Nuts Recipe Packs (Coming Soon)
                 </Link>
               </li>
@@ -115,14 +155,18 @@ export default function Footer() {
 
         <div className="border-t border-gray-800 mt-12 pt-8">
           <div className="flex justify-between items-center">
-            <p>&copy; {new Date().getFullYear()} Effideli. All rights reserved.</p>
-            <Link href="/admin" className="text-sm text-gray-400 hover:text-white transition-colors">
+            <p>
+              &copy; {new Date().getFullYear()} Effideli. All rights reserved.
+            </p>
+            <Link
+              href="/admin"
+              className="text-sm text-gray-400 hover:text-white transition-colors"
+            >
               Admin
             </Link>
           </div>
         </div>
       </div>
     </footer>
-  )
+  );
 }
-
