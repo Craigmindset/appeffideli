@@ -64,10 +64,13 @@ export function DashboardHeader() {
 
       // Clear server-side session and sign out from Supabase
       await signOut();
+
+      // Redirect to home page
+      router.push("/");
     } catch (error) {
       console.error("Logout error:", error);
-      // Even if server signout fails, redirect to login
-      router.push("/login");
+      // Even if server signout fails, redirect to home page
+      router.push("/");
     }
   };
 
@@ -81,7 +84,7 @@ export function DashboardHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:border-gray-700 hidden md:block">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:border-gray-700">
       <div className="container flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-2">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">

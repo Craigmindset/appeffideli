@@ -13,9 +13,10 @@ import {
   Menu,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signOut } from "@/app/actions/auth";
+import { createBrowserSupabaseClient } from "@/lib/supabase";
 
 const navItems = [
   {
@@ -49,6 +50,39 @@ export function DashboardSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [firstName, setFirstName] = useState("User");
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const supabase = createBrowserSupabaseClient();
+
+        // Get current user
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (user) {
+          // Fetch user profile from database
+          const { data: profile, error } = await supabase
+            .from("users_profile")
+            .select("full_name")
+            .eq("id", user.id)
+            .single();
+
+          if (!error && profile && profile.full_name) {
+            // Extract first name from full name
+            const firstName = profile.full_name.split(" ")[0];
+            setFirstName(firstName || "User");
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -58,10 +92,13 @@ export function DashboardSidebar() {
 
       // Clear server-side session and sign out from Supabase
       await signOut();
+
+      // Redirect to home page
+      router.push("/");
     } catch (error) {
       console.error("Logout error:", error);
-      // Even if server signout fails, redirect to login
-      router.push("/login");
+      // Even if server signout fails, redirect to home page
+      router.push("/");
     }
   };
 
@@ -77,21 +114,11 @@ export function DashboardSidebar() {
         >
           <Menu className="h-6 w-6" />
         </Button>
-        <Link href="/dashboard/overview" className="flex items-center gap-2">
-          <img
-            src="/logo.png"
-            alt="AppEffideli Logo"
-            width={32}
-            height={32}
-            className="h-8 w-auto"
-          />
-          <span
-            className="text-xl font-bold dark:text-white"
-            style={{ color: "#174969" }}
-          >
-            Effideli
-          </span>
-        </Link>
+        <div className="flex items-center gap-2">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            Hi {firstName}! 👋
+          </h2>
+        </div>
       </div>
 
       {/* Sidebar */}
