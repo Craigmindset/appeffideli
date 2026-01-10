@@ -1,7 +1,8 @@
 {
-  "/page": "app/page.js",
-  "/login/page": "app/login/page.js",
-  "/services/page": "app/services/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
   "/dashboard/overview/page": "app/dashboard/overview/page.js",
-  "/dashboard/meal-timetable/page": "app/dashboard/meal-timetable/page.js"
+  "/dashboard/my-downloads/page": "app/dashboard/my-downloads/page.js",
+  "/dashboard/my-subscription/page": "app/dashboard/my-subscription/page.js",
+  "/dashboard/meal-timetable/page": "app/dashboard/meal-timetable/page.js",
+  "/dashboard/settings/page": "app/dashboard/settings/page.js"
 }

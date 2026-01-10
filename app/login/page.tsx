@@ -2,41 +2,77 @@
 import Link from "next/link";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { createBrowserSupabaseClient as createClient } from "@/lib/supabase";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const router = useRouter();
   const togglePassword = () => setShowPassword((v) => !v);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
 
     const formData = new FormData(e.currentTarget);
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
-    // TODO: Replace with actual authentication logic
-    // For now, simulate login and store user data
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const supabase = createClient();
 
-      // Store user data in localStorage
-      localStorage.setItem("user", JSON.stringify({ email }));
-      localStorage.setItem("userEmail", email);
-      localStorage.setItem("userName", email.split("@")[0]);
+      // Sign in with Supabase
+      const { data, error: signInError } =
+        await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+      if (signInError) {
+        setError(signInError.message);
+        setIsLoading(false);
+        return;
+      }
+
+      if (!data.user) {
+        setError("Failed to sign in");
+        setIsLoading(false);
+        return;
+      }
+
+      // Fetch user profile to get first name
+      const { data: profileData, error: profileError } = await supabase
+        .from("users_profile")
+        .select("first_name, last_name, full_name")
+        .eq("user_id", data.user.id)
+        .single();
+
+      // Store user data in localStorage for compatibility with existing code
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ email: data.user.email, id: data.user.id })
+      );
+      localStorage.setItem("userEmail", data.user.email || "");
+      localStorage.setItem("userId", data.user.id);
+
+      // Store user's name for welcome modal and personalization
+      if (profileData) {
+        localStorage.setItem("userName", profileData.full_name || "");
+        localStorage.setItem("userFirstName", profileData.first_name || "");
+        localStorage.setItem("userLastName", profileData.last_name || "");
+      }
 
       // Redirect to dashboard
       router.push("/dashboard/overview");
-    } catch (error) {
-      console.error("Login failed:", error);
-      alert("Login failed. Please try again.");
-    } finally {
+    } catch (err) {
+      console.error("Login error:", err);
+      setError("An unexpected error occurred. Please try again.");
       setIsLoading(false);
     }
   };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8 p-8 bg-white rounded shadow">
@@ -54,6 +90,11 @@ export default function LoginPage() {
             Sign in to your account
           </h2>
         </div>
+        {error && (
+          <div className="rounded-md bg-red-50 p-4">
+            <p className="text-sm text-red-800">{error}</p>
+          </div>
+        )}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm flex flex-col gap-4">
             <div>

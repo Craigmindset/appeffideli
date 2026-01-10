@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signOut } from "@/app/actions/auth";
 
 const navItems = [
   {
@@ -49,20 +50,30 @@ export function DashboardSidebar() {
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    sessionStorage.clear();
-    router.push("/login");
+  const handleLogout = async () => {
+    try {
+      // Clear client-side storage
+      localStorage.clear();
+      sessionStorage.clear();
+
+      // Clear server-side session and sign out from Supabase
+      await signOut();
+    } catch (error) {
+      console.error("Logout error:", error);
+      // Even if server signout fails, redirect to login
+      router.push("/login");
+    }
   };
 
   return (
     <>
       {/* Mobile Header */}
-      <div className="fixed top-0 left-0 right-0 z-[60] flex h-16 items-center justify-between border-b bg-background/95 backdrop-blur px-4 md:hidden">
+      <div className="fixed top-0 left-0 right-0 z-[60] flex h-16 items-center justify-between border-b bg-background/95 backdrop-blur px-4 md:hidden dark:border-gray-700 dark:bg-gray-800/95">
         <Button
           variant="ghost"
           size="icon"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="dark:text-gray-200"
         >
           <Menu className="h-6 w-6" />
         </Button>
@@ -74,7 +85,10 @@ export function DashboardSidebar() {
             height={32}
             className="h-8 w-auto"
           />
-          <span className="text-xl font-bold" style={{ color: "#174969" }}>
+          <span
+            className="text-xl font-bold dark:text-white"
+            style={{ color: "#174969" }}
+          >
             Effideli
           </span>
         </Link>
@@ -83,13 +97,13 @@ export function DashboardSidebar() {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed left-0 top-16 z-[55] h-[calc(100vh-4rem)] w-64 border-r bg-background transition-transform md:top-0 md:h-screen md:translate-x-0",
+          "fixed left-0 top-16 z-[55] h-[calc(100vh-4rem)] w-64 border-r bg-background transition-transform md:top-0 md:h-screen md:translate-x-0 dark:border-gray-700 dark:bg-gray-800",
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         <div className="flex h-full flex-col">
           {/* Logo/Brand */}
-          <div className="flex h-16 items-center border-b px-6">
+          <div className="flex h-16 items-center border-b px-6 dark:border-gray-700">
             <Link
               href="/dashboard/overview"
               className="flex items-center gap-2"
@@ -118,8 +132,8 @@ export function DashboardSidebar() {
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                     isActive
-                      ? "bg-primary text-primary-foreground"
-                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                      ? "bg-primary text-primary-foreground dark:bg-blue-600"
+                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground dark:text-gray-300 dark:hover:bg-gray-700"
                   )}
                 >
                   <Icon className="h-5 w-5" />
@@ -130,10 +144,10 @@ export function DashboardSidebar() {
           </nav>
 
           {/* Logout Button */}
-          <div className="border-t p-4">
+          <div className="border-t p-4 dark:border-gray-700">
             <Button
               variant="ghost"
-              className="w-full justify-start text-red-600 hover:bg-red-50 hover:text-red-700"
+              className="w-full justify-start text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-900/20"
               onClick={handleLogout}
             >
               <LogOut className="mr-3 h-5 w-5" />

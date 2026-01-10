@@ -1,4 +1,10 @@
 import { createClient } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
+
+/**
+ * Server-side Supabase clients
+ * For authenticated server operations, use createServerSupabaseClient from @/lib/auth-server
+ */
 
 // Use environment variables for credentials
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -15,6 +21,7 @@ export const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
 });
 
 // Create a Supabase admin client with the service role key for server-side operations
+// Use this ONLY for admin operations that bypass RLS (Row Level Security)
 export const supabaseAdmin = supabaseServiceKey
   ? createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
@@ -26,6 +33,14 @@ export const supabaseAdmin = supabaseServiceKey
         persistSession: false,
       },
     });
+
+// Create a browser client for client-side operations (components, client pages)
+export function createBrowserSupabaseClient() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
 
 // Database types
 export type Order = {

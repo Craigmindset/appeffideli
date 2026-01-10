@@ -1,7 +1,8 @@
-import type React from "react"
-import "./globals.css"
-import type { Metadata } from "next"
-import { ThemeProvider } from "@/components/theme-provider"
+import type React from "react";
+import "./globals.css";
+import type { Metadata } from "next";
+import { ThemeProvider } from "@/components/theme-provider";
+import { AuthProvider } from "@/components/auth-provider";
 
 export const metadata: Metadata = {
   title: "Effideli - Home Management & Services",
@@ -14,13 +15,13 @@ export const metadata: Metadata = {
       },
     ],
   },
-    generator: 'v0.app'
-}
+  generator: "v0.app",
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -32,10 +33,9 @@ export default function RootLayout({
       </head>
       <body>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-          {children}
+          <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>
       </body>
     </html>
-  )
+  );
 }
-

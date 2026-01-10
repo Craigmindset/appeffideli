@@ -14,7 +14,8 @@ import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, Mail, Phone, MapPin, Bell, Shield, Palette } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createBrowserSupabaseClient } from "@/lib/supabase";
 
 export default function SettingsPage() {
   const [settings, setSettings] = useState({
@@ -23,6 +24,56 @@ export default function SettingsPage() {
     marketingEmails: true,
     weeklyDigest: true,
   });
+
+  const [userData, setUserData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+  });
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const supabase = createBrowserSupabaseClient();
+
+        // Get current user
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (user) {
+          // Fetch user profile from database
+          const { data: profile, error } = await supabase
+            .from("users_profile")
+            .select("full_name, email, phone")
+            .eq("id", user.id)
+            .single();
+
+          if (!error && profile) {
+            const names = profile.full_name?.split(" ") || ["", ""];
+            setUserData({
+              firstName: names[0] || "",
+              lastName: names.slice(1).join(" ") || "",
+              email: profile.email || user.email || "",
+              phone: profile.phone || "",
+            });
+          } else {
+            setUserData({
+              firstName: "",
+              lastName: "",
+              email: user.email || "",
+              phone: "",
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const handleToggle = (key: string) => {
     setSettings((prev) => ({
@@ -72,7 +123,14 @@ export default function SettingsPage() {
                 <User className="h-4 w-4 inline mr-2" />
                 First Name
               </Label>
-              <Input id="firstName" placeholder="John" defaultValue="John" />
+              <Input
+                id="firstName"
+                placeholder="First Name"
+                value={userData.firstName}
+                onChange={(e) =>
+                  setUserData({ ...userData, firstName: e.target.value })
+                }
+              />
             </div>
 
             <div className="space-y-2">
@@ -80,7 +138,14 @@ export default function SettingsPage() {
                 <User className="h-4 w-4 inline mr-2" />
                 Last Name
               </Label>
-              <Input id="lastName" placeholder="Doe" defaultValue="Doe" />
+              <Input
+                id="lastName"
+                placeholder="Last Name"
+                value={userData.lastName}
+                onChange={(e) =>
+                  setUserData({ ...userData, lastName: e.target.value })
+                }
+              />
             </div>
 
             <div className="space-y-2">
@@ -91,8 +156,10 @@ export default function SettingsPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="john@example.com"
-                defaultValue="john@example.com"
+                placeholder="email@example.com"
+                value={userData.email}
+                readOnly
+                className="bg-gray-100 dark:bg-gray-800 cursor-not-allowed"
               />
             </div>
 
@@ -105,7 +172,10 @@ export default function SettingsPage() {
                 id="phone"
                 type="tel"
                 placeholder="+234 800 000 0000"
-                defaultValue="+234 800 000 0000"
+                value={userData.phone}
+                onChange={(e) =>
+                  setUserData({ ...userData, phone: e.target.value })
+                }
               />
             </div>
 

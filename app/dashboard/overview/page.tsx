@@ -46,8 +46,10 @@ export default function OverviewPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Overview</h1>
-        <p className="text-muted-foreground mt-2">
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
+          Overview
+        </h1>
+        <p className="text-muted-foreground dark:text-gray-400 mt-2">
           Welcome back! Here's a summary of your account activity.
         </p>
       </div>
@@ -56,19 +58,26 @@ export default function OverviewPage() {
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <Card key={stat.title} className={stat.color}>
+            <Card
+              key={stat.title}
+              className={`${stat.color} dark:bg-gray-800 dark:border-gray-700`}
+            >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
+                <CardTitle className="text-sm font-medium text-gray-900 dark:text-white">
                   {stat.title}
                 </CardTitle>
-                <Icon className="h-4 w-4 text-muted-foreground" />
+                <Icon className="h-4 w-4 text-gray-600 dark:text-gray-400" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <p className="text-xs text-muted-foreground mt-1">
+                <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {stat.value}
+                </div>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                   {stat.description}
                 </p>
-                <p className="text-xs text-green-600 mt-2">{stat.trend}</p>
+                <p className="text-xs text-green-600 dark:text-green-400 mt-2">
+                  {stat.trend}
+                </p>
               </CardContent>
             </Card>
           );
@@ -76,10 +85,14 @@ export default function OverviewPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <Card className="bg-slate-50 border-slate-200">
+        <Card className="bg-slate-50 border-slate-200 dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>Your latest actions and updates</CardDescription>
+            <CardTitle className="text-gray-900 dark:text-white">
+              Recent Activity
+            </CardTitle>
+            <CardDescription className="dark:text-gray-400">
+              Your latest actions and updates
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -103,11 +116,13 @@ export default function OverviewPage() {
               ].map((activity, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between border-b pb-3 last:border-0"
+                  className="flex items-center justify-between border-b dark:border-gray-700 pb-3 last:border-0"
                 >
                   <div>
-                    <p className="text-sm font-medium">{activity.action}</p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      {activity.action}
+                    </p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">
                       {activity.time}
                     </p>
                   </div>
@@ -117,33 +132,41 @@ export default function OverviewPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gray-50 border-gray-200">
+        <Card className="bg-gray-50 border-gray-200 dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Common tasks and shortcuts</CardDescription>
+            <CardTitle className="text-gray-900 dark:text-white">
+              Quick Actions
+            </CardTitle>
+            <CardDescription className="dark:text-gray-400">
+              Common tasks and shortcuts
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid gap-2">
               <a
                 href="/dashboard/my-downloads"
-                className="flex items-center gap-2 rounded-lg border p-3 hover:bg-accent transition-colors"
+                className="flex items-center gap-2 rounded-lg border dark:border-gray-700 p-3 hover:bg-accent dark:hover:bg-gray-700 transition-colors"
               >
-                <Download className="h-5 w-5" />
-                <span className="text-sm font-medium">View Downloads</span>
+                <Download className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+                <span className="text-sm font-medium text-gray-900 dark:text-white">
+                  View Downloads
+                </span>
               </a>
               <a
                 href="/dashboard/meal-timetable"
-                className="flex items-center gap-2 rounded-lg border p-3 hover:bg-accent transition-colors"
+                className="flex items-center gap-2 rounded-lg border dark:border-gray-700 p-3 hover:bg-accent dark:hover:bg-gray-700 transition-colors"
               >
-                <Calendar className="h-5 w-5" />
-                <span className="text-sm font-medium">Manage Meal Plans</span>
+                <Calendar className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+                <span className="text-sm font-medium text-gray-900 dark:text-white">
+                  Manage Meal Plans
+                </span>
               </a>
               <a
                 href="/dashboard/my-subscription"
-                className="flex items-center gap-2 rounded-lg border p-3 hover:bg-accent transition-colors"
+                className="flex items-center gap-2 rounded-lg border dark:border-gray-700 p-3 hover:bg-accent dark:hover:bg-gray-700 transition-colors"
               >
-                <CreditCard className="h-5 w-5" />
-                <span className="text-sm font-medium">
+                <CreditCard className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+                <span className="text-sm font-medium text-gray-900 dark:text-white">
                   Subscription Details
                 </span>
               </a>

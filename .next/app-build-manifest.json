@@ -16,6 +16,11 @@
       "static/chunks/main-app.js",
       "static/chunks/app/login/page.js"
     ],
+    "/signup/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/signup/page.js"
+    ],
     "/dashboard/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -26,15 +31,35 @@
       "static/chunks/main-app.js",
       "static/chunks/app/dashboard/overview/page.js"
     ],
+    "/dashboard/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/dashboard/page.js"
+    ],
+    "/success/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/success/page.js"
+    ],
+    "/dashboard/my-downloads/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/dashboard/my-downloads/page.js"
+    ],
+    "/dashboard/my-subscription/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/dashboard/my-subscription/page.js"
+    ],
     "/dashboard/meal-timetable/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/dashboard/meal-timetable/page.js"
     ],
-    "/services/page": [
+    "/dashboard/settings/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/services/page.js"
+      "static/chunks/app/dashboard/settings/page.js"
     ]
   }
 }
