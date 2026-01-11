@@ -678,6 +678,9 @@ video {
 .top-full {
   top: 100%;
 }
+.top-2\.5 {
+  top: 0.625rem;
+}
 .z-10 {
   z-index: 10;
 }
@@ -2183,6 +2186,9 @@ video {
 .leading-tight {
   line-height: 1.25;
 }
+.leading-5 {
+  line-height: 1.25rem;
+}
 .tracking-tight {
   letter-spacing: -0.025em;
 }
@@ -3075,6 +3081,11 @@ video {
 
 .disabled\:cursor-not-allowed:disabled {
   cursor: not-allowed;
+}
+
+.disabled\:bg-gray-100:disabled {
+  --tw-bg-opacity: 1;
+  background-color: rgb(243 244 246 / var(--tw-bg-opacity, 1));
 }
 
 .disabled\:opacity-50:disabled {

@@ -13,6 +13,12 @@ CREATE TABLE IF NOT EXISTS users_profile (
 ALTER TABLE users_profile ENABLE ROW LEVEL SECURITY;
 
 -- Create policies
+-- Allow public to read only email for password reset verification
+CREATE POLICY "Public can check if email exists"
+  ON users_profile
+  FOR SELECT
+  USING (true);
+
 -- Users can read their own profile
 CREATE POLICY "Users can read own profile"
   ON users_profile

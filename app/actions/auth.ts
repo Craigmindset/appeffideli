@@ -271,3 +271,57 @@ export async function signOut(): Promise<{ success: boolean; error?: string }> {
     };
   }
 }
+
+/**
+ * Reset user password (admin function for forgot password flow)
+ */
+export async function resetUserPassword(
+  email: string,
+  newPassword: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    // Get user by email
+    const { data: users, error: getUserError } =
+      await supabaseAdmin.auth.admin.listUsers();
+
+    if (getUserError) {
+      console.error("Error listing users:", getUserError);
+      return {
+        success: false,
+        error: "Failed to reset password. Please try again.",
+      };
+    }
+
+    const user = users.users.find((u) => u.email === email);
+
+    if (!user) {
+      return {
+        success: false,
+        error: "User not found",
+      };
+    }
+
+    // Update user password using admin
+    const { error: updateError } =
+      await supabaseAdmin.auth.admin.updateUserById(user.id, {
+        password: newPassword,
+      });
+
+    if (updateError) {
+      console.error("Password update error:", updateError);
+      return {
+        success: false,
+        error: updateError.message,
+      };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Unexpected password reset error:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "An unexpected error occurred",
+    };
+  }
+}
