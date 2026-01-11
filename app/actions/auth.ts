@@ -92,8 +92,22 @@ export async function signUp(
       };
     }
 
-    // Profile will be created on first login after email confirmation
-    // User metadata is stored in auth.user for now
+    // Create user profile immediately on signup
+    // Metadata is also stored in auth.user for reference
+    const { error: profileError } = await supabaseAdmin
+      .from("users_profile")
+      .insert({
+        id: authData.user.id,
+        email: authData.user.email,
+        full_name: fullName,
+        phone: formattedPhone,
+      });
+
+    if (profileError) {
+      console.error("Profile creation error:", profileError);
+      // Don't fail the signup if profile creation fails
+      // The user account is still created
+    }
 
     return {
       success: true,
@@ -151,25 +165,6 @@ export async function signIn(
         error:
           "Please verify your email address before signing in. Check your inbox for the verification link.",
       };
-    }
-
-    // Create user profile if it doesn't exist (for users who verified email)
-    const { data: existingProfile } = await supabaseAdmin
-      .from("users_profile")
-      .select("id")
-      .eq("id", data.user.id)
-      .single();
-
-    if (!existingProfile) {
-      const fullName = data.user.user_metadata?.full_name;
-      const phone = data.user.user_metadata?.phone;
-
-      await supabaseAdmin.from("users_profile").insert({
-        id: data.user.id,
-        email: data.user.email,
-        full_name: fullName,
-        phone: phone,
-      });
     }
 
     return {
