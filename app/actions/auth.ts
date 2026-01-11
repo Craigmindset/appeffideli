@@ -92,23 +92,8 @@ export async function signUp(
       };
     }
 
-    // Only create profile if email is confirmed
-    // For new signups, profile will be created after email verification
-    if (authData.user.email_confirmed_at) {
-      const { error: profileError } = await supabaseAdmin
-        .from("users_profile")
-        .insert({
-          id: authData.user.id,
-          email: authData.user.email,
-          full_name: fullName,
-          phone: formattedPhone,
-        });
-
-      if (profileError) {
-        console.error("Profile creation error:", profileError);
-        // Don't fail the signup if profile creation fails
-      }
-    }
+    // Profile will be created on first login after email confirmation
+    // User metadata is stored in auth.user for now
 
     return {
       success: true,
