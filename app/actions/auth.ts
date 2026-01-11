@@ -55,12 +55,24 @@ export async function signUp(
     // Format phone number with +234 prefix if provided
     let formattedPhone = phone ? "+234" + phone : undefined;
 
-    // Create auth user using admin client to avoid email confirmation issues
+    // Build full name from first and last name (needed for metadata)
+    const fullName =
+      [firstName, lastName].filter(Boolean).join(" ").trim() || undefined;
+
+    // Create auth user with email verification required
     const { data: authData, error: authError } =
-      await supabaseAdmin.auth.admin.createUser({
+      await supabaseAdmin.auth.signUp({
         email,
         password,
-        email_confirm: true, // Auto-confirm email
+        options: {
+          data: {
+            full_name: fullName,
+            phone: formattedPhone,
+          },
+          emailRedirectTo: `${
+            process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+          }/login?verified=true`,
+        },
       });
 
     if (authError) {
@@ -80,24 +92,22 @@ export async function signUp(
       };
     }
 
-    // Build full name from first and last name
-    const fullName =
-      [firstName, lastName].filter(Boolean).join(" ").trim() || undefined;
+    // Only create profile if email is confirmed
+    // For new signups, profile will be created after email verification
+    if (authData.user.email_confirmed_at) {
+      const { error: profileError } = await supabaseAdmin
+        .from("users_profile")
+        .insert({
+          id: authData.user.id,
+          email: authData.user.email,
+          full_name: fullName,
+          phone: formattedPhone,
+        });
 
-    // Create user profile
-    const { error: profileError } = await supabaseAdmin
-      .from("users_profile")
-      .insert({
-        id: authData.user.id,
-        email: authData.user.email,
-        full_name: fullName,
-        phone: formattedPhone,
-      });
-
-    if (profileError) {
-      console.error("Profile creation error:", profileError);
-      // Don't fail the signup if profile creation fails
-      // The user account is still created
+      if (profileError) {
+        console.error("Profile creation error:", profileError);
+        // Don't fail the signup if profile creation fails
+      }
     }
 
     return {
@@ -147,6 +157,34 @@ export async function signIn(
         success: false,
         error: "Failed to sign in",
       };
+    }
+
+    // Check if email is verified
+    if (!data.user.email_confirmed_at) {
+      return {
+        success: false,
+        error:
+          "Please verify your email address before signing in. Check your inbox for the verification link.",
+      };
+    }
+
+    // Create user profile if it doesn't exist (for users who verified email)
+    const { data: existingProfile } = await supabaseAdmin
+      .from("users_profile")
+      .select("id")
+      .eq("id", data.user.id)
+      .single();
+
+    if (!existingProfile) {
+      const fullName = data.user.user_metadata?.full_name;
+      const phone = data.user.user_metadata?.phone;
+
+      await supabaseAdmin.from("users_profile").insert({
+        id: data.user.id,
+        email: data.user.email,
+        full_name: fullName,
+        phone: phone,
+      });
     }
 
     return {

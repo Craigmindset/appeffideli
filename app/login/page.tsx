@@ -42,6 +42,15 @@ export default function LoginPage() {
         return;
       }
 
+      // Check if email is verified
+      if (!data.user.email_confirmed_at) {
+        setError(
+          "Please verify your email address before signing in. Check your inbox for the verification link."
+        );
+        setIsLoading(false);
+        return;
+      }
+
       // Fetch user profile to get first name
       const { data: profileData, error: profileError } = await supabase
         .from("users_profile")

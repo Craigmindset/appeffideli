@@ -60,10 +60,18 @@ export default function SuccessPage() {
               Account Created Successfully! 🎉
             </h2>
 
-            <p className="p-4 text-center text-gray-600">
-              {" "}
-              A verification link has been sent to your email address.
-            </p>
+            <div className="p-4 space-y-2">
+              <p className="text-center text-gray-600 font-medium">
+                Please verify your email to complete registration
+              </p>
+              <p className="text-sm text-gray-500">
+                We've sent a verification link to your email address. Click the
+                link to verify your account before signing in.
+              </p>
+              <p className="text-xs text-gray-400 mt-2">
+                Don't see the email? Check your spam folder.
+              </p>
+            </div>
           </div>
 
           {/* Lottie Animation */}
