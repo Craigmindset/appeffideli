@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -8,8 +9,60 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Download, CreditCard, Calendar, FileText } from "lucide-react";
+import { createBrowserSupabaseClient } from "@/lib/supabase";
 
 export default function OverviewPage() {
+  const [subscriptionPlan, setSubscriptionPlan] = useState("Not Subscribed");
+  const [subscriptionStatus, setSubscriptionStatus] = useState("inactive");
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSubscriptionData = async () => {
+      try {
+        const supabase = createBrowserSupabaseClient();
+
+        // Get current user
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (user) {
+          // Fetch user profile subscription info
+          const { data: profile } = await supabase
+            .from("users_profile")
+            .select("meal_subscription, meal_subscription_status")
+            .eq("id", user.id)
+            .single();
+
+          if (profile && profile.meal_subscription) {
+            // Format plan name
+            const planName =
+              profile.meal_subscription
+                .replace("meal_", "")
+                .charAt(0)
+                .toUpperCase() + profile.meal_subscription.slice(6);
+
+            setSubscriptionPlan(planName);
+            setSubscriptionStatus(
+              profile.meal_subscription_status || "inactive"
+            );
+          } else {
+            setSubscriptionPlan("Not Subscribed");
+            setSubscriptionStatus("inactive");
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching subscription data:", error);
+        setSubscriptionPlan("Not Subscribed");
+        setSubscriptionStatus("inactive");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSubscriptionData();
+  }, []);
+
   // Mock data - replace with actual data from your database
   const stats = [
     {
@@ -21,10 +74,13 @@ export default function OverviewPage() {
     },
     {
       title: "Active Subscription",
-      value: "Premium",
+      value: isLoading ? "Loading..." : subscriptionPlan,
       description: "Your current plan",
       icon: CreditCard,
-      color: "bg-green-50 border-green-200",
+      color:
+        subscriptionStatus === "active"
+          ? "bg-green-50 border-green-200"
+          : "bg-gray-50 border-gray-200",
     },
     {
       title: "Meal Plans",

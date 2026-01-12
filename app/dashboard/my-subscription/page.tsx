@@ -9,12 +9,19 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Calendar, CreditCard, AlertCircle } from "lucide-react";
+import {
+  CheckCircle2,
+  Calendar,
+  CreditCard,
+  AlertCircle,
+  Loader2,
+} from "lucide-react";
 import { useState, useEffect } from "react";
+import { createBrowserSupabaseClient } from "@/lib/supabase";
 
 interface Subscription {
   plan: string;
-  status: "active" | "expired" | "cancelled";
+  status: "active" | "expired" | "cancelled" | "inactive";
   startDate: string;
   endDate: string;
   amount: string;
@@ -24,20 +31,94 @@ interface Subscription {
 
 export default function MySubscriptionPage() {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Mock data - replace with actual API call
-    const mockSubscription: Subscription = {
-      plan: "Premium Plan",
-      status: "active",
-      startDate: "2024-11-22",
-      endDate: "2025-01-22",
-      amount: "₦5,000",
-      nextBillingDate: "2025-01-22",
-      autoRenew: true,
+    const fetchSubscriptionData = async () => {
+      try {
+        const supabase = createBrowserSupabaseClient();
+
+        // Get current user
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user) {
+          setIsLoading(false);
+          return;
+        }
+
+        // Fetch user profile subscription info
+        const { data: profile } = await supabase
+          .from("users_profile")
+          .select(
+            "meal_subscription, meal_subscription_status, meal_subscription_started_at, meal_subscription_expires_at"
+          )
+          .eq("id", user.id)
+          .single();
+
+        if (!profile || !profile.meal_subscription) {
+          setIsLoading(false);
+          return;
+        }
+
+        // Fetch subscription details from the appropriate table
+        const tableName = profile.meal_subscription;
+        const { data: subscriptionData } = await supabase
+          .from(tableName)
+          .select("*")
+          .eq("user_id", user.id)
+          .eq("status", "active")
+          .single();
+
+        if (subscriptionData) {
+          // Format plan name
+          const planName =
+            subscriptionData.subscription_reference.split("_")[0] === "EFFIDELI"
+              ? profile.meal_subscription
+                  .replace("meal_", "")
+                  .charAt(0)
+                  .toUpperCase() + profile.meal_subscription.slice(6)
+              : "Premium";
+
+          // Plan pricing map
+          const pricingMap: Record<string, string> = {
+            meal_basic: "₦3,500",
+            meal_premium: "₦5,000",
+            meal_vip: "₦7,999",
+          };
+
+          const billingAmount = pricingMap[tableName] || "₦0";
+
+          // Calculate next billing date (30 days from start)
+          const startDate = new Date(subscriptionData.started_at);
+          const nextBillingDate = new Date(startDate);
+          nextBillingDate.setDate(nextBillingDate.getDate() + 30);
+
+          setSubscription({
+            plan: `${planName} Plan`,
+            status:
+              (profile.meal_subscription_status as
+                | "active"
+                | "expired"
+                | "cancelled"
+                | "inactive") || "inactive",
+            startDate: subscriptionData.started_at,
+            endDate:
+              subscriptionData.expires_at || nextBillingDate.toISOString(),
+            amount: billingAmount,
+            nextBillingDate: nextBillingDate.toISOString(),
+            autoRenew: true,
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching subscription data:", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
-    setSubscription(mockSubscription);
+    fetchSubscriptionData();
   }, []);
 
   const getStatusBadge = (status: string) => {
@@ -48,10 +129,35 @@ export default function MySubscriptionPage() {
         return <Badge variant="destructive">Expired</Badge>;
       case "cancelled":
         return <Badge variant="secondary">Cancelled</Badge>;
+      case "inactive":
+        return <Badge variant="secondary">Inactive</Badge>;
       default:
         return <Badge variant="outline">Unknown</Badge>;
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">My Subscription</h1>
+          <p className="text-muted-foreground mt-2">
+            Manage your subscription and billing
+          </p>
+        </div>
+
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <Loader2 className="h-12 w-12 text-muted-foreground animate-spin mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Loading...</h3>
+            <p className="text-muted-foreground text-center">
+              Fetching your subscription information
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (!subscription) {
     return (

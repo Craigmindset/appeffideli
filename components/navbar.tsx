@@ -11,15 +11,90 @@ import {
   UtensilsCrossed,
   Baby,
   UserRound,
+  LogOut,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { createBrowserSupabaseClient } from "@/lib/supabase";
+import { signOut } from "@/app/actions/auth";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const [isMobileServicesOpen, setIsMobileServicesOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [firstName, setFirstName] = useState("User");
   const pathname = usePathname();
+  const router = useRouter();
+
+  // Check if user is logged in
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const supabase = createBrowserSupabaseClient();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (user) {
+          setIsLoggedIn(true);
+
+          // Fetch user profile
+          const { data: profile } = await supabase
+            .from("users_profile")
+            .select("full_name")
+            .eq("id", user.id)
+            .single();
+
+          if (profile && profile.full_name) {
+            const firstName = profile.full_name.split(" ")[0];
+            setFirstName(firstName || "User");
+          }
+        } else {
+          setIsLoggedIn(false);
+        }
+      } catch (error) {
+        console.error("Error checking auth:", error);
+        setIsLoggedIn(false);
+      }
+    };
+
+    checkAuth();
+  }, [pathname]);
+
+  const handleLogout = async () => {
+    try {
+      // Clear client-side storage
+      localStorage.clear();
+      sessionStorage.clear();
+
+      // Get supabase client and sign out
+      const supabase = createBrowserSupabaseClient();
+      await supabase.auth.signOut();
+
+      // Clear server-side session
+      await signOut();
+
+      // Update state
+      setIsLoggedIn(false);
+
+      // Redirect to home page
+      router.push("/");
+    } catch (error) {
+      console.error("Logout error:", error);
+      router.push("/");
+    }
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
   // Prevent scroll when menu is open
   useEffect(() => {
@@ -36,24 +111,19 @@ export default function Navbar() {
 
   const serviceLinks = [
     {
-      name: "Household Chore Routine Management",
-      href: "/services#household-chores",
-      icon: <ClipboardList className="h-4 w-4" />,
-    },
-    {
-      name: "Monthly Home Meal Subscription/Weekly Home Meal Plan",
-      href: "/services#meal-planning",
+      name: "Monthly Meal Subscription",
+      href: "/services/meal-plan-subscription",
       icon: <UtensilsCrossed className="h-4 w-4" />,
     },
     {
-      name: "6-Months to 1-Years Infant Recipe Plan",
-      href: "/services#infant-recipe",
+      name: "Infant Recipe Plans",
+      href: "/services/infant-recipes",
       icon: <Baby className="h-4 w-4" />,
     },
     {
-      name: "Tiger Nuts Recipe Packs (Coming Soon!)",
-      href: "/services#tiger-nuts",
-      icon: <Baby className="h-4 w-4" />,
+      name: "Household Cleaning Routine",
+      href: "/services/cleaning-routine",
+      icon: <ClipboardList className="h-4 w-4" />,
     },
   ];
 
@@ -147,12 +217,40 @@ export default function Navbar() {
 
             {/* Theme Toggle */}
             <ThemeToggle />
-            <Link
-              href="/login"
-              className="ml-2 px-4 py-2 rounded-md text-sm font-semibold text-white bg-primary hover:bg-primary/90 transition-colors"
-            >
-              Login
-            </Link>
+
+            {/* Auth Section */}
+            {isLoggedIn ? (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => router.push("/dashboard")}
+                  className="ml-2 flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-accent transition-colors"
+                  title="Go to Dashboard"
+                >
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src="/images/avatar.png" alt={firstName} />
+                    <AvatarFallback className="bg-primary text-white text-xs">
+                      {getInitials(firstName)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="hidden lg:inline">{firstName}</span>
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="px-4 py-2 rounded-md text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors inline-flex items-center gap-2"
+                  title="Logout"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span className="hidden lg:inline">Logout</span>
+                </button>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="ml-2 px-4 py-2 rounded-md text-sm font-semibold text-white bg-primary hover:bg-primary/90 transition-colors"
+              >
+                Login
+              </Link>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -273,14 +371,41 @@ export default function Navbar() {
                 {link.name}
               </Link>
             ))}
-            <Link
-              href="/login"
-              className="flex w-full mt-4 px-4 py-3 rounded-lg text-base font-semibold text-white bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 transition-all items-center justify-center gap-2 shadow-sm"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              <UserRound className="h-5 w-5" />
-              Login
-            </Link>
+
+            {/* Auth Section for Mobile */}
+            {isLoggedIn ? (
+              <>
+                <button
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    router.push("/dashboard");
+                  }}
+                  className="flex w-full mt-4 px-4 py-3 rounded-lg text-base font-semibold text-white bg-primary hover:bg-primary/90 transition-all items-center justify-center gap-2 shadow-sm"
+                >
+                  <UserRound className="h-5 w-5" />
+                  Dashboard ({firstName})
+                </button>
+                <button
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    handleLogout();
+                  }}
+                  className="flex w-full mt-2 px-4 py-3 rounded-lg text-base font-semibold text-white bg-red-600 hover:bg-red-700 transition-all items-center justify-center gap-2 shadow-sm"
+                >
+                  <LogOut className="h-5 w-5" />
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                className="flex w-full mt-4 px-4 py-3 rounded-lg text-base font-semibold text-white bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 transition-all items-center justify-center gap-2 shadow-sm"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <UserRound className="h-5 w-5" />
+                Login
+              </Link>
+            )}
           </div>
         </div>
       </div>

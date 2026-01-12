@@ -10,12 +10,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, Home, Headphones } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { signOut } from "@/app/actions/auth";
 import { DashboardThemeToggle } from "./dashboard-theme-toggle";
 import { useEffect, useState } from "react";
 import { createBrowserSupabaseClient } from "@/lib/supabase";
+import Link from "next/link";
 
 export function DashboardHeader() {
   const router = useRouter();
@@ -62,7 +63,11 @@ export function DashboardHeader() {
       localStorage.clear();
       sessionStorage.clear();
 
-      // Clear server-side session and sign out from Supabase
+      // Get supabase client and sign out
+      const supabase = createBrowserSupabaseClient();
+      await supabase.auth.signOut();
+
+      // Clear server-side session
       await signOut();
 
       // Redirect to home page
@@ -86,12 +91,32 @@ export function DashboardHeader() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:border-gray-700">
       <div className="container flex h-16 items-center justify-between px-4">
-        <div className="flex items-center gap-2">
+        {/* Left: Greeting */}
+        <div className="flex items-center">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
             Hi {firstName}! 👋
           </h2>
         </div>
 
+        {/* Center: Navigation Links */}
+        <nav className="hidden md:flex items-center gap-4">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary hover:bg-accent transition-colors"
+          >
+            <Home className="h-4 w-4" />
+            Home
+          </Link>
+          <Link
+            href="/contact"
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary hover:bg-accent transition-colors"
+          >
+            <Headphones className="h-4 w-4" />
+            Support
+          </Link>
+        </nav>
+
+        {/* Right: Actions */}
         <div className="flex items-center gap-3">
           {/* Theme Toggle */}
           <DashboardThemeToggle />
