@@ -1,8 +1,7 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/payment-success/page": "app/payment-success/page.js",
   "/page": "app/page.js",
-  "/services/selection/page": "app/services/selection/page.js",
+  "/payment-success/page": "app/payment-success/page.js",
   "/services/meal-plan-subscription/page": "app/services/meal-plan-subscription/page.js",
-  "/dashboard/my-subscription/page": "app/dashboard/my-subscription/page.js"
+  "/dashboard/my-subscription/page": "app/dashboard/my-subscription/page.js",
+  "/services/selection/page": "app/services/selection/page.js"
 }
