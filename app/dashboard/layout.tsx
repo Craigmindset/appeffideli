@@ -1,9 +1,8 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth-server";
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
 import { DashboardThemeProvider } from "@/components/dashboard/dashboard-theme-provider";
-import { WelcomeModal } from "@/components/dashboard/welcome-modal";
+import { SidebarProvider } from "@/components/dashboard/sidebar-context";
+import { DashboardLayoutClient } from "@/components/dashboard/dashboard-layout-client";
 
 export default async function DashboardLayout({
   children,
@@ -11,7 +10,6 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   // Server-side authentication check
-  // This provides an additional layer of security on top of middleware
   const user = await getCurrentUser();
 
   if (!user) {
@@ -20,16 +18,9 @@ export default async function DashboardLayout({
 
   return (
     <DashboardThemeProvider>
-      <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors">
-        <DashboardSidebar />
-        <div className="md:pl-64">
-          <DashboardHeader />
-          <main className="container mx-auto p-6">
-            <WelcomeModal />
-            {children}
-          </main>
-        </div>
-      </div>
+      <SidebarProvider>
+        <DashboardLayoutClient>{children}</DashboardLayoutClient>
+      </SidebarProvider>
     </DashboardThemeProvider>
   );
 }

@@ -6,25 +6,10 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/services/layout": [
+    "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/services/layout.js"
-    ],
-    "/services/meal-plan-subscription/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/services/meal-plan-subscription/page.js"
-    ],
-    "/signup/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/signup/page.js"
-    ],
-    "/login/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/login/page.js"
+      "static/chunks/app/page.js"
     ],
     "/dashboard/layout": [
       "static/chunks/webpack.js",
@@ -41,40 +26,15 @@
       "static/chunks/main-app.js",
       "static/chunks/app/dashboard/overview/page.js"
     ],
-    "/page": [
+    "/dashboard/meal-timetable/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
+      "static/chunks/app/dashboard/meal-timetable/page.js"
     ],
-    "/payment-success/page": [
+    "/_not-found/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/payment-success/page.js"
-    ],
-    "/api/verify-payment/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/verify-payment/route.js"
-    ],
-    "/services/selection/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/services/selection/page.js"
-    ],
-    "/dashboard/my-subscription/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/dashboard/my-subscription/page.js"
-    ],
-    "/dashboard/my-downloads/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/dashboard/my-downloads/page.js"
-    ],
-    "/dashboard/shop-list/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/dashboard/shop-list/page.js"
+      "static/chunks/app/_not-found/page.js"
     ]
   }
 }

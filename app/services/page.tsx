@@ -150,7 +150,7 @@ export default function ServicesPage() {
                   src={slide.image || "/placeholder.svg"}
                   alt={slide.title}
                   fill
-                  className="object-cover md:object-cover object-contain"
+                  className="object-cover"
                   priority={index === 0}
                 />
                 <div className="absolute inset-0 bg-black/40" />
