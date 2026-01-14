@@ -10,9 +10,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, Download } from "lucide-react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import { createBrowserSupabaseClient } from "@/lib/supabase";
 
 interface MealPlan {
   id: string;
@@ -33,106 +34,82 @@ const mealTimes = [
 ];
 
 export default function MealTimetablePage() {
-  const [mealPlans, setMealPlans] = useState<MealPlan[]>([
-    {
-      id: "1",
-      day: "Monday",
-      breakfast: "Akamu (Pap) with Akara",
-      "snack/tea": "Tea with Biscuits",
-      lunch: "Jollof Rice with Chicken",
-      "snack/bites-1": "Chin-Chin with Zobo",
-      dinner: "Eba with Egusi Soup",
-      sideDish: "Fried Plantain",
-      "snack/bites-2": "Coffee with Meat Pie",
-      dessert: "Fresh Fruit Salad",
-    },
-    {
-      id: "1",
-      day: "Monday",
-      breakfast: "Akamu (Pap) with Akara",
-      "snack/tea": "Tea with Biscuits",
-      lunch: "Jollof Rice with Chicken",
-      "snack/bites-1": "Chin-Chin with Zobo",
-      dinner: "Eba with Egusi Soup",
-      sideDish: "Fried Plantain",
-      "snack/bites-2": "Coffee with Meat Pie",
-      dessert: "Fresh Fruit Salad",
-    },
-    {
-      id: "2",
-      day: "Tuesday",
-      breakfast: "Bread with Scrambled Eggs",
-      "snack/tea": "Smoothie with Banana",
-      lunch: "Fried Rice with Fish",
-      "snack/bites-1": "Puff Puff with Tea",
-      dinner: "Pounded Yam with Vegetable Soup",
-      sideDish: "Steamed Vegetables",
-      "snack/bites-2": "Hot Chocolate with Doughnut",
-      dessert: "Yogurt with Granola",
-    },
-    {
-      id: "3",
-      day: "Wednesday",
-      breakfast: "Yam Porridge with Vegetables",
-      "snack/tea": "Tiger Nuts with Coconut",
-      lunch: "Ofada Rice with Ayamase",
-      "snack/bites-1": "Garden Egg with Groundnut",
-      dinner: "Tuwo Shinkafa with Miyan Kuka",
-      sideDish: "Fried Fish",
-      "snack/bites-2": "Herbal Tea with Chin-Chin",
-      dessert: "Coconut Candy",
-    },
-    {
-      id: "4",
-      day: "Thursday",
-      breakfast: "Pancakes with Honey",
-      "snack/tea": "Plantain Chips with Zobo",
-      lunch: "Spaghetti Jollof with Beef",
-      "snack/bites-1": "Roasted Groundnut",
-      dinner: "Semovita with Okra Soup",
-      sideDish: "Grilled Chicken",
-      "snack/bites-2": "Lipton Tea with Biscuits",
-      dessert: "Puff Puff",
-    },
-    {
-      id: "5",
-      day: "Friday",
-      breakfast: "Fried Plantain with Beans",
-      "snack/tea": "Fruit Smoothie (Mango)",
-      lunch: "White Rice with Stew",
-      "snack/bites-1": "Boli with Groundnut",
-      dinner: "Fufu with Banga Soup",
-      sideDish: "Fried Fish",
-      "snack/bites-2": "Ginger Tea with Cake",
-      dessert: "Ice Cream",
-    },
-    {
-      id: "6",
-      day: "Saturday",
-      breakfast: "Indomie with Eggs",
-      "snack/tea": "Orange Juice with Cookies",
-      lunch: "Pepper Soup with Agidi",
-      "snack/bites-1": "Suya with Cucumber",
-      dinner: "Amala with Ewedu",
-      sideDish: "Assorted Meat",
-      "snack/bites-2": "Milo with Bread",
-      dessert: "Chocolate Cake",
-    },
-    {
-      id: "7",
-      day: "Sunday",
-      breakfast: "French Toast with Fruits",
-      "snack/tea": "Chapman with Peanuts",
-      lunch: "Coconut Rice with Chicken",
-      "snack/bites-1": "Moi Moi with Bread",
-      dinner: "Oha Soup with Pounded Yam",
-      sideDish: "Fried Plantain",
-      "snack/bites-2": "Coffee with Buns",
-      dessert: "Fruit Parfait",
-    },
-  ]);
-
+  const [mealPlans, setMealPlans] = useState<MealPlan[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const supabase = createBrowserSupabaseClient();
   const timetableRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    fetchMealTimetable();
+  }, []);
+
+  const fetchMealTimetable = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      console.log("Fetching meal timetable...");
+
+      const { data, error: fetchError } = await supabase
+        .from("meal_timetable")
+        .select("*")
+        .eq("week_number", 1);
+
+      console.log("Fetch result:", { data, error: fetchError });
+
+      if (fetchError) {
+        console.error("Fetch error:", fetchError);
+        throw fetchError;
+      }
+
+      if (!data || data.length === 0) {
+        console.warn("No data returned from meal_timetable");
+        setMealPlans([]);
+        return;
+      }
+
+      console.log("Raw data from database:", data);
+
+      // Map database fields to component format
+      const mappedData: MealPlan[] = (data || []).map((item: any) => ({
+        id: item.id,
+        day: item.day_of_week,
+        breakfast: item.breakfast || "",
+        "snack/tea": item.morning_snack || "",
+        lunch: item.lunch || "",
+        "snack/bites-1": item.afternoon_bites || "",
+        dinner: item.dinner || "",
+        sideDish: item.side_dish || "",
+        "snack/bites-2": item.evening_snack || "",
+        dessert: item.dessert || "",
+      }));
+
+      console.log("Mapped data:", mappedData);
+
+      // Sort by day of week
+      const dayOrder = [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+      ];
+      mappedData.sort(
+        (a, b) => dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day)
+      );
+
+      console.log("Final sorted data:", mappedData);
+      setMealPlans(mappedData);
+    } catch (err: any) {
+      console.error("Error fetching meal timetable:", err);
+      setError(err.message || "Failed to load meal timetable");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const downloadPDF = async () => {
     if (!timetableRef.current) return;
@@ -193,42 +170,77 @@ export default function MealTimetablePage() {
       </div>
 
       <div ref={timetableRef} className="grid gap-4">
-        {mealPlans.map((plan) => (
-          <Card key={plan.id}>
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <Calendar className="h-5 w-5 text-primary" />
-                <CardTitle>{plan.day}</CardTitle>
-                <Badge variant="outline">This Week</Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-3 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8">
-                {mealTimes.map((meal) => {
-                  const mealValue = plan[meal.key as keyof MealPlan];
-                  if (!mealValue) return null;
-                  return (
-                    <div
-                      key={meal.key}
-                      className="space-y-1 p-3 bg-muted/50 rounded-lg"
-                    >
-                      <div className="flex flex-col gap-1 text-xs font-medium text-muted-foreground">
-                        <span className="text-base">{meal.label}</span>
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          <span>{meal.time}</span>
-                        </div>
-                      </div>
-                      <p className="text-sm font-medium text-foreground">
-                        {mealValue as string}
-                      </p>
-                    </div>
-                  );
-                })}
+        {isLoading ? (
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-center">
+                <div className="text-muted-foreground">
+                  Loading meal timetable...
+                </div>
               </div>
             </CardContent>
           </Card>
-        ))}
+        ) : error ? (
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex flex-col items-center justify-center gap-2">
+                <div className="text-destructive">Error: {error}</div>
+                <Button
+                  onClick={fetchMealTimetable}
+                  variant="outline"
+                  size="sm"
+                >
+                  Retry
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ) : mealPlans.length === 0 ? (
+          <Card>
+            <CardContent className="p-6">
+              <div className="text-center text-muted-foreground">
+                No meal plans found for this week
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          mealPlans.map((plan) => (
+            <Card key={plan.id}>
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <Calendar className="h-5 w-5 text-primary" />
+                  <CardTitle>{plan.day}</CardTitle>
+                  <Badge variant="outline">This Week</Badge>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-3 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8">
+                  {mealTimes.map((meal) => {
+                    const mealValue = plan[meal.key as keyof MealPlan];
+                    if (!mealValue) return null;
+                    return (
+                      <div
+                        key={meal.key}
+                        className="space-y-1 p-3 bg-muted/50 rounded-lg"
+                      >
+                        <div className="flex flex-col gap-1 text-xs font-medium text-muted-foreground">
+                          <span className="text-base">{meal.label}</span>
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            <span>{meal.time}</span>
+                          </div>
+                        </div>
+                        <p className="text-sm font-medium text-foreground">
+                          {mealValue as string}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        )}
       </div>
 
       <Card>

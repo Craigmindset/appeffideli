@@ -1,7 +1,7 @@
 -- Create meal timetable table for storing user's daily meal plans
 CREATE TABLE IF NOT EXISTS meal_timetable (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NULL,
   day_of_week TEXT CHECK (day_of_week IN ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')),
   week_number INTEGER DEFAULT 1,
   
