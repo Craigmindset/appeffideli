@@ -17,6 +17,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { createBrowserSupabaseClient } from "@/lib/supabase";
 
 interface Subscription {
@@ -32,6 +33,7 @@ interface Subscription {
 export default function MySubscriptionPage() {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchSubscriptionData = async () => {
@@ -262,31 +264,16 @@ export default function MySubscriptionPage() {
                 </p>
               </div>
             </div>
-
-            <div>
-              <p className="text-sm text-muted-foreground mb-1">
-                Payment Method
-              </p>
-              <div className="flex items-center gap-2">
-                <CreditCard className="h-4 w-4" />
-                <p className="font-medium">Card ending in ****1234</p>
-              </div>
-            </div>
-
-            <div>
-              <p className="text-sm text-muted-foreground mb-1">Auto Renewal</p>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-green-500" />
-                <p className="font-medium">
-                  {subscription.autoRenew ? "Enabled" : "Disabled"}
-                </p>
-              </div>
-            </div>
           </div>
 
           <div className="flex gap-3 pt-4">
             <Button variant="outline">Update Payment Method</Button>
-            <Button variant="outline">Change Plan</Button>
+            <Button
+              variant="outline"
+              onClick={() => router.push("/services/meal-plan-subscription")}
+            >
+              Change Plan
+            </Button>
             <Button variant="destructive">Cancel Subscription</Button>
           </div>
         </CardContent>
@@ -294,25 +281,123 @@ export default function MySubscriptionPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Benefits</CardTitle>
-          <CardDescription>What's included in your plan</CardDescription>
+          <CardTitle>Plan Benefits</CardTitle>
+          <CardDescription>
+            What's included in your {subscription.plan}
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <ul className="space-y-2">
-            {[
-              "Unlimited PDF downloads",
-              "Access to all meal plans",
-              "Weekly nutrition guides",
-              "Priority customer support",
-              "Exclusive content and recipes",
-              "Personalized meal recommendations",
-            ].map((benefit, index) => (
-              <li key={index} className="flex items-center gap-2">
-                <CheckCircle2 className="h-5 w-5 text-green-500" />
-                <span>{benefit}</span>
-              </li>
-            ))}
-          </ul>
+          {subscription.plan.toLowerCase().includes("basic") && (
+            <div className="space-y-4">
+              <p className="text-muted-foreground">
+                Perfect for families who want core meal guidance and easy weekly
+                menus.
+              </p>
+              <div>
+                <p className="font-medium mb-2">Includes:</p>
+                <ul className="space-y-2">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="h-5 w-5 text-green-500" />
+                    <span>Weekly meal plans (breakfast, lunch, dinner)</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="h-5 w-5 text-green-500" />
+                    <span>Simple shopping list (view only)</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="h-5 w-5 text-green-500" />
+                    <span>Email support</span>
+                  </li>
+                </ul>
+              </div>
+              <p className="text-sm text-muted-foreground italic">
+                Best for: Busy mums on a budget or first-time meal planners
+              </p>
+            </div>
+          )}
+
+          {subscription.plan.toLowerCase().includes("premium") && (
+            <div className="space-y-4">
+              <p className="text-muted-foreground">
+                For families who want more variety & added convenience.
+              </p>
+              <div>
+                <p className="font-medium mb-2">
+                  Includes everything in Basic, plus:
+                </p>
+                <ul className="space-y-2">
+                  <li className="flex items-center gap-2">
+                    <span className="text-yellow-500">🌟</span>
+                    <span>
+                      Expanded weekly meal plans (Breakfast, Snack, Lunch,
+                      Bites, Dinner, Side Dish, Snack & Desserts)
+                    </span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-yellow-500">🌟</span>
+                    <span>Downloadable recipe</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-yellow-500">🌟</span>
+                    <span>Shopping list export</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-yellow-500">🌟</span>
+                    <span>Email Support</span>
+                  </li>
+                </ul>
+              </div>
+              <p className="text-sm text-muted-foreground italic">
+                Best for: Families wanting more variety & structure
+              </p>
+            </div>
+          )}
+
+          {subscription.plan.toLowerCase().includes("vip") && (
+            <div className="space-y-4">
+              <p className="text-muted-foreground">
+                The full Effidelicious experience — tailored and stress-free.
+              </p>
+              <div>
+                <p className="font-medium mb-2">
+                  Includes everything in Premium, plus:
+                </p>
+                <ul className="space-y-2">
+                  <li className="flex items-center gap-2">
+                    <span className="text-purple-500">✨</span>
+                    <span>
+                      Expanded weekly meal plans (Breakfast, Snack, Lunch,
+                      Bites, Dinner, Side Dish, Snack & Desserts)
+                    </span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-purple-500">✨</span>
+                    <span>Downloadable recipe</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-purple-500">✨</span>
+                    <span>Shopping list export</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-purple-500">✨</span>
+                    <span>Priority support</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-purple-500">✨</span>
+                    <span>Monthly live Q&A with Effideli</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-purple-500">✨</span>
+                    <span>Seasonal & festive menus</span>
+                  </li>
+                </ul>
+              </div>
+              <p className="text-sm text-muted-foreground italic">
+                Best for: Families who want the ultimate meal planning
+                experience
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
