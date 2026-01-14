@@ -1,10 +1,8 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/api/verify-payment/route": "app/api/verify-payment/route.js",
-  "/payment-success/page": "app/payment-success/page.js",
-  "/services/selection/page": "app/services/selection/page.js",
-  "/services/meal-plan-subscription/page": "app/services/meal-plan-subscription/page.js",
   "/dashboard/my-subscription/page": "app/dashboard/my-subscription/page.js",
   "/dashboard/page": "app/dashboard/page.js",
-  "/dashboard/overview/page": "app/dashboard/overview/page.js"
+  "/dashboard/overview/page": "app/dashboard/overview/page.js",
+  "/dashboard/my-downloads/page": "app/dashboard/my-downloads/page.js",
+  "/dashboard/shop-list/page": "app/dashboard/shop-list/page.js",
+  "/dashboard/meal-timetable/page": "app/dashboard/meal-timetable/page.js"
 }

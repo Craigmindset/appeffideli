@@ -10,6 +10,17 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
   CheckCircle2,
   Calendar,
   CreditCard,
@@ -19,6 +30,7 @@ import {
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createBrowserSupabaseClient } from "@/lib/supabase";
+import { cancelMealSubscription } from "@/app/actions/meal-subscription";
 
 interface Subscription {
   plan: string;
@@ -33,7 +45,30 @@ interface Subscription {
 export default function MySubscriptionPage() {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCancelling, setIsCancelling] = useState(false);
   const router = useRouter();
+
+  const handleCancelSubscription = async () => {
+    setIsCancelling(true);
+    try {
+      const result = await cancelMealSubscription();
+      if (result.success) {
+        // Update local state to reflect cancellation
+        setSubscription((prev) =>
+          prev ? { ...prev, status: "cancelled", autoRenew: false } : null
+        );
+        alert("Subscription cancelled successfully");
+        router.refresh();
+      } else {
+        alert(result.error || "Failed to cancel subscription");
+      }
+    } catch (error) {
+      console.error("Error cancelling subscription:", error);
+      alert("An error occurred while cancelling your subscription");
+    } finally {
+      setIsCancelling(false);
+    }
+  };
 
   useEffect(() => {
     const fetchSubscriptionData = async () => {
@@ -274,7 +309,51 @@ export default function MySubscriptionPage() {
             >
               Change Plan
             </Button>
-            <Button variant="destructive">Cancel Subscription</Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="destructive"
+                  disabled={subscription.status === "cancelled" || isCancelling}
+                >
+                  {isCancelling ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Cancelling...
+                    </>
+                  ) : subscription.status === "cancelled" ? (
+                    "Subscription Cancelled"
+                  ) : (
+                    "Cancel Subscription"
+                  )}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Cancel Subscription?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to cancel your {subscription.plan}?
+                    <br />
+                    <br />
+                    <strong>What happens when you cancel:</strong>
+                    <ul className="list-disc list-inside mt-2 space-y-1">
+                      <li>Your subscription will be cancelled immediately</li>
+                      <li>You will lose access to your plan features</li>
+                      <li>No further charges will be made</li>
+                      <li>You can subscribe again anytime</li>
+                    </ul>
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Keep Subscription</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleCancelSubscription}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    Yes, Cancel Subscription
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </CardContent>
       </Card>

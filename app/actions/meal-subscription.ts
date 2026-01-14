@@ -2,7 +2,10 @@
 
 import { supabaseAdmin } from "@/lib/supabase";
 import { createServerSupabaseClient } from "@/lib/auth-server";
-import { generatePaystackReference } from "@/lib/paystack";
+import {
+  generatePaystackReference,
+  cancelPaystackSubscription,
+} from "@/lib/paystack";
 
 export type MealPlanType = "basic" | "premium" | "vip";
 
@@ -202,5 +205,182 @@ export async function getUserMealSubscription() {
   } catch (error) {
     console.error("Error in getUserMealSubscription:", error);
     return null;
+  }
+}
+
+/**
+ * Cancel a user's meal subscription (both locally and on Paystack)
+ */
+export async function cancelMealSubscription(): Promise<{
+  success: boolean;
+  error?: string;
+}> {
+  try {
+    const supabase = await createServerSupabaseClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return {
+        success: false,
+        error: "User not authenticated",
+      };
+    }
+
+    // Get user profile to check current subscription
+    const { data: profile } = await supabaseAdmin
+      .from("users_profile")
+      .select(
+        "meal_subscription, meal_subscription_status, paystack_subscription_code, paystack_email_token"
+      )
+      .eq("id", user.id)
+      .single();
+
+    if (!profile || !profile.meal_subscription) {
+      return {
+        success: false,
+        error: "No active subscription found",
+      };
+    }
+
+    if (profile.meal_subscription_status !== "active") {
+      return {
+        success: false,
+        error: "Subscription is not active",
+      };
+    }
+
+    // If we have Paystack subscription code, cancel on Paystack first
+    if (profile.paystack_subscription_code && profile.paystack_email_token) {
+      try {
+        await cancelPaystackSubscription(
+          profile.paystack_subscription_code,
+          profile.paystack_email_token
+        );
+      } catch (paystackError) {
+        console.error("Error cancelling on Paystack:", paystackError);
+        // Continue with local cancellation even if Paystack fails
+        // (subscription might already be cancelled on Paystack)
+      }
+    }
+
+    const tableName = profile.meal_subscription;
+
+    // Update subscription status in the meal table
+    const { error: subscriptionError } = await supabaseAdmin
+      .from(tableName)
+      .update({
+        status: "cancelled",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("user_id", user.id)
+      .eq("status", "active");
+
+    if (subscriptionError) {
+      console.error("Error updating subscription status:", subscriptionError);
+      return {
+        success: false,
+        error: "Failed to cancel subscription",
+      };
+    }
+
+    // Update user profile
+    const { error: profileError } = await supabaseAdmin
+      .from("users_profile")
+      .update({
+        meal_subscription_status: "cancelled",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", user.id);
+
+    if (profileError) {
+      console.error("Error updating user profile:", profileError);
+      return {
+        success: false,
+        error: "Failed to update profile",
+      };
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error in cancelMealSubscription:", error);
+    return {
+      success: false,
+      error: "An unexpected error occurred",
+    };
+  }
+}
+
+/**
+ * Store Paystack subscription details after successful subscription creation
+ */
+export async function storePaystackSubscriptionDetails(
+  subscriptionCode: string,
+  emailToken: string,
+  planType: MealPlanType
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = await createServerSupabaseClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return {
+        success: false,
+        error: "User not authenticated",
+      };
+    }
+
+    const tableName = `meal_${planType}`;
+
+    // Update the meal subscription table with Paystack details
+    const { error: subscriptionError } = await supabaseAdmin
+      .from(tableName)
+      .update({
+        paystack_subscription_code: subscriptionCode,
+        paystack_email_token: emailToken,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("user_id", user.id)
+      .eq("status", "active");
+
+    if (subscriptionError) {
+      console.error(
+        "Error storing Paystack details in subscription:",
+        subscriptionError
+      );
+    }
+
+    // Also update users_profile for quick reference
+    const { error: profileError } = await supabaseAdmin
+      .from("users_profile")
+      .update({
+        paystack_subscription_code: subscriptionCode,
+        paystack_email_token: emailToken,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", user.id);
+
+    if (profileError) {
+      console.error("Error storing Paystack details in profile:", profileError);
+      return {
+        success: false,
+        error: "Failed to store subscription details",
+      };
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error in storePaystackSubscriptionDetails:", error);
+    return {
+      success: false,
+      error: "An unexpected error occurred",
+    };
   }
 }

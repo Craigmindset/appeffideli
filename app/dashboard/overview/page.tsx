@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -15,6 +16,7 @@ export default function OverviewPage() {
   const [subscriptionPlan, setSubscriptionPlan] = useState("Not Subscribed");
   const [subscriptionStatus, setSubscriptionStatus] = useState("inactive");
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchSubscriptionData = async () => {
@@ -113,10 +115,20 @@ export default function OverviewPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => {
           const Icon = stat.icon;
+          const isClickable = stat.title === "Active Subscription";
           return (
             <Card
               key={stat.title}
-              className={`${stat.color} dark:bg-gray-800 dark:border-gray-700`}
+              className={`${stat.color} dark:bg-gray-800 dark:border-gray-700 ${
+                isClickable
+                  ? "cursor-pointer hover:shadow-md transition-shadow"
+                  : ""
+              }`}
+              onClick={
+                isClickable
+                  ? () => router.push("/dashboard/my-subscription")
+                  : undefined
+              }
             >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-gray-900 dark:text-white">

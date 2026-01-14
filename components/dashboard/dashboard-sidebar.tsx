@@ -11,6 +11,7 @@ import {
   Settings,
   LogOut,
   Menu,
+  ShoppingCart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -33,6 +34,11 @@ const navItems = [
     title: "My Subscription",
     href: "/dashboard/my-subscription",
     icon: CreditCard,
+  },
+  {
+    title: "Shop List",
+    href: "/dashboard/shop-list",
+    icon: ShoppingCart,
   },
   {
     title: "Meal Timetable",

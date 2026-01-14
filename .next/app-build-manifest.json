@@ -66,10 +66,15 @@
       "static/chunks/main-app.js",
       "static/chunks/app/dashboard/my-subscription/page.js"
     ],
-    "/_not-found/page": [
+    "/dashboard/my-downloads/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/_not-found/page.js"
+      "static/chunks/app/dashboard/my-downloads/page.js"
+    ],
+    "/dashboard/shop-list/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/dashboard/shop-list/page.js"
     ]
   }
 }
