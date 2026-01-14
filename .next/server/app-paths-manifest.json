@@ -1,5 +1,4 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
-  "/dashboard/overview/page": "app/dashboard/overview/page.js",
-  "/dashboard/meal-timetable/page": "app/dashboard/meal-timetable/page.js"
+  "/dashboard/settings/page": "app/dashboard/settings/page.js"
 }

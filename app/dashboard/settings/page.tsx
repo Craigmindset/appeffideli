@@ -16,8 +16,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, Mail, Phone, MapPin, Bell, Shield, Palette } from "lucide-react";
 import { useState, useEffect } from "react";
 import { createBrowserSupabaseClient } from "@/lib/supabase";
+import { useDashboardTheme } from "@/components/dashboard/dashboard-theme-provider";
 
 export default function SettingsPage() {
+  const { theme, setTheme } = useDashboardTheme();
+
   const [settings, setSettings] = useState({
     emailNotifications: true,
     smsNotifications: false,
@@ -315,19 +318,44 @@ export default function SettingsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
+          <div className="space-y-3">
             <Label>Theme</Label>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm">
+            <p className="text-sm text-muted-foreground">
+              Select your preferred theme for the dashboard
+            </p>
+            <div className="flex gap-3">
+              <Button
+                variant={theme === "light" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setTheme("light")}
+                className="flex-1"
+              >
                 Light
               </Button>
-              <Button variant="outline" size="sm">
+              <Button
+                variant={theme === "dark" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setTheme("dark")}
+                className="flex-1"
+              >
                 Dark
               </Button>
-              <Button variant="outline" size="sm">
+              <Button
+                variant={theme === "system" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setTheme("system")}
+                className="flex-1"
+              >
                 System
               </Button>
             </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              {theme === "system"
+                ? "Automatically switches between light and dark based on your system preference"
+                : theme === "dark"
+                ? "Dark theme is enabled"
+                : "Light theme is enabled"}
+            </p>
           </div>
         </CardContent>
       </Card>
