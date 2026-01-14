@@ -8,30 +8,27 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock } from "lucide-react";
-import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Calendar, Clock, Download } from "lucide-react";
+import { useState, useRef } from "react";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 interface MealPlan {
   id: string;
   day: string;
   breakfast: string;
-  morningSnack: string;
-  lunch: string;
-  afternoonBites: string;
-  dinner: string;
-  sideDish: string;
-  eveningSnack: string;
-  dessert: string;
+  [key: string]: string;
 }
 
 const mealTimes = [
   { key: "breakfast", label: "🍳 Breakfast", time: "7:00 AM" },
-  { key: "morningSnack", label: "☕ Morning Snack/Tea", time: "9:30 AM" },
+  { key: "snack/tea", label: "Snack/Tea", time: "9:30 AM" },
   { key: "lunch", label: "🍽️ Lunch", time: "12:30 PM" },
-  { key: "afternoonBites", label: "🫖 Afternoon Bites/Tea", time: "3:00 PM" },
+  { key: "snack/bites-1", label: "Snack/Bites-1", time: "3:00 PM" },
   { key: "dinner", label: "🍲 Dinner", time: "6:00 PM" },
   { key: "sideDish", label: "🥗 Side Dish", time: "6:00 PM" },
-  { key: "eveningSnack", label: "☕ Evening Snack/Tea", time: "8:00 PM" },
+  { key: "snack/bites-2", label: "Snack/Bites-2", time: "8:00 PM" },
   { key: "dessert", label: "🍰 Dessert", time: "8:00 PM" },
 ];
 
@@ -41,98 +38,161 @@ export default function MealTimetablePage() {
       id: "1",
       day: "Monday",
       breakfast: "Akamu (Pap) with Akara",
-      morningSnack: "Tea with Biscuits",
+      "snack/tea": "Tea with Biscuits",
       lunch: "Jollof Rice with Chicken",
-      afternoonBites: "Chin-Chin with Zobo",
+      "snack/bites-1": "Chin-Chin with Zobo",
       dinner: "Eba with Egusi Soup",
       sideDish: "Fried Plantain",
-      eveningSnack: "Coffee with Meat Pie",
+      "snack/bites-2": "Coffee with Meat Pie",
+      dessert: "Fresh Fruit Salad",
+    },
+    {
+      id: "1",
+      day: "Monday",
+      breakfast: "Akamu (Pap) with Akara",
+      "snack/tea": "Tea with Biscuits",
+      lunch: "Jollof Rice with Chicken",
+      "snack/bites-1": "Chin-Chin with Zobo",
+      dinner: "Eba with Egusi Soup",
+      sideDish: "Fried Plantain",
+      "snack/bites-2": "Coffee with Meat Pie",
       dessert: "Fresh Fruit Salad",
     },
     {
       id: "2",
       day: "Tuesday",
       breakfast: "Bread with Scrambled Eggs",
-      morningSnack: "Smoothie with Banana",
+      "snack/tea": "Smoothie with Banana",
       lunch: "Fried Rice with Fish",
-      afternoonBites: "Puff Puff with Tea",
+      "snack/bites-1": "Puff Puff with Tea",
       dinner: "Pounded Yam with Vegetable Soup",
       sideDish: "Steamed Vegetables",
-      eveningSnack: "Hot Chocolate with Doughnut",
+      "snack/bites-2": "Hot Chocolate with Doughnut",
       dessert: "Yogurt with Granola",
     },
     {
       id: "3",
       day: "Wednesday",
       breakfast: "Yam Porridge with Vegetables",
-      morningSnack: "Tiger Nuts with Coconut",
+      "snack/tea": "Tiger Nuts with Coconut",
       lunch: "Ofada Rice with Ayamase",
-      afternoonBites: "Garden Egg with Groundnut",
+      "snack/bites-1": "Garden Egg with Groundnut",
       dinner: "Tuwo Shinkafa with Miyan Kuka",
       sideDish: "Fried Fish",
-      eveningSnack: "Herbal Tea with Chin-Chin",
+      "snack/bites-2": "Herbal Tea with Chin-Chin",
       dessert: "Coconut Candy",
     },
     {
       id: "4",
       day: "Thursday",
       breakfast: "Pancakes with Honey",
-      morningSnack: "Plantain Chips with Zobo",
+      "snack/tea": "Plantain Chips with Zobo",
       lunch: "Spaghetti Jollof with Beef",
-      afternoonBites: "Roasted Groundnut",
+      "snack/bites-1": "Roasted Groundnut",
       dinner: "Semovita with Okra Soup",
       sideDish: "Grilled Chicken",
-      eveningSnack: "Lipton Tea with Biscuits",
+      "snack/bites-2": "Lipton Tea with Biscuits",
       dessert: "Puff Puff",
     },
     {
       id: "5",
       day: "Friday",
       breakfast: "Fried Plantain with Beans",
-      morningSnack: "Fruit Smoothie (Mango)",
+      "snack/tea": "Fruit Smoothie (Mango)",
       lunch: "White Rice with Stew",
-      afternoonBites: "Boli with Groundnut",
+      "snack/bites-1": "Boli with Groundnut",
       dinner: "Fufu with Banga Soup",
       sideDish: "Fried Fish",
-      eveningSnack: "Ginger Tea with Cake",
+      "snack/bites-2": "Ginger Tea with Cake",
       dessert: "Ice Cream",
     },
     {
       id: "6",
       day: "Saturday",
       breakfast: "Indomie with Eggs",
-      morningSnack: "Orange Juice with Cookies",
+      "snack/tea": "Orange Juice with Cookies",
       lunch: "Pepper Soup with Agidi",
-      afternoonBites: "Suya with Cucumber",
+      "snack/bites-1": "Suya with Cucumber",
       dinner: "Amala with Ewedu",
       sideDish: "Assorted Meat",
-      eveningSnack: "Milo with Bread",
+      "snack/bites-2": "Milo with Bread",
       dessert: "Chocolate Cake",
     },
     {
       id: "7",
       day: "Sunday",
       breakfast: "French Toast with Fruits",
-      morningSnack: "Chapman with Peanuts",
+      "snack/tea": "Chapman with Peanuts",
       lunch: "Coconut Rice with Chicken",
-      afternoonBites: "Moi Moi with Bread",
+      "snack/bites-1": "Moi Moi with Bread",
       dinner: "Oha Soup with Pounded Yam",
       sideDish: "Fried Plantain",
-      eveningSnack: "Coffee with Buns",
+      "snack/bites-2": "Coffee with Buns",
       dessert: "Fruit Parfait",
     },
   ]);
 
+  const timetableRef = useRef<HTMLDivElement>(null);
+
+  const downloadPDF = async () => {
+    if (!timetableRef.current) return;
+
+    try {
+      const canvas = await html2canvas(timetableRef.current, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: "#ffffff",
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
+
+      const imgWidth = 210; // A4 width in mm
+      const pageHeight = 295; // A4 height in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+
+      let position = 0;
+
+      // Add first page
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      // Add additional pages if needed
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save("meal-timetable.pdf");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Meal Timetable</h1>
-        <p className="text-muted-foreground mt-2">
-          View your weekly meal schedule (Admin-managed)
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Meal Timetable</h1>
+          <p className="text-muted-foreground mt-2">
+            View your weekly meal schedule
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          className="flex items-center gap-2"
+          onClick={downloadPDF}
+        >
+          <Download className="h-4 w-4" />
+          Download PDF
+        </Button>
       </div>
 
-      <div className="grid gap-4">
+      <div ref={timetableRef} className="grid gap-4">
         {mealPlans.map((plan) => (
           <Card key={plan.id}>
             <CardHeader>
