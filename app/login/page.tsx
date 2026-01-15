@@ -51,11 +51,11 @@ export default function LoginPage() {
         return;
       }
 
-      // Fetch user profile to get first name
+      // Fetch user profile to get first name and role
       const { data: profileData, error: profileError } = await supabase
         .from("users_profile")
-        .select("first_name, last_name, full_name")
-        .eq("user_id", data.user.id)
+        .select("first_name, last_name, full_name, role")
+        .eq("id", data.user.id)
         .single();
 
       // Store user data in localStorage for compatibility with existing code
@@ -71,10 +71,16 @@ export default function LoginPage() {
         localStorage.setItem("userName", profileData.full_name || "");
         localStorage.setItem("userFirstName", profileData.first_name || "");
         localStorage.setItem("userLastName", profileData.last_name || "");
+        localStorage.setItem("userRole", profileData.role || "user");
       }
 
-      // Redirect to dashboard
-      router.push("/dashboard/overview");
+      // Role-based routing
+      const userRole = profileData?.role || "user";
+      if (userRole === "admin") {
+        router.push("/admin/overview");
+      } else {
+        router.push("/dashboard/overview");
+      }
     } catch (err) {
       console.error("Login error:", err);
       setError("An unexpected error occurred. Please try again.");

@@ -85,9 +85,40 @@ export async function updateSession(request: NextRequest) {
 
   // If accessing auth routes while already authenticated, redirect to dashboard
   if (isAuthRoute && user) {
+    // Check user role for proper redirect
+    const { data: profile } = await supabase
+      .from("users_profile")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
     const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/dashboard";
+    // Redirect admin users to admin dashboard, regular users to user dashboard
+    if (profile?.role === "admin") {
+      redirectUrl.pathname = "/admin/overview";
+    } else {
+      redirectUrl.pathname = "/dashboard/overview";
+    }
     return NextResponse.redirect(redirectUrl);
+  }
+
+  // Check if admin is accessing non-admin dashboard
+  if (request.nextUrl.pathname.startsWith("/dashboard") && user) {
+    const { data: profile } = await supabase
+      .from("users_profile")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    // If admin tries to access regular dashboard, redirect to admin dashboard
+    if (profile?.role === "admin") {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = request.nextUrl.pathname.replace(
+        "/dashboard",
+        "/admin"
+      );
+      return NextResponse.redirect(redirectUrl);
+    }
   }
 
   return response;

@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Download, CreditCard, Calendar, FileText } from "lucide-react";
+import { Download, CreditCard, Calendar } from "lucide-react";
 import { createBrowserSupabaseClient } from "@/lib/supabase";
 
 export default function OverviewPage() {
@@ -85,19 +85,11 @@ export default function OverviewPage() {
           : "bg-gray-50 border-gray-200",
     },
     {
-      title: "Meal Plans",
+      title: "Meal Table",
       value: "4",
       description: "Active meal schedules",
       icon: Calendar,
       color: "bg-orange-50 border-orange-200",
-    },
-    {
-      title: "Articles Read",
-      value: "24",
-      description: "Educational content",
-      icon: FileText,
-      color: "bg-purple-50 border-purple-200",
-      trend: "",
     },
   ];
 
@@ -112,10 +104,23 @@ export default function OverviewPage() {
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {stats.map((stat) => {
           const Icon = stat.icon;
-          const isClickable = stat.title === "Active Subscription";
+          const getRoute = (title: string) => {
+            switch (title) {
+              case "Total Downloads":
+                return "/dashboard/my-downloads";
+              case "Active Subscription":
+                return "/dashboard/my-subscription";
+              case "Meal Table":
+                return "/dashboard/meal-timetable";
+              default:
+                return null;
+            }
+          };
+          const route = getRoute(stat.title);
+          const isClickable = !!route;
           return (
             <Card
               key={stat.title}
@@ -124,11 +129,7 @@ export default function OverviewPage() {
                   ? "cursor-pointer hover:shadow-md transition-shadow"
                   : ""
               }`}
-              onClick={
-                isClickable
-                  ? () => router.push("/dashboard/my-subscription")
-                  : undefined
-              }
+              onClick={isClickable ? () => router.push(route!) : undefined}
             >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-gray-900 dark:text-white">
@@ -142,9 +143,6 @@ export default function OverviewPage() {
                 </div>
                 <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                   {stat.description}
-                </p>
-                <p className="text-xs text-green-600 dark:text-green-400 mt-2">
-                  {stat.trend}
                 </p>
               </CardContent>
             </Card>

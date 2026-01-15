@@ -34,11 +34,6 @@ const navItems = [
     icon: Download,
   },
   {
-    title: "My Subscription",
-    href: "/dashboard/my-subscription",
-    icon: CreditCard,
-  },
-  {
     title: "Shop List",
     href: "/dashboard/shop-list",
     icon: ShoppingCart,
@@ -47,6 +42,11 @@ const navItems = [
     title: "Meal Timetable",
     href: "/dashboard/meal-timetable",
     icon: Calendar,
+  },
+  {
+    title: "My Subscription",
+    href: "/dashboard/my-subscription",
+    icon: CreditCard,
   },
   {
     title: "Settings",
