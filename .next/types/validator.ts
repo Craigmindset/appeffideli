@@ -119,6 +119,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../app/admin/uploads/my-download/page.tsx
+{
+  type __IsExpected<Specific extends AppPageConfig<"/admin/uploads/my-download">> = Specific
+  const handler = {} as typeof import("../../app/admin/uploads/my-download/page.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../app/admin/uploads/page.tsx
 {
   type __IsExpected<Specific extends AppPageConfig<"/admin/uploads">> = Specific
@@ -407,6 +416,24 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../app/api/cloudinary/save-upload/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/cloudinary/save-upload">> = Specific
+  const handler = {} as typeof import("../../app/api/cloudinary/save-upload/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../app/api/cloudinary/signature/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/cloudinary/signature">> = Specific
+  const handler = {} as typeof import("../../app/api/cloudinary/signature/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../app/api/download-pdf/route.ts
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/download-pdf">> = Specific
@@ -429,6 +456,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/subscription/process">> = Specific
   const handler = {} as typeof import("../../app/api/subscription/process/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../app/api/upload/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/upload">> = Specific
+  const handler = {} as typeof import("../../app/api/upload/route.js")
   type __Check = __IsExpected<typeof handler>
   // @ts-ignore
   type __Unused = __Check

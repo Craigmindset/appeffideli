@@ -1,6 +1,6 @@
-/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/.pnpm/next@15.5.9_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[10].use[2]!./node_modules/.pnpm/next@15.5.9_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[10].use[3]!./app/globals.css ***!
-  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*!*************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[10].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[10].use[3]!./app/globals.css ***!
+  \*************************************************************************************************************************************************************************************************************************************************************/
 *, ::before, ::after {
   --tw-border-spacing-x: 0;
   --tw-border-spacing-y: 0;
@@ -108,7 +108,7 @@
   --tw-contain-paint:  ;
   --tw-contain-style:  ;
 }/*
-! tailwindcss v3.4.19 | MIT License | https://tailwindcss.com
+! tailwindcss v3.4.18 | MIT License | https://tailwindcss.com
 *//*
 1. Prevent padding and border from affecting element width. (https://github.com/mozdevs/cssremedy/issues/4)
 2. Allow adding a border to an element by just adding a border-width. (https://github.com/tailwindcss/tailwindcss/pull/116)
@@ -856,12 +856,6 @@ video {
 .mt-auto {
   margin-top: auto;
 }
-.line-clamp-1 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
-}
 .line-clamp-2 {
   overflow: hidden;
   display: -webkit-box;
@@ -1039,9 +1033,6 @@ video {
 .max-h-0 {
   max-height: 0px;
 }
-.max-h-52 {
-  max-height: 13rem;
-}
 .max-h-96 {
   max-height: 24rem;
 }
@@ -1068,9 +1059,6 @@ video {
 }
 .min-h-\[150px\] {
   min-height: 150px;
-}
-.min-h-\[200px\] {
-  min-height: 200px;
 }
 .min-h-\[80px\] {
   min-height: 80px;
@@ -1164,9 +1152,6 @@ video {
 }
 .w-\[100px\] {
   width: 100px;
-}
-.w-\[140px\] {
-  width: 140px;
 }
 .w-\[1px\] {
   width: 1px;
@@ -2127,9 +2112,6 @@ video {
   padding-top: 2rem;
   padding-bottom: 2rem;
 }
-.pb-0 {
-  padding-bottom: 0px;
-}
 .pb-12 {
   padding-bottom: 3rem;
 }
@@ -2144,9 +2126,6 @@ video {
 }
 .pb-4 {
   padding-bottom: 1rem;
-}
-.pb-6 {
-  padding-bottom: 1.5rem;
 }
 .pl-10 {
   padding-left: 2.5rem;
@@ -2198,9 +2177,6 @@ video {
 }
 .pt-4 {
   padding-top: 1rem;
-}
-.pt-5 {
-  padding-top: 1.25rem;
 }
 .pt-6 {
   padding-top: 1.5rem;
@@ -2343,10 +2319,6 @@ video {
   --tw-text-opacity: 1;
   color: rgb(37 99 235 / var(--tw-text-opacity, 1));
 }
-.text-blue-700 {
-  --tw-text-opacity: 1;
-  color: rgb(29 78 216 / var(--tw-text-opacity, 1));
-}
 .text-blue-800 {
   --tw-text-opacity: 1;
   color: rgb(30 64 175 / var(--tw-text-opacity, 1));
@@ -2448,10 +2420,6 @@ video {
 .text-purple-600 {
   --tw-text-opacity: 1;
   color: rgb(147 51 234 / var(--tw-text-opacity, 1));
-}
-.text-purple-700 {
-  --tw-text-opacity: 1;
-  color: rgb(126 34 206 / var(--tw-text-opacity, 1));
 }
 .text-purple-800 {
   --tw-text-opacity: 1;

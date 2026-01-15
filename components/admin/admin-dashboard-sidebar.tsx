@@ -14,6 +14,7 @@ import {
   Menu,
   ChevronLeft,
   ChevronRight,
+  Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -36,6 +37,11 @@ const navItems = [
     title: "Uploads",
     href: "/admin/uploads",
     icon: Upload,
+  },
+  {
+    title: "My Downloads",
+    href: "/admin/uploads/my-download",
+    icon: Download,
   },
   {
     title: "Meal Table",

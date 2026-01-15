@@ -1,8 +1,7 @@
 {
-  "/login/page": "app/login/page.js",
-  "/page": "app/page.js",
-  "/admin/users/page": "app/admin/users/page.js",
-  "/admin/finances/page": "app/admin/finances/page.js",
+  "/admin/uploads/page": "app/admin/uploads/page.js",
+  "/admin/page": "app/admin/page.js",
+  "/admin/overview/page": "app/admin/overview/page.js",
   "/admin/settings/page": "app/admin/settings/page.js",
-  "/admin/overview/page": "app/admin/overview/page.js"
+  "/admin/uploads/my-download/page": "app/admin/uploads/my-download/page.js"
 }
