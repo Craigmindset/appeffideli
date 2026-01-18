@@ -409,7 +409,7 @@ export default function MySubscriptionPage() {
                     <span className="text-yellow-500">🌟</span>
                     <span>
                       Expanded weekly meal plans (Breakfast, Snack, Lunch,
-                      Bites, Dinner, Side Dish, Snack & Desserts)
+                      Bites, Dinner, and Side Dish )
                     </span>
                   </li>
                   <li className="flex items-center gap-2">

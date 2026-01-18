@@ -249,6 +249,28 @@ export default function MealPlanSubscriptionPage() {
                   </p>
                 </div>
 
+                {/* Best For Note - Basic Plan */}
+                {plan.id === "basic" && (
+                  <p className="text-sm text-gray-600 dark:text-gray-400 italic">
+                    Best for: Busy mums on a budget or first-time meal planners
+                  </p>
+                )}
+
+                {/* Best For Note - Premium Plan */}
+                {plan.id === "premium" && (
+                  <p className="text-sm text-gray-600 dark:text-gray-400 italic">
+                    Best for: Families wanting more variety & structure
+                  </p>
+                )}
+
+                {/* Best For Note - VIP Plan */}
+                {plan.id === "vip" && (
+                  <p className="text-sm text-gray-600 dark:text-gray-400 italic">
+                    Best for:  Families who want personal guidance &
+                    highest value
+                  </p>
+                )}
+
                 {/* Price */}
                 <div className="border-t border-b border-gray-200 dark:border-gray-700 py-4">
                   <div className="flex items-baseline">
