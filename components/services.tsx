@@ -41,7 +41,7 @@ export default function Services() {
       description:
         "Saturday Breakfast with Gloria is a show that inspires families with breakfast ideas they can recreate at home, celebrating culture, promoting intercontinental dishes, and showcasing the brand’s wide range of culinary creativity.",
       image:
-        "https://res.cloudinary.com/djrup28qq/image/upload/v1768937040/saturday-gloria_bonqxq.jpg", // Add image URL if available
+        "https://res.cloudinary.com/djrup28qq/image/upload/v1768938613/3883_ojtmwa.jpg", // Add image URL if available
       href: "/services#saturday-breakfast-gloria",
     },
   ];
