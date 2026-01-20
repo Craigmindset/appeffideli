@@ -344,6 +344,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../app/services/kitchen-hacks-monday/page.tsx
+{
+  type __IsExpected<Specific extends AppPageConfig<"/services/kitchen-hacks-monday">> = Specific
+  const handler = {} as typeof import("../../app/services/kitchen-hacks-monday/page.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../app/services/meal-plan-subscription/page.tsx
 {
   type __IsExpected<Specific extends AppPageConfig<"/services/meal-plan-subscription">> = Specific
@@ -357,6 +366,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   type __IsExpected<Specific extends AppPageConfig<"/services">> = Specific
   const handler = {} as typeof import("../../app/services/page.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../app/services/saturday-breakfast-gloria/page.tsx
+{
+  type __IsExpected<Specific extends AppPageConfig<"/services/saturday-breakfast-gloria">> = Specific
+  const handler = {} as typeof import("../../app/services/saturday-breakfast-gloria/page.js")
   type __Check = __IsExpected<typeof handler>
   // @ts-ignore
   type __Unused = __Check

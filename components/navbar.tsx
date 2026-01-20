@@ -111,12 +111,12 @@ export default function Navbar() {
 
   const serviceLinks = [
     {
-      name: "Monthly Meal Subscription",
+      name: "Monthly Meal Plan",
       href: "/services/meal-plan-subscription",
       icon: <UtensilsCrossed className="h-4 w-4" />,
     },
     {
-      name: "Infant Recipe Plans",
+      name: "Onetime Infant & Toddler Recipe Pack",
       href: "/services/infant-recipes",
       icon: <Baby className="h-4 w-4" />,
     },
@@ -124,6 +124,16 @@ export default function Navbar() {
       name: "Household Cleaning Routine",
       href: "/services/cleaning-routine",
       icon: <ClipboardList className="h-4 w-4" />,
+    },
+    {
+      name: "Kitchen Hacks Monday",
+      href: "/services/kitchen-hacks-monday",
+      icon: <UtensilsCrossed className="h-4 w-4" />,
+    },
+    {
+      name: "Saturday Breakfast with Gloria",
+      href: "/services/saturday-breakfast-gloria",
+      icon: <UtensilsCrossed className="h-4 w-4" />,
     },
   ];
 

@@ -1,7 +1,6 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/subscription/login/page": "app/subscription/login/page.js",
   "/page": "app/page.js",
-  "/services/page": "app/services/page.js",
-  "/services/meal-plan-subscription/page": "app/services/meal-plan-subscription/page.js"
+  "/services/kitchen-hacks-monday/page": "app/services/kitchen-hacks-monday/page.js",
+  "/services/saturday-breakfast-gloria/page": "app/services/saturday-breakfast-gloria/page.js",
+  "/services/cleaning-routine/page": "app/services/cleaning-routine/page.js"
 }

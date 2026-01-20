@@ -16,25 +16,20 @@
       "static/chunks/main-app.js",
       "static/chunks/app/services/layout.js"
     ],
-    "/services/page": [
+    "/services/kitchen-hacks-monday/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/services/page.js"
+      "static/chunks/app/services/kitchen-hacks-monday/page.js"
     ],
-    "/subscription/login/page": [
+    "/services/saturday-breakfast-gloria/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/subscription/login/page.js"
+      "static/chunks/app/services/saturday-breakfast-gloria/page.js"
     ],
-    "/services/meal-plan-subscription/page": [
+    "/services/cleaning-routine/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/services/meal-plan-subscription/page.js"
-    ],
-    "/_not-found/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/_not-found/page.js"
+      "static/chunks/app/services/cleaning-routine/page.js"
     ]
   }
 }

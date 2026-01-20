@@ -270,7 +270,7 @@ export default function MealPlanSubscriptionPage() {
                 {plan.id === "vip" && (
                   <p className="text-sm text-gray-600 dark:text-gray-400 italic">
                     Best for: Private Chef, Catering, Patient food services, and
-                    families whi want personal guidance & highest value.
+                    families who want personal guidance & highest value.
                   </p>
                 )}
 
