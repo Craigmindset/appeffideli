@@ -79,15 +79,7 @@ export default function Footer() {
 
               <li>
                 <Link
-                  href="/contact"
-                  className="hover:text-white transition-colors"
-                >
-                  Contact Us
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/subscription/login"
+                  href="/services/meal-plan-subscription"
                   className="hover:text-white transition-colors"
                 >
                   Subscription Access
@@ -104,7 +96,7 @@ export default function Footer() {
                   href="/services#household-chores"
                   className="hover:text-white transition-colors"
                 >
-                  Household Chores Routine Management
+                  Household Cleaning Routine
                 </Link>
               </li>
               <li>
@@ -112,7 +104,7 @@ export default function Footer() {
                   href="/services#meal-planning"
                   className="hover:text-white transition-colors"
                 >
-                  Monthly Home Meal Subscription
+                  Monthly Meal Plan Subscription
                 </Link>
               </li>
               <li>
@@ -120,17 +112,10 @@ export default function Footer() {
                   href="/services#infant-recipe"
                   className="hover:text-white transition-colors"
                 >
-                  Infant Recipe Plan
+                  Onetime Infant & Toddler Recipe Pack
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/services#tiger-nuts"
-                  className="hover:text-white transition-colors"
-                >
-                  Tiger Nuts Recipe Packs (Coming Soon)
-                </Link>
-              </li>
+              <li></li>
             </ul>
           </div>
 
@@ -141,10 +126,7 @@ export default function Footer() {
                 <MapPin className="h-5 w-5 mr-2 flex-shrink-0" />
                 <span>Lagos, Nigeria</span>
               </li>
-              <li className="flex items-center">
-                <Phone className="h-5 w-5 mr-2 flex-shrink-0" />
-                <span>+2348034567305</span>
-              </li>
+
               <li className="flex items-center">
                 <Mail className="h-5 w-5 mr-2 flex-shrink-0" />
                 <span>info@effideli.com</span>

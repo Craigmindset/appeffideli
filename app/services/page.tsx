@@ -12,9 +12,9 @@ const slides = [
   {
     image:
       "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/2149248535.jpg-usn5FvbaQ9vdaEjX246IcgCPawANlP.jpeg",
-    title: "Professional Home Management",
+    title: "Household Cleaning Routine",
     description:
-      "Transform your living space with our expert home management and cleaning solutions",
+      "Effideli’s Household Cleaning Routine is a one-time customized chore guide for maids, nannies, and house managers, detailing what to clean, where, and how in any home type—flat, bungalow, or duplex—across a full Monday-to-Sunday schedule to ensure proper hygiene and maintenance",
   },
   {
     image:
@@ -26,7 +26,7 @@ const slides = [
   {
     image:
       "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/2148580388.jpg-JDSXekfxQWwqZ4kTIb14TePj6KG7XF.jpeg",
-    title: "Infant Care Solutions",
+    title: "Onetime Infant & Toddler Recipe Pack",
     description:
       "Specialized baby food meal plans for your little one's healthy development (6 months - 1 year)",
   },
@@ -136,7 +136,6 @@ export default function ServicesPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
       <main className="flex-grow">
         {/* Hero Slider Section */}
         <section className="relative h-[90vh] md:h-[80vh] overflow-hidden">

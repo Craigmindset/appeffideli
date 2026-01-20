@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 export default function Services() {
   const services = [
     {
-      title: "Monthly Home Meal Subscription / Weekly Home Meal Plan",
+      title: "Monthly Meal Plan Subscription",
       description:
         "Effideli offers a comprehensive monthly family meal plan featuring intercontinental dishes with African-infused recipes. It includes breakfast, snacks, lunch,  dinner, and evening bites—perfect for school meal prep and everyday home cooking.",
       image:
@@ -13,18 +13,18 @@ export default function Services() {
       href: "/services#meal-planning",
     },
     {
-      title: "Household Chores Routine Management",
+      title: "Household Cleaning Routine",
       description:
-        "Are you struggling to keep up with house chores? Our structured Household Chores Routine Management plan provides customized cleaning schedules based on your home type, ensuring efficiency and consistency.",
+        "Effideli’s Household Cleaning Routine is a one-time customized chore guide for maids, nannies, and house managers, detailing what to clean, where, and how in any home type—flat, bungalow, or duplex—across a full Monday-to-Sunday schedule to ensure proper hygiene and maintenance",
       image:
         "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/30286.jpg-vhmf07MH4i4JgOFTn71c3MUUWSC2UJ.jpeg",
       href: "/services#household-chores",
     },
 
     {
-      title: "6-Month to 1-Year Infant Recipe Plan",
+      title: "Onetime Infant & Toddler Recipe Pack",
       description:
-        "Give your baby the best start with our nutritionally balanced meal plan, designed for infants aged 6 months to 1 year.",
+        "Effideli’s One-Time Infant & Toddler Recipe Pack provides balanced, nutritious recipes tailored to a baby’s tooth stage, taste development, and potential allergies, helping mums introduce new foods and fruits safely during each stage of their baby’s transition.",
       image:
         "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/2149125810.jpg-pl5CDhf6uIFzqamjRctTgZyUV9SoBI.jpeg",
       href: "/services#infant-recipe",

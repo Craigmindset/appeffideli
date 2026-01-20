@@ -1,7 +1,6 @@
 {
-  "/get-started/page": "app/get-started/page.js",
-  "/dashboard/overview/page": "app/dashboard/overview/page.js",
-  "/dashboard/shop-list/page": "app/dashboard/shop-list/page.js",
-  "/dashboard/meal-timetable/page": "app/dashboard/meal-timetable/page.js",
-  "/services/meal-plan-subscription/page": "app/services/meal-plan-subscription/page.js"
+  "/page": "app/page.js",
+  "/subscription/login/page": "app/subscription/login/page.js",
+  "/services/meal-plan-subscription/page": "app/services/meal-plan-subscription/page.js",
+  "/services/page": "app/services/page.js"
 }

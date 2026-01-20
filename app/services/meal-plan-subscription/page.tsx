@@ -95,7 +95,7 @@ export default function MealPlanSubscriptionPage() {
           profile.meal_subscription_status === "active"
         ) {
           alert(
-            `You already have an active ${plan.name} subscription. Please cancel your current subscription before subscribing again.`
+            `You already have an active ${plan.name} subscription. Please cancel your current subscription before subscribing again.`,
           );
           setIsLoading(false);
           return;
@@ -107,7 +107,7 @@ export default function MealPlanSubscriptionPage() {
         // Create subscription record
         const result = await createMealSubscription(
           plan.id as MealPlanType,
-          plan.amount
+          plan.amount,
         );
 
         if (result.success && result.reference) {
@@ -139,7 +139,7 @@ export default function MealPlanSubscriptionPage() {
       console.log("Payment successful:", response);
       setIsModalOpen(false);
       router.push(
-        `/payment-success?reference=${subscriptionReference}&plan=${selectedPlan?.id}`
+        `/payment-success?reference=${subscriptionReference}&plan=${selectedPlan?.id}`,
       );
     },
     onClose: () => {
@@ -196,8 +196,11 @@ export default function MealPlanSubscriptionPage() {
             Effortless Meal Planning
           </h1>
           <p className="text-lg text-orange-50 max-w-2xl mx-auto">
-            Stress-free weekly meal plans tailored for your family. Never worry
-            about what's for dinner again.
+            Effideli’s Monthly Meal Plan Subscription provides a complete
+            family-friendly menu of intercontinental, African-infused
+            recipes—covering breakfast, snacks, lunch, and dinner—perfect for
+            healthy families, working mums, private chefs, and anyone looking to
+            spice up their home meals.
           </p>
         </div>
       </div>
@@ -266,8 +269,8 @@ export default function MealPlanSubscriptionPage() {
                 {/* Best For Note - VIP Plan */}
                 {plan.id === "vip" && (
                   <p className="text-sm text-gray-600 dark:text-gray-400 italic">
-                    Best for:  Families who want personal guidance &
-                    highest value
+                    Best for: Private Chef, Catering, Patient food services, and
+                    families whi want personal guidance & highest value.
                   </p>
                 )}
 
