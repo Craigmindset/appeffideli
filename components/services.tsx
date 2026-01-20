@@ -7,7 +7,7 @@ export default function Services() {
     {
       title: "Monthly Meal Plan Subscription",
       description:
-        "Effideli offers a comprehensive monthly family meal plan featuring intercontinental dishes with African-infused recipes. It includes breakfast, snacks, lunch,  dinner, and evening bites—perfect for school meal prep and everyday home cooking.",
+        "Effideli offers a comprehensive monthly family meal plan featuring intercontinental dishes with African-infused recipes. It includes breakfast, snacks, lunch, dinner, and evening bites—perfect for school meal prep and everyday home cooking.",
       image:
         "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/63326.jpg-NLSFxg9gkYBCAtPn6A80KDasclzgTs.jpeg",
       href: "/services#meal-planning",
@@ -20,7 +20,6 @@ export default function Services() {
         "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/30286.jpg-vhmf07MH4i4JgOFTn71c3MUUWSC2UJ.jpeg",
       href: "/services#household-chores",
     },
-
     {
       title: "Onetime Infant & Toddler Recipe Pack",
       description:
@@ -28,6 +27,22 @@ export default function Services() {
       image:
         "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/2149125810.jpg-pl5CDhf6uIFzqamjRctTgZyUV9SoBI.jpeg",
       href: "/services#infant-recipe",
+    },
+    {
+      title: "Kitchen Hacks Monday",
+      description:
+        "Kitchen Hacks Monday is an Effideli brand program that shares tips to make cooking fun, flavorful, and educational, adding value to your home—tune in every Monday on social media and the Effideli website.",
+      image:
+        "https://res.cloudinary.com/djrup28qq/image/upload/v1768937040/kitchen-hack_vzsvch.jpg", // Add image URL if available
+      href: "/services#kitchen-hacks-monday",
+    },
+    {
+      title: "Saturday Breakfast with Gloria",
+      description:
+        "Saturday Breakfast with Gloria is a show that inspires families with breakfast ideas they can recreate at home, celebrating culture, promoting intercontinental dishes, and showcasing the brand’s wide range of culinary creativity.",
+      image:
+        "https://res.cloudinary.com/djrup28qq/image/upload/v1768937040/saturday-gloria_bonqxq.jpg", // Add image URL if available
+      href: "/services#saturday-breakfast-gloria",
     },
   ];
 

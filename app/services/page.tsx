@@ -1,7 +1,5 @@
 "use client";
 
-import Navbar from "@/components/navbar";
-import Footer from "@/components/footer";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Clock } from "lucide-react";
@@ -102,6 +100,32 @@ const services = [
     ],
     formId: "custom-recipe",
     id: "custom-recipe",
+  },
+  {
+    image: "",
+    title: "Kitchen Hacks Monday",
+    description:
+      "Kitchen Hacks Monday is an Effideli brand program that shares tips to make cooking fun, flavorful, and educational, adding value to your home—tune in every Monday on social media and the Effideli website.",
+    howItWorks: [
+      "Tune in every Monday for new tips and tricks!",
+      "Follow us on social media and the Effideli website for updates.",
+    ],
+    formId: "kitchen-hacks-monday",
+    id: "kitchen-hacks-monday",
+    learnMore: true,
+  },
+  {
+    image: "",
+    title: "Saturday Breakfast with Gloria",
+    description:
+      "Saturday Breakfast with Gloria is a show that inspires families with breakfast ideas they can recreate at home, celebrating culture, promoting intercontinental dishes, and showcasing the brand’s wide range of culinary creativity.",
+    howItWorks: [
+      "Watch every Saturday for new breakfast inspiration!",
+      "Discover recipes and cultural stories on our platforms.",
+    ],
+    formId: "saturday-breakfast-gloria",
+    id: "saturday-breakfast-gloria",
+    learnMore: true,
   },
 ];
 
@@ -245,6 +269,10 @@ export default function ServicesPage() {
                               <Clock className="mr-2 h-4 w-4" />
                               Coming Soon!
                             </Button>
+                          ) : service.learnMore ? (
+                            <Button asChild className="w-full sm:w-auto">
+                              <Link href="#">Learn More</Link>
+                            </Button>
                           ) : (
                             <Button asChild className="w-full sm:w-auto">
                               <Link
@@ -264,7 +292,7 @@ export default function ServicesPage() {
           </div>
         </section>
       </main>
-      <Footer />
+      {/* Footer removed, handled by layout */}
     </div>
   );
 }
