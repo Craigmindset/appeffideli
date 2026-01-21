@@ -74,7 +74,8 @@ const services = [
   },
 
   {
-    image: "",
+    image:
+      "https://res.cloudinary.com/djrup28qq/image/upload/v1768937040/kitchen-hack_vzsvch.jpg",
     title: "Kitchen Hacks Monday",
     description:
       "Kitchen Hacks Monday is an Effideli brand program that shares tips to make cooking fun, flavorful, and educational, adding value to your home—tune in every Monday on social media and the Effideli website.",
@@ -87,7 +88,8 @@ const services = [
     learnMore: true,
   },
   {
-    image: "",
+    image:
+      "https://res.cloudinary.com/djrup28qq/image/upload/v1768938613/3883_ojtmwa.jpg",
     title: "Saturday Breakfast with Gloria",
     description:
       "Saturday Breakfast with Gloria is a show that inspires families with breakfast ideas they can recreate at home, celebrating culture, promoting intercontinental dishes, and showcasing the brand’s wide range of culinary creativity.",

@@ -14,6 +14,8 @@ import {
   ShoppingCart,
   ChevronLeft,
   ChevronRight,
+  Home,
+  Baby,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -47,6 +49,16 @@ const navItems = [
     title: "My Subscription",
     href: "/dashboard/my-subscription",
     icon: CreditCard,
+  },
+  {
+    title: "Household Cleaning",
+    href: "/dashboard/household-cleaning",
+    icon: Home,
+  },
+  {
+    title: "Infant & Toddler Pack",
+    href: "/dashboard/onetime-infant-toddler",
+    icon: Baby,
   },
   {
     title: "Settings",
@@ -137,7 +149,7 @@ export function DashboardSidebar() {
           "fixed left-0 top-16 z-[55] h-[calc(100vh-4rem)] border-r bg-background transition-all duration-300 md:top-0 md:h-screen md:translate-x-0 dark:border-gray-700 dark:bg-gray-800",
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full",
           isCollapsed ? "md:w-16" : "md:w-64",
-          "w-64"
+          "w-64",
         )}
       >
         <div className="flex h-full flex-col">
@@ -147,7 +159,7 @@ export function DashboardSidebar() {
               href="/dashboard/overview"
               className={cn(
                 "flex items-center gap-2",
-                isCollapsed && "md:hidden"
+                isCollapsed && "md:hidden",
               )}
             >
               <img
@@ -174,7 +186,7 @@ export function DashboardSidebar() {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 space-y-8 p-4">
+          <nav className="flex-1 space-y-2 p-4">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
@@ -189,7 +201,7 @@ export function DashboardSidebar() {
                     isActive
                       ? "bg-primary text-primary-foreground dark:bg-blue-600"
                       : "text-muted-foreground hover:bg-accent hover:text-accent-foreground dark:text-gray-300 dark:hover:bg-gray-700",
-                    isCollapsed && "md:justify-center md:px-2"
+                    isCollapsed && "md:justify-center md:px-2",
                   )}
                   title={isCollapsed ? item.title : undefined}
                 >
@@ -208,7 +220,7 @@ export function DashboardSidebar() {
               variant="ghost"
               className={cn(
                 "w-full justify-start text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-900/20",
-                isCollapsed && "md:justify-center md:px-2"
+                isCollapsed && "md:justify-center md:px-2",
               )}
               onClick={handleLogout}
               title={isCollapsed ? "Logout" : undefined}
