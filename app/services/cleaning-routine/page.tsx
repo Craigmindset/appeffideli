@@ -255,6 +255,24 @@ export default function CleaningRoutinePage() {
             </p>
           </div>
         </div>
+
+        {/* Proceed Button */}
+        <div className="flex justify-center mt-6">
+          <button
+            className="bg-primary text-white font-semibold px-8 py-3 rounded-lg shadow-md hover:bg-primary/90 transition-all duration-300 flex items-center gap-2 text-lg"
+            onClick={() => {
+              // Scroll to the next section or trigger the next action
+              const nextSection = document.getElementById(
+                "subscription-section",
+              );
+              if (nextSection) {
+                nextSection.scrollIntoView({ behavior: "smooth" });
+              }
+            }}
+          >
+            Proceed <ArrowRight className="w-5 h-5" />
+          </button>
+        </div>
       </section>
 
       {/* Subscription Confirmation Modal */}
