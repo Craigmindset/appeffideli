@@ -1,6 +1,5 @@
 {
+  "/_not-found/page": "app/_not-found/page.js",
   "/page": "app/page.js",
-  "/dashboard/page": "app/dashboard/page.js",
-  "/dashboard/overview/page": "app/dashboard/overview/page.js",
-  "/services/infant-recipes/page": "app/services/infant-recipes/page.js"
+  "/services/cleaning-routine/page": "app/services/cleaning-routine/page.js"
 }
