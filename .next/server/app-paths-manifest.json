@@ -1,6 +1,7 @@
 {
+  "/contact/page": "app/contact/page.js",
+  "/articles/page": "app/articles/page.js",
+  "/about/page": "app/about/page.js",
   "/page": "app/page.js",
-  "/services/kitchen-hacks-monday/page": "app/services/kitchen-hacks-monday/page.js",
-  "/services/saturday-breakfast-gloria/page": "app/services/saturday-breakfast-gloria/page.js",
-  "/services/cleaning-routine/page": "app/services/cleaning-routine/page.js"
+  "/services/page": "app/services/page.js"
 }

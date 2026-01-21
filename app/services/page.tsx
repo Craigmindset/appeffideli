@@ -34,9 +34,9 @@ const services = [
   {
     image:
       "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/30286.jpg-XFYYhqFTHOGJnCgLRpRO9nnDeNWxiw.jpeg",
-    title: "Household Chores Routine Management",
+    title: "Household Cleaning Routine",
     description:
-      "Are you struggling to keep up with house chores? Our structured Household Chores Routine Management plan provides customized cleaning schedules based on your home type, ensuring efficiency and consistency",
+      "Effideli’s Household Cleaning Routine is a one-time customized chore guide for maids, nannies, and house managers, detailing what to clean, where, and how in any home type—flat, bungalow, or duplex—across a full Monday-to-Sunday schedule to ensure proper hygiene and maintenance.",
     howItWorks: [
       "Choose a plan based on your home size (Studio, Apartment, Bungalow, Duplex)",
       "Receive a structured cleaning guide",
@@ -48,9 +48,9 @@ const services = [
   {
     image:
       "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/2151156154.jpg-dsEfo1hVCLbi8sDEGYFAgLppUzMKsh.jpeg",
-    title: "Monthly Home Meal Subscription ",
+    title: "Monthly Meal Plan",
     description:
-      "This plan is perfect for families committed to healthy living, busy working mums, parents who feel unsure about what meals to prepare for school or home, private chefs, and mothers looking to bring more variety and balanced nutrition into their kitchens",
+      "Effideli’s Monthly Meal Plan provides a complete family-friendly menu of intercontinental, African-infused recipes—covering breakfast, snacks, lunch, and dinner—perfect for healthy families, working mums, private chefs, and anyone looking to spice up their home meals.",
     howItWorks: [
       "Subscribe and receive a new meal plan every Friday at 9 PM",
       "Enjoy weekly or monthly curated meals tailored to your dietary needs",
@@ -61,9 +61,9 @@ const services = [
   {
     image:
       "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/2149125810.jpg-IscvO8MRCRt5nA08SNlRw4UlVZWmqN.jpeg",
-    title: "6-Month to 1-Year Infant Recipe Plan",
+    title: "One-time Infant & Toddler Recipe Pack",
     description:
-      "Give your baby the best start with our nutritionally balanced meal plan, designed for infants aged 6 months to 1 year.",
+      "Specialized baby food meal plans for your little one's healthy development (6 months - 1 year).",
     howItWorks: [
       "50 carefully curated infant meals",
       "Recipes delivered instantly via email after payment",
@@ -72,35 +72,7 @@ const services = [
     formId: "baby-menu",
     id: "infant-recipe",
   },
-  {
-    image:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/2682.jpg-ViTZJWdsG3VcWYIF0L8dj3bPKO2Mc5.jpeg",
-    title: "Tiger Nuts Recipe Packs",
-    description:
-      "Discover the health benefits of tiger nuts with our expertly crafted tiger nut-based recipes.",
-    howItWorks: [
-      "Easy-to-follow recipes",
-      "A selection of nutritious, delicious tiger nut dishes",
-      "Home delivery for convenience",
-    ],
-    formId: "tiger-nuts",
-    id: "tiger-nuts",
-  },
-  {
-    image:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/63326.jpg-F9Ws6Ivv8v1IspHRqUeysULoM7tCPK.jpeg",
-    title: "Customized Recipe Development",
-    description:
-      "Do you have unique dietary preferences? Our Customized Recipe Development service creates tailor-made meal plans that suit your needs.",
-    howItWorks: [
-      "Select your preferred food types (Traditional, Iconic, or Classical – pick two)",
-      "Specify allergies and dietary requirements",
-      "Receive a personalized meal plan within one week",
-      "Pay 60% upfront, with the balance settled before final delivery",
-    ],
-    formId: "custom-recipe",
-    id: "custom-recipe",
-  },
+
   {
     image: "",
     title: "Kitchen Hacks Monday",
