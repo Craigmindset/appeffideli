@@ -36,10 +36,10 @@ export default function AboutPage() {
               </div>
               <div className="relative h-[400px] rounded-lg overflow-hidden">
                 <Image
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/2149230513.jpg-attFUM9iJbmQJpp71o07P34hhsSjmi.jpeg"
-                  alt="Effideli team members"
+                  src="/effideli_ceo.jpeg"
+                  alt="Effideli"
                   fill
-                  className="object-cover"
+                  className="object-cover object-top md:object-[center_30%]"
                 />
               </div>
             </div>

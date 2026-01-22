@@ -86,7 +86,7 @@ export default function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link
-                  href="/services#household-chores"
+                  href="/services/cleaning-routine"
                   className="hover:text-white transition-colors"
                 >
                   Household Cleaning Routine
@@ -94,7 +94,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/services#meal-planning"
+                  href="/services/meal-plan-subscription"
                   className="hover:text-white transition-colors"
                 >
                   Monthly Meal Plan Subscription
@@ -102,7 +102,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/services#infant-recipe"
+                  href="/services/infant-recipes"
                   className="hover:text-white transition-colors"
                 >
                   Onetime Infant & Toddler Recipe Pack
@@ -128,17 +128,11 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-12 pt-8">
-          <div className="flex justify-between items-center">
+        <div className="border-t border-gray-800 mt-12 pt-8 text-center w-auto">
+          <div className="flex justify-center items-center">
             <p>
               &copy; {new Date().getFullYear()} Effideli. All rights reserved.
             </p>
-            <Link
-              href="/admin"
-              className="text-sm text-gray-400 hover:text-white transition-colors"
-            >
-              Admin
-            </Link>
           </div>
         </div>
       </div>
