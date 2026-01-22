@@ -1,5 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,16 +14,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, User, Home, Headphones } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { signOut } from "@/app/actions/auth";
+
+import { LogOut, User, Home, Headphones, Menu } from "lucide-react";
+
 import { DashboardThemeToggle } from "./dashboard-theme-toggle";
-import { useEffect, useState } from "react";
 import { createBrowserSupabaseClient } from "@/lib/supabase";
-import Link from "next/link";
+import { signOut } from "@/app/actions/auth";
+import { useSidebar } from "./sidebar-context";
 
 export function DashboardHeader() {
   const router = useRouter();
+  const { setIsMobileMenuOpen } = useSidebar();
   const [firstName, setFirstName] = useState("User");
   const [userEmail, setUserEmail] = useState("");
 
@@ -27,8 +32,6 @@ export function DashboardHeader() {
     const fetchUserData = async () => {
       try {
         const supabase = createBrowserSupabaseClient();
-
-        // Get current user
         const {
           data: { user },
         } = await supabase.auth.getUser();
@@ -36,21 +39,18 @@ export function DashboardHeader() {
         if (user) {
           setUserEmail(user.email || "");
 
-          // Fetch user profile from database
-          const { data: profile, error } = await supabase
+          const { data: profile } = await supabase
             .from("users_profile")
             .select("full_name")
             .eq("id", user.id)
             .single();
 
-          if (!error && profile && profile.full_name) {
-            // Extract first name from full name
-            const firstName = profile.full_name.split(" ")[0];
-            setFirstName(firstName || "User");
+          if (profile?.full_name) {
+            setFirstName(profile.full_name.split(" ")[0]);
           }
         }
       } catch (error) {
-        console.error("Error fetching user data:", error);
+        console.error("Error fetching user:", error);
       }
     };
 
@@ -59,123 +59,134 @@ export function DashboardHeader() {
 
   const handleLogout = async () => {
     try {
-      // Clear client-side storage
       localStorage.clear();
       sessionStorage.clear();
 
-      // Get supabase client and sign out
       const supabase = createBrowserSupabaseClient();
       await supabase.auth.signOut();
-
-      // Clear server-side session
       await signOut();
 
-      // Redirect to home page
       router.push("/");
     } catch (error) {
-      console.error("Logout error:", error);
-      // Even if server signout fails, redirect to home page
       router.push("/");
     }
   };
 
-  const getInitials = (name: string) => {
-    return name
+  const getInitials = (name: string) =>
+    name
       .split(" ")
       .map((n) => n[0])
       .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
+      .slice(0, 2)
+      .toUpperCase();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:border-gray-700">
-      <div className="container flex h-16 items-center justify-between px-4">
-        {/* Left: Greeting */}
-        <div className="flex items-center">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-            Hi {firstName}! 👋
-          </h2>
-        </div>
+    <header className="sticky top-0 z-80 w-full border-b bg-background/95 backdrop-blur md:supports-[backdrop-filter]:bg-background/60">
+      <div className="flex h-16 items-center justify-between px-3 md:px-4 gap-2 md:gap-4">
+        {/* LEFT: Hamburger (Mobile Only) */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsMobileMenuOpen?.(true)}
+          className="md:hidden text-foreground hover:bg-accent/50"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
 
-        {/* Center: Navigation Links */}
-        <nav className="hidden md:flex items-center gap-4">
+        {/* CENTER: Home and Support Icons (Mobile Only) */}
+        <nav className="flex md:hidden items-center gap-2 flex-1 justify-center">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary hover:bg-accent transition-colors"
+            className="inline-flex items-center gap-2 px-2 py-2 rounded-md text-foreground hover:bg-accent/50 transition-colors"
+            title="Home"
           >
             <Home className="h-4 w-4" />
-            Home
           </Link>
           <Link
             href="/contact"
-            className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary hover:bg-accent transition-colors"
+            className="inline-flex items-center gap-2 px-2 py-2 rounded-md text-foreground hover:bg-accent/50 transition-colors"
+            title="Support"
           >
             <Headphones className="h-4 w-4" />
-            Support
           </Link>
         </nav>
 
-        {/* Right: Actions */}
-        <div className="flex items-center gap-3">
+        {/* CENTER-RIGHT: Desktop Full Section */}
+        <div className="hidden md:flex items-center gap-4 flex-1">
+          <h2 className="text-lg font-semibold">Hi {firstName}! 👋</h2>
+          <nav className="flex items-center gap-4">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent"
+            >
+              <Home className="h-4 w-4" />
+              Home
+            </Link>
+            <Link
+              href="/contact"
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium hover:bg-accent"
+            >
+              <Headphones className="h-4 w-4" />
+              Support
+            </Link>
+          </nav>
+        </div>
+
+        {/* RIGHT: Mobile Greeting + All Shared Actions */}
+        <div className="flex items-center gap-2 md:gap-4">
+          {/* Mobile Greeting Only */}
+          <h2 className="md:hidden text-sm font-semibold text-foreground whitespace-nowrap">
+            Hi {firstName}! 👋
+          </h2>
+
           {/* Theme Toggle */}
           <DashboardThemeToggle />
 
-          {/* Logout Button */}
+          {/* Logout Icon (Desktop Only) */}
           <Button
             variant="ghost"
             size="icon"
             onClick={handleLogout}
-            className="rounded-full text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400"
             title="Logout"
+            className="hidden md:inline-flex text-foreground hover:text-red-600"
           >
             <LogOut className="h-5 w-5" />
-            <span className="sr-only">Logout</span>
           </Button>
 
-          {/* User Dropdown */}
+          {/* User Dropdown (Desktop Only) */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="relative h-10 w-10 rounded-full"
+                className="hidden md:inline-flex h-10 w-10 rounded-full"
               >
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src="/images/avatar.png" alt={firstName} />
-                  <AvatarFallback className="bg-primary text-white">
-                    {getInitials(firstName)}
-                  </AvatarFallback>
+                <Avatar>
+                  <AvatarImage src="/images/avatar.png" />
+                  <AvatarFallback>{getInitials(firstName)}</AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent
-              className="w-56 dark:bg-gray-800 dark:border-gray-700"
-              align="end"
-              forceMount
-            >
+
+            <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none dark:text-white">
+                  <p className="text-sm font-medium leading-none">
                     {firstName}
                   </p>
-                  <p className="text-xs leading-none text-muted-foreground dark:text-gray-400">
+                  <p className="text-xs leading-none text-muted-foreground">
                     {userEmail}
                   </p>
                 </div>
               </DropdownMenuLabel>
-              <DropdownMenuSeparator className="dark:bg-gray-700" />
+              <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => router.push("/dashboard/settings")}
-                className="dark:hover:bg-gray-700 dark:text-gray-200"
               >
                 <User className="mr-2 h-4 w-4" />
                 <span>Settings</span>
               </DropdownMenuItem>
-              <DropdownMenuSeparator className="dark:bg-gray-700" />
-              <DropdownMenuItem
-                onClick={handleLogout}
-                className="text-red-600 dark:text-red-400 dark:hover:bg-gray-700"
-              >
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout} className="text-red-600">
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Logout</span>
               </DropdownMenuItem>

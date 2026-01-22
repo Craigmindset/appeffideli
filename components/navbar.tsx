@@ -155,7 +155,7 @@ export default function Navbar() {
                 alt="Effideli Logo"
                 width={60}
                 height={60}
-                className="h-14 w-auto"
+                className="h-10 w-auto md:h-14"
               />
               <span className="text-2xl font-bold" style={{ color: "#174969" }}>
                 Effideli
@@ -266,6 +266,20 @@ export default function Navbar() {
           {/* Mobile menu button */}
           <div className="flex items-center gap-2 md:hidden">
             <ThemeToggle />
+            {isLoggedIn && (
+              <button
+                onClick={() => router.push("/dashboard")}
+                className="inline-flex items-center justify-center p-1 rounded-full hover:bg-accent transition-colors"
+                title="Go to Dashboard"
+              >
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src="/images/avatar.png" alt={firstName} />
+                  <AvatarFallback className="bg-primary text-white text-xs">
+                    {getInitials(firstName)}
+                  </AvatarFallback>
+                </Avatar>
+              </button>
+            )}
             <button
               onClick={toggleMenu}
               className="inline-flex items-center justify-center p-2 rounded-md text-foreground hover:text-primary hover:bg-accent focus:outline-none"

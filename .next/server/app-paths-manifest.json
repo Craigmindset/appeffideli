@@ -1,5 +1,7 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
   "/page": "app/page.js",
-  "/services/cleaning-routine/page": "app/services/cleaning-routine/page.js"
+  "/dashboard/page": "app/dashboard/page.js",
+  "/dashboard/overview/page": "app/dashboard/overview/page.js",
+  "/dashboard/my-downloads/page": "app/dashboard/my-downloads/page.js"
 }

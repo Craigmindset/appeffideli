@@ -10,7 +10,7 @@ export default function Services() {
         "Effideli offers a comprehensive monthly family meal plan featuring intercontinental dishes with African-infused recipes. It includes breakfast, snacks, lunch, dinner, and evening bites—perfect for school meal prep and everyday home cooking.",
       image:
         "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/63326.jpg-NLSFxg9gkYBCAtPn6A80KDasclzgTs.jpeg",
-      href: "/services#meal-planning",
+      href: "/services/meal-plan-subscription",
     },
     {
       title: "Household Cleaning Routine",
@@ -18,7 +18,7 @@ export default function Services() {
         "Effideli’s Household Cleaning Routine is a one-time customized chore guide for maids, nannies, and house managers, detailing what to clean, where, and how in any home type—flat, bungalow, or duplex—across a full Monday-to-Sunday schedule to ensure proper hygiene and maintenance",
       image:
         "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/30286.jpg-vhmf07MH4i4JgOFTn71c3MUUWSC2UJ.jpeg",
-      href: "/services#household-chores",
+      href: "/services/cleaning-routine",
     },
     {
       title: "Onetime Infant & Toddler Recipe Pack",
@@ -26,7 +26,7 @@ export default function Services() {
         "Effideli’s One-Time Infant & Toddler Recipe Pack provides balanced, nutritious recipes tailored to a baby’s tooth stage, taste development, and potential allergies, helping mums introduce new foods and fruits safely during each stage of their baby’s transition.",
       image:
         "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/2149125810.jpg-pl5CDhf6uIFzqamjRctTgZyUV9SoBI.jpeg",
-      href: "/services#infant-recipe",
+      href: "/services/infant-recipe",
     },
     {
       title: "Kitchen Hacks Monday",
@@ -34,7 +34,7 @@ export default function Services() {
         "Kitchen Hacks Monday is an Effideli brand program that shares tips to make cooking fun, flavorful, and educational, adding value to your home—tune in every Monday on social media and the Effideli website.",
       image:
         "https://res.cloudinary.com/djrup28qq/image/upload/v1768937040/kitchen-hack_vzsvch.jpg", // Add image URL if available
-      href: "/services#kitchen-hacks-monday",
+      href: "/services/kitchen-hacks-monday",
     },
     {
       title: "Saturday Breakfast with Gloria",
@@ -42,7 +42,7 @@ export default function Services() {
         "Saturday Breakfast with Gloria is a show that inspires families with breakfast ideas they can recreate at home, celebrating culture, promoting intercontinental dishes, and showcasing the brand’s wide range of culinary creativity.",
       image:
         "https://res.cloudinary.com/djrup28qq/image/upload/v1768938613/3883_ojtmwa.jpg", // Add image URL if available
-      href: "/services#saturday-breakfast-gloria",
+      href: "/services/saturday-breakfast-gloria",
     },
   ];
 

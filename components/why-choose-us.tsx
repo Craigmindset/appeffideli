@@ -56,8 +56,7 @@ export default function WhyChooseUs() {
           </h2>
           <div className="w-24 h-1 bg-primary mx-auto mb-6" />
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Experience the difference with our comprehensive home management
-            solutions and dedicated team of professionals.
+            Delicious meals. Easy cooking. Happy homes.
           </p>
         </div>
 

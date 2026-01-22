@@ -43,7 +43,8 @@ const services = [
       "Get a downloadable version instantly upon payment",
     ],
     formId: "household-chore",
-    id: "household-chores",
+    id: "cleaning-routine",
+    learnMore: true,
   },
   {
     image:
@@ -56,7 +57,8 @@ const services = [
       "Enjoy weekly or monthly curated meals tailored to your dietary needs",
     ],
     formId: "meal-planning",
-    id: "meal-planning",
+    id: "meal-plan-subscription",
+    learnMore: true,
   },
   {
     image:
@@ -70,7 +72,8 @@ const services = [
       "Tailored options based on allergies, sweet tooth preferences, and nutrition goals",
     ],
     formId: "baby-menu",
-    id: "infant-recipe",
+    id: "infant-recipes",
+    learnMore: true,
   },
 
   {
@@ -245,7 +248,9 @@ export default function ServicesPage() {
                             </Button>
                           ) : service.learnMore ? (
                             <Button asChild className="w-full sm:w-auto">
-                              <Link href="#">Learn More</Link>
+                              <Link href={`/services/${service.id}`}>
+                                Learn More
+                              </Link>
                             </Button>
                           ) : (
                             <Button asChild className="w-full sm:w-auto">

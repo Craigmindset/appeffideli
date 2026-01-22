@@ -45,11 +45,7 @@ const navItems = [
     href: "/dashboard/meal-timetable",
     icon: Calendar,
   },
-  {
-    title: "My Subscription",
-    href: "/dashboard/my-subscription",
-    icon: CreditCard,
-  },
+
   {
     title: "Household Cleaning",
     href: "/dashboard/household-cleaning",
@@ -61,6 +57,11 @@ const navItems = [
     icon: Baby,
   },
   {
+    title: "My Subscription",
+    href: "/dashboard/my-subscription",
+    icon: CreditCard,
+  },
+  {
     title: "Settings",
     href: "/dashboard/settings",
     icon: Settings,
@@ -70,8 +71,8 @@ const navItems = [
 export function DashboardSidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { isCollapsed, setIsCollapsed } = useSidebar();
+  const { isCollapsed, setIsCollapsed, isMobileMenuOpen, setIsMobileMenuOpen } =
+    useSidebar();
   const [firstName, setFirstName] = useState("User");
 
   useEffect(() => {
@@ -126,8 +127,8 @@ export function DashboardSidebar() {
 
   return (
     <>
-      {/* Mobile Header */}
-      <div className="fixed top-0 left-0 right-0 z-[60] flex h-16 items-center justify-between border-b bg-background/95 backdrop-blur px-4 md:hidden dark:border-gray-700 dark:bg-gray-800/95">
+      {/* Mobile Header - Hidden, using DashboardHeader instead */}
+      <div className="hidden">
         <Button
           variant="ghost"
           size="icon"
@@ -146,7 +147,7 @@ export function DashboardSidebar() {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed left-0 top-16 z-[55] h-[calc(100vh-4rem)] border-r bg-background transition-all duration-300 md:top-0 md:h-screen md:translate-x-0 dark:border-gray-700 dark:bg-gray-800",
+          "fixed left-0 top-0 z-[55] h-screen border-r bg-background transition-all duration-300 md:translate-x-0 dark:border-gray-700 dark:bg-gray-800",
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full",
           isCollapsed ? "md:w-16" : "md:w-64",
           "w-64",
