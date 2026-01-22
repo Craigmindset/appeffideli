@@ -134,10 +134,10 @@ export default function AboutPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div className="relative h-[500px] rounded-lg overflow-hidden">
                 <Image
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/45519.jpg-DIalqoHMrDSfB4d0xTTYuTYN2yYSNM.jpeg"
+                  src="/CEO.png"
                   alt="Our story"
                   fill
-                  className="object-cover"
+                  className="object-cover object-top md:object-[center_30%]"
                 />
               </div>
               <div className="space-y-6">

@@ -2043,6 +2043,9 @@ video {
 .object-cover {
   object-fit: cover;
 }
+.object-top {
+  object-position: top;
+}
 .p-0 {
   padding: 0px;
 }
@@ -4761,6 +4764,10 @@ video {
 
   .md\:bg-background\/95 {
     background-color: hsl(var(--background) / 0.95);
+  }
+
+  .md\:object-\[center_30\%\] {
+    object-position: center 30%;
   }
 
   .md\:p-12 {
