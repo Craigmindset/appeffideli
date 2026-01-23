@@ -1,7 +1,7 @@
 {
-  "/login/page": "app/login/page.js",
   "/page": "app/page.js",
-  "/dashboard/meal-timetable/page": "app/dashboard/meal-timetable/page.js",
+  "/login/page": "app/login/page.js",
+  "/about/page": "app/about/page.js",
   "/services/saturday-breakfast-gloria/page": "app/services/saturday-breakfast-gloria/page.js",
   "/services/kitchen-hacks-monday/page": "app/services/kitchen-hacks-monday/page.js"
 }

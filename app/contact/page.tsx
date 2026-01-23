@@ -131,7 +131,7 @@ export default function ContactPage() {
                       <span className="sr-only">YouTube</span>
                     </a>
                     <a
-                      href="#"
+                      href="https://www.tiktok.com/@effideli?_r=1&_t=ZS-93IEVCSXwPd"
                       className="p-2 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors"
                     >
                       <FaTiktok className="h-5 w-5" />

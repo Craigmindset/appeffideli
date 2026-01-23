@@ -34,7 +34,7 @@ export default function AboutPage() {
                   celebration.
                 </p>
               </div>
-              <div className="relative h-[400px] rounded-lg overflow-hidden">
+              <div className="relative h-[500px] rounded-lg overflow-hidden">
                 <Image
                   src="/effideli_ceo.jpeg"
                   alt="Effideli"

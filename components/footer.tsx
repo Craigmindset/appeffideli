@@ -29,7 +29,7 @@ export default function Footer() {
                 <span className="sr-only">YouTube</span>
               </a>
               <a
-                href="#"
+                href="https://www.tiktok.com/@effideli?_r=1&_t=ZS-93IEVCSXwPd"
                 className="text-gray-400 hover:text-white transition-colors"
               >
                 <FaTiktok className="h-5 w-5" />
