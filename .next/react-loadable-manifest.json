@@ -13,7 +13,9 @@
   },
   "node_modules\\.pnpm\\jspdf@4.0.0\\node_modules\\jspdf\\dist\\jspdf.es.min.js -> html2canvas": {
     "id": "node_modules\\.pnpm\\jspdf@4.0.0\\node_modules\\jspdf\\dist\\jspdf.es.min.js -> html2canvas",
-    "files": []
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_pnpm_html2canvas_1_4_1_node_modules_html2canvas_dist_html2canvas_js.js"
+    ]
   },
   "node_modules\\.pnpm\\next@15.5.9_react-dom@19.2.3_react@19.2.3__react@19.2.3\\node_modules\\next\\dist\\client\\dev\\hot-reloader\\app\\use-websocket.js -> @vercel/turbopack-ecmascript-runtime/browser/dev/hmr-client/hmr-client.ts": {
     "id": "node_modules\\.pnpm\\next@15.5.9_react-dom@19.2.3_react@19.2.3__react@19.2.3\\node_modules\\next\\dist\\client\\dev\\hot-reloader\\app\\use-websocket.js -> @vercel/turbopack-ecmascript-runtime/browser/dev/hmr-client/hmr-client.ts",

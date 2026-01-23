@@ -1,7 +1,8 @@
 {
-  "/page": "app/page.js",
-  "/login/page": "app/login/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
   "/about/page": "app/about/page.js",
-  "/services/saturday-breakfast-gloria/page": "app/services/saturday-breakfast-gloria/page.js",
-  "/services/kitchen-hacks-monday/page": "app/services/kitchen-hacks-monday/page.js"
+  "/dashboard/overview/page": "app/dashboard/overview/page.js",
+  "/dashboard/meal-timetable/page": "app/dashboard/meal-timetable/page.js",
+  "/dashboard/household-cleaning/page": "app/dashboard/household-cleaning/page.js",
+  "/dashboard/shop-list/page": "app/dashboard/shop-list/page.js"
 }

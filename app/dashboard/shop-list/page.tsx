@@ -10,62 +10,9 @@ import {
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-  Leaf,
-  Beef,
-  Wheat,
-  Flame,
-  Milk,
-  Star,
-  ChevronLeft,
-  ChevronRight,
-  Download,
-} from "lucide-react";
+import { Leaf, Beef, Wheat, Flame, Milk, Download } from "lucide-react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-
-// Mock reviews data
-const reviews = [
-  {
-    id: 1,
-    name: "Amara",
-    image: "/images/avatar1.jpg",
-    rating: 5,
-    review:
-      "The shop list has completely transformed my meal prep! So organized and efficient.",
-  },
-  {
-    id: 2,
-    name: "Chioma",
-    image: "/images/avatar2.jpg",
-    rating: 5,
-    review:
-      "I save so much time at the market now. Everything is categorized perfectly!",
-  },
-  {
-    id: 3,
-    name: "Blessing",
-    image: "/images/avatar3.jpg",
-    rating: 4,
-    review:
-      "Love how detailed it is. My family eats healthier since I started using it.",
-  },
-  {
-    id: 4,
-    name: "Ngozi",
-    image: "/images/avatar4.jpg",
-    rating: 5,
-    review:
-      "Best shopping guide for Nigerian meals. No more forgetting ingredients!",
-  },
-  {
-    id: 5,
-    name: "Funmi",
-    image: "/images/avatar5.jpg",
-    rating: 5,
-    review: "So helpful for meal planning and budgeting. Highly recommend!",
-  },
-];
 
 const shopCategories = [
   {
@@ -164,21 +111,8 @@ const shopCategories = [
 ];
 
 export default function ShopListPage() {
-  const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
   const [isDownloading, setIsDownloading] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
-
-  const nextReview = () => {
-    setCurrentReviewIndex((prev) => (prev + 1) % reviews.length);
-  };
-
-  const prevReview = () => {
-    setCurrentReviewIndex(
-      (prev) => (prev - 1 + reviews.length) % reviews.length
-    );
-  };
-
-  const currentReview = reviews[currentReviewIndex];
 
   const handleDownloadPDF = async () => {
     setIsDownloading(true);
@@ -245,12 +179,12 @@ export default function ShopListPage() {
         pdf.setFont("helvetica", "italic");
         const subtitleLines = pdf.splitTextToSize(
           category.subtitle,
-          columnWidth - 2
+          columnWidth - 2,
         );
         pdf.text(
           subtitleLines,
           xPosition,
-          yPosition + titleLines.length * 3 + 2
+          yPosition + titleLines.length * 3 + 2,
         );
 
         // Items
@@ -295,138 +229,11 @@ export default function ShopListPage() {
         <h1 className="text-3xl font-bold tracking-tight">
           Effideli Shop List
         </h1>
-        <p className="text-muted-foreground mt-2">
-          Your comprehensive guide to smart grocery shopping
+        <p className="text-muted-foreground mt-2 mx-auto">
+          The Effideli Shop List has revolutionized the way families approach
+          meal preparation, making grocery shopping more efficient and
+          stress-free. Our carefully curated shopping guide helps you:
         </p>
-      </div>
-
-      {/* First Section: Description & Reviews */}
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Description */}
-        <Card className="bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/20 border-primary/20">
-          <CardHeader>
-            <CardTitle className="text-2xl">
-              Transform Your Meal Preparation
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-muted-foreground leading-relaxed">
-              The Effideli Shop List has revolutionized the way families
-              approach meal preparation, making grocery shopping more efficient
-              and stress-free. Our carefully curated shopping guide helps you:
-            </p>
-            <ul className="space-y-2 text-muted-foreground">
-              <li className="flex items-start gap-2">
-                <span className="text-primary mt-1">✓</span>
-                <span>
-                  <strong>Save Time:</strong> Organized categories mean faster
-                  shopping trips
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-primary mt-1">✓</span>
-                <span>
-                  <strong>Eat Healthier:</strong> Balanced selection across all
-                  food groups
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-primary mt-1">✓</span>
-                <span>
-                  <strong>Reduce Waste:</strong> Buy exactly what you need for
-                  your meal plans
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-primary mt-1">✓</span>
-                <span>
-                  <strong>Budget Better:</strong> Clear categories help track
-                  spending
-                </span>
-              </li>
-            </ul>
-          </CardContent>
-        </Card>
-
-        {/* Reviews Slider */}
-        <Card className="bg-gradient-to-br from-secondary/5 to-secondary/10 dark:from-secondary/10 dark:to-secondary/20">
-          <CardHeader>
-            <CardTitle>What Our Clients Say</CardTitle>
-            <CardDescription>Real reviews from satisfied users</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="relative">
-              <div className="space-y-4">
-                <div className="flex items-center gap-4">
-                  <Avatar className="h-16 w-16">
-                    <AvatarImage
-                      src={currentReview.image}
-                      alt={currentReview.name}
-                    />
-                    <AvatarFallback className="bg-primary text-primary-foreground text-lg">
-                      {currentReview.name.charAt(0)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg">
-                      {currentReview.name}
-                    </h3>
-                    <div className="flex gap-1">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-4 w-4 ${
-                            i < currentReview.rating
-                              ? "fill-yellow-500 text-yellow-500"
-                              : "text-gray-300 dark:text-gray-600"
-                          }`}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <blockquote className="text-muted-foreground italic border-l-4 border-primary pl-4 py-2 min-h-[80px]">
-                  "{currentReview.review}"
-                </blockquote>
-
-                {/* Navigation */}
-                <div className="flex items-center justify-between pt-4">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={prevReview}
-                    className="rounded-full"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <div className="flex gap-2">
-                    {reviews.map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setCurrentReviewIndex(index)}
-                        className={`h-2 w-2 rounded-full transition-all ${
-                          index === currentReviewIndex
-                            ? "bg-primary w-6"
-                            : "bg-gray-300 dark:bg-gray-600"
-                        }`}
-                        aria-label={`Go to review ${index + 1}`}
-                      />
-                    ))}
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={nextReview}
-                    className="rounded-full"
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Second Section: Shopping Categories */}

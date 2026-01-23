@@ -112,8 +112,7 @@ export function DashboardHeader() {
         </nav>
 
         {/* CENTER-RIGHT: Desktop Full Section */}
-        <div className="hidden md:flex items-center gap-4 flex-1">
-          <h2 className="text-lg font-semibold">Hi {firstName}! 👋</h2>
+        <div className="hidden md:flex items-center justify-center flex-1">
           <nav className="flex items-center gap-4">
             <Link
               href="/"
@@ -136,6 +135,11 @@ export function DashboardHeader() {
         <div className="flex items-center gap-2 md:gap-4">
           {/* Mobile Greeting Only */}
           <h2 className="md:hidden text-sm font-semibold text-foreground whitespace-nowrap">
+            Hi {firstName}! 👋
+          </h2>
+
+          {/* Desktop Greeting */}
+          <h2 className="hidden md:block text-lg font-semibold text-foreground whitespace-nowrap">
             Hi {firstName}! 👋
           </h2>
 
