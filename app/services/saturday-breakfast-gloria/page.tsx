@@ -1,3 +1,5 @@
+"use client";
+
 export default function SaturdayBreakfastWithGloriaPage() {
   return (
     <div className="container mx-auto py-16 px-4">

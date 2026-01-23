@@ -1,3 +1,5 @@
+"use client";
+
 export default function KitchenHackMondayPage() {
   return (
     <div className="container mx-auto py-16 px-4">
