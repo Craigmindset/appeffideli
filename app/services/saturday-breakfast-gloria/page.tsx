@@ -54,7 +54,12 @@ export default function SaturdayBreakfastWithGloriaPage() {
           </div>
         </div>
         <div className="flex justify-center">
-          <button className="bg-primary text-white font-semibold px-8 py-3 rounded-lg shadow-md hover:bg-primary/90 transition-all duration-300 text-lg">
+          <button
+            className="bg-primary text-white font-semibold px-8 py-3 rounded-lg shadow-md hover:bg-primary/90 transition-all duration-300 text-lg"
+            onClick={() =>
+              window.open("https://www.youtube.com/@EffiDeli/videos", "_blank")
+            }
+          >
             Watch More Episodes
           </button>
         </div>
