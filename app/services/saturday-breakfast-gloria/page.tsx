@@ -25,7 +25,7 @@ export default function SaturdayBreakfastWithGloriaPage() {
           {/* Video 1 */}
           <div className="aspect-w-16 aspect-h-9 rounded-xl overflow-hidden shadow-lg bg-gray-100">
             <iframe
-              src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+              src="https://www.youtube.com/embed/aq4cKiVzt-4"
               title="Episode 1"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
@@ -35,7 +35,7 @@ export default function SaturdayBreakfastWithGloriaPage() {
           {/* Video 2 */}
           <div className="aspect-w-16 aspect-h-9 rounded-xl overflow-hidden shadow-lg bg-gray-100">
             <iframe
-              src="https://www.youtube.com/embed/9bZkp7q19f0"
+              src="https://www.youtube.com/embed/pxlieDw1VcA"
               title="Episode 2"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
@@ -45,7 +45,7 @@ export default function SaturdayBreakfastWithGloriaPage() {
           {/* Video 3 */}
           <div className="aspect-w-16 aspect-h-9 rounded-xl overflow-hidden shadow-lg bg-gray-100">
             <iframe
-              src="https://www.youtube.com/embed/3JZ_D3ELwOQ"
+              src="https://www.youtube.com/embed/wjMprNDmSfg"
               title="Episode 3"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen

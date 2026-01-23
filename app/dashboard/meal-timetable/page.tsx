@@ -38,7 +38,9 @@ export default function MealTimetablePage() {
   const [mealPlans, setMealPlans] = useState<MealPlan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null);
+  const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(
+    null,
+  );
   const supabase = createBrowserSupabaseClient();
   const timetableRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -47,8 +49,11 @@ export default function MealTimetablePage() {
     const checkAuthAndSubscription = async () => {
       try {
         // Check if user is authenticated
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
-        
+        const {
+          data: { user },
+          error: authError,
+        } = await supabase.auth.getUser();
+
         if (authError || !user) {
           setError("User not authenticated");
           setIsLoading(false);

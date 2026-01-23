@@ -24,7 +24,7 @@ export default function KitchenHackMondayPage() {
           {/* Video 1 */}
           <div className="aspect-w-16 aspect-h-12 rounded-2xl overflow-hidden shadow-xl bg-gray-100">
             <iframe
-              src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+              src="https://www.youtube.com/embed/vx4ltU-QKlY"
               title="Episode 1"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
@@ -34,7 +34,7 @@ export default function KitchenHackMondayPage() {
           {/* Video 2 */}
           <div className="aspect-w-16 aspect-h-12 rounded-2xl overflow-hidden shadow-xl bg-gray-100">
             <iframe
-              src="https://www.youtube.com/embed/9bZkp7q19f0"
+              src="https://www.youtube.com/embed/5moMXvX0YGI"
               title="Episode 2"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
@@ -44,7 +44,7 @@ export default function KitchenHackMondayPage() {
           {/* Video 3 */}
           <div className="aspect-w-16 aspect-h-12 rounded-2xl overflow-hidden shadow-xl bg-gray-100">
             <iframe
-              src="https://www.youtube.com/embed/3JZ_D3ELwOQ"
+              src="https://www.youtube.com/embed/zV0lNoo9wCc"
               title="Episode 3"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen

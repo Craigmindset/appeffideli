@@ -1,7 +1,7 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
   "/login/page": "app/login/page.js",
   "/page": "app/page.js",
-  "/dashboard/overview/page": "app/dashboard/overview/page.js",
-  "/dashboard/meal-timetable/page": "app/dashboard/meal-timetable/page.js"
+  "/dashboard/meal-timetable/page": "app/dashboard/meal-timetable/page.js",
+  "/services/saturday-breakfast-gloria/page": "app/services/saturday-breakfast-gloria/page.js",
+  "/services/kitchen-hacks-monday/page": "app/services/kitchen-hacks-monday/page.js"
 }
