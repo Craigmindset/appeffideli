@@ -14,6 +14,7 @@ import { useState, useRef, useEffect } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { createBrowserSupabaseClient } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
 
 interface MealPlan {
   id: string;
@@ -37,11 +38,55 @@ export default function MealTimetablePage() {
   const [mealPlans, setMealPlans] = useState<MealPlan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null);
   const supabase = createBrowserSupabaseClient();
   const timetableRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    fetchMealTimetable();
+    const checkAuthAndSubscription = async () => {
+      try {
+        // Check if user is authenticated
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        
+        if (authError || !user) {
+          setError("User not authenticated");
+          setIsLoading(false);
+          return;
+        }
+
+        // Check subscription status from users_profile table
+        const { data: profileData, error: profileError } = await supabase
+          .from("users_profile")
+          .select("meal_subscription_status")
+          .eq("id", user.id)
+          .single();
+
+        if (profileError) {
+          console.error("Error fetching user profile:", profileError);
+          setError("Failed to verify subscription status");
+          setIsLoading(false);
+          return;
+        }
+
+        const status = profileData?.meal_subscription_status;
+        setSubscriptionStatus(status);
+
+        // Only fetch meal timetable if subscription is active
+        if (status === "active") {
+          fetchMealTimetable();
+        } else {
+          setError("Active subscription required to view meal plans");
+          setIsLoading(false);
+        }
+      } catch (err) {
+        console.error("Authentication check failed:", err);
+        setError("Authentication failed");
+        setIsLoading(false);
+      }
+    };
+
+    checkAuthAndSubscription();
   }, []);
 
   const fetchMealTimetable = async () => {
@@ -98,7 +143,7 @@ export default function MealTimetablePage() {
         "Sunday",
       ];
       mappedData.sort(
-        (a, b) => dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day)
+        (a, b) => dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day),
       );
 
       console.log("Final sorted data:", mappedData);
@@ -149,6 +194,43 @@ export default function MealTimetablePage() {
       console.error("Error generating PDF:", error);
     }
   };
+
+  // Show subscription prompt if user doesn't have an active subscription
+  if (subscriptionStatus !== "active") {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Meal Timetable</h1>
+          <p className="text-muted-foreground mt-2">
+            View your weekly meal schedule
+          </p>
+        </div>
+
+        <Card>
+          <CardContent className="p-12">
+            <div className="flex flex-col items-center justify-center gap-4 text-center">
+              <Calendar className="h-16 w-16 text-muted-foreground" />
+              <div className="space-y-2">
+                <h3 className="text-xl font-semibold">
+                  You are currently not subscribed to any plan
+                </h3>
+                <p className="text-muted-foreground">
+                  Please click "Get Plan" to begin your meal planning journey
+                </p>
+              </div>
+              <Button
+                onClick={() => router.push("/services/meal-plan-subscription")}
+                size="lg"
+                className="mt-4"
+              >
+                Get Plan
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
