@@ -16,50 +16,65 @@
       "static/chunks/main-app.js",
       "static/chunks/app/dashboard/layout.js"
     ],
+    "/dashboard/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/dashboard/page.js"
+    ],
     "/dashboard/overview/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/dashboard/overview/page.js"
-    ],
-    "/dashboard/meal-timetable/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/dashboard/meal-timetable/page.js"
-    ],
-    "/login/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/login/page.js"
     ],
     "/services/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/services/layout.js"
     ],
-    "/services/saturday-breakfast-gloria/page": [
+    "/services/meal-plan-subscription/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/services/saturday-breakfast-gloria/page.js"
+      "static/chunks/app/services/meal-plan-subscription/page.js"
     ],
-    "/services/kitchen-hacks-monday/page": [
+    "/services/infant-recipes/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/services/kitchen-hacks-monday/page.js"
+      "static/chunks/app/services/infant-recipes/page.js"
     ],
-    "/about/page": [
+    "/dashboard/meal-timetable/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/about/page.js"
+      "static/chunks/app/dashboard/meal-timetable/page.js"
+    ],
+    "/dashboard/shop-list/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/dashboard/shop-list/page.js"
+    ],
+    "/login/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/login/page.js"
     ],
     "/dashboard/household-cleaning/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/dashboard/household-cleaning/page.js"
     ],
-    "/dashboard/shop-list/page": [
+    "/dashboard/onetime-infant-toddler/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/dashboard/shop-list/page.js"
+      "static/chunks/app/dashboard/onetime-infant-toddler/page.js"
+    ],
+    "/dashboard/my-downloads/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/dashboard/my-downloads/page.js"
+    ],
+    "/dashboard/my-subscription/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/dashboard/my-subscription/page.js"
     ],
     "/_not-found/page": [
       "static/chunks/webpack.js",

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -8,11 +9,19 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Leaf, Beef, Wheat, Flame, Milk, Download } from "lucide-react";
+import {
+  Leaf,
+  Beef,
+  Wheat,
+  Flame,
+  Milk,
+  Download,
+  Calendar,
+} from "lucide-react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import { createBrowserSupabaseClient } from "@/lib/supabase";
 
 const shopCategories = [
   {
@@ -112,7 +121,51 @@ const shopCategories = [
 
 export default function ShopListPage() {
   const [isDownloading, setIsDownloading] = useState(false);
+  const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(
+    null,
+  );
   const contentRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkAuthAndSubscription = async () => {
+      try {
+        const supabase = createBrowserSupabaseClient();
+
+        // Check if user is authenticated
+        const {
+          data: { user },
+          error: authError,
+        } = await supabase.auth.getUser();
+
+        if (authError || !user) {
+          setSubscriptionStatus("unauthenticated");
+          return;
+        }
+
+        // Check subscription status from users_profile table
+        const { data: profileData, error: profileError } = await supabase
+          .from("users_profile")
+          .select("meal_subscription_status")
+          .eq("id", user.id)
+          .single();
+
+        if (profileError) {
+          console.error("Error fetching user profile:", profileError);
+          setSubscriptionStatus("error");
+          return;
+        }
+
+        const status = profileData?.meal_subscription_status;
+        setSubscriptionStatus(status);
+      } catch (err) {
+        console.error("Authentication check failed:", err);
+        setSubscriptionStatus("error");
+      }
+    };
+
+    checkAuthAndSubscription();
+  }, []);
 
   const handleDownloadPDF = async () => {
     setIsDownloading(true);
@@ -236,70 +289,102 @@ export default function ShopListPage() {
         </p>
       </div>
 
-      {/* Second Section: Shopping Categories */}
-      <div>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold">Shopping Categories</h2>
-          <Button
-            onClick={handleDownloadPDF}
-            disabled={isDownloading}
-            className="gap-2 whitespace-nowrap"
-            size="lg"
-          >
-            {isDownloading ? (
-              <>
-                <Download className="h-4 w-4 animate-pulse" />
-                Generating...
-              </>
-            ) : (
-              <>
-                <Download className="h-4 w-4" />
-                Download PDF
-              </>
-            )}
-          </Button>
-        </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-          {shopCategories.map((category) => {
-            const Icon = category.icon;
-            return (
-              <Card
-                key={category.title}
-                className={`${category.bgColor} border-2 hover:shadow-lg transition-shadow`}
+      {/* Show subscription prompt if user doesn't have an active subscription */}
+      {subscriptionStatus !== "active" ? (
+        <Card>
+          <CardContent className="p-12">
+            <div className="flex flex-col items-center justify-center gap-4 text-center">
+              <Calendar className="h-16 w-16 text-muted-foreground" />
+              <div className="space-y-2">
+                <h3 className="text-xl font-semibold">
+                  You are currently not subscribed to any plan
+                </h3>
+                <p className="text-muted-foreground">
+                  Please click "Get Plan" to begin your meal planning journey
+                </p>
+              </div>
+              <Button
+                onClick={() => router.push("/services/meal-plan-subscription")}
+                size="lg"
+                className="mt-4"
               >
-                <CardHeader className="pb-3">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div
-                      className={`p-2 rounded-lg bg-white dark:bg-gray-800 ${category.color}`}
-                    >
-                      <Icon className="h-6 w-6" />
-                    </div>
-                  </div>
-                  <CardTitle className="text-lg">{category.title}</CardTitle>
-                  <CardDescription className="text-xs">
-                    {category.subtitle}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {category.items.map((item, index) => (
-                      <li
-                        key={index}
-                        className="flex items-start gap-2 text-sm text-muted-foreground"
-                      >
-                        <span className={`${category.color} font-bold mt-0.5`}>
-                          {index + 1}.
-                        </span>
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      </div>
+                Get Plan
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <>
+          {/* Second Section: Shopping Categories */}
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold">Shopping Categories</h2>
+              <Button
+                onClick={handleDownloadPDF}
+                disabled={isDownloading}
+                className="gap-2 whitespace-nowrap"
+                size="lg"
+              >
+                {isDownloading ? (
+                  <>
+                    <Download className="h-4 w-4 animate-pulse" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Download className="h-4 w-4" />
+                    Download PDF
+                  </>
+                )}
+              </Button>
+            </div>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+              {shopCategories.map((category) => {
+                const Icon = category.icon;
+                return (
+                  <Card
+                    key={category.title}
+                    className={`${category.bgColor} border-2 hover:shadow-lg transition-shadow`}
+                  >
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div
+                          className={`p-2 rounded-lg bg-white dark:bg-gray-800 ${category.color}`}
+                        >
+                          <Icon className="h-6 w-6" />
+                        </div>
+                      </div>
+                      <CardTitle className="text-lg">
+                        {category.title}
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        {category.subtitle}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-2">
+                        {category.items.map((item, index) => (
+                          <li
+                            key={index}
+                            className="flex items-start gap-2 text-sm text-muted-foreground"
+                          >
+                            <span
+                              className={`${category.color} font-bold mt-0.5`}
+                            >
+                              {index + 1}.
+                            </span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

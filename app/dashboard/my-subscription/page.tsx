@@ -55,7 +55,7 @@ export default function MySubscriptionPage() {
       if (result.success) {
         // Update local state to reflect cancellation
         setSubscription((prev) =>
-          prev ? { ...prev, status: "cancelled", autoRenew: false } : null
+          prev ? { ...prev, status: "cancelled", autoRenew: false } : null,
         );
         alert("Subscription cancelled successfully");
         router.refresh();
@@ -89,7 +89,7 @@ export default function MySubscriptionPage() {
         const { data: profile } = await supabase
           .from("users_profile")
           .select(
-            "meal_subscription, meal_subscription_status, meal_subscription_started_at, meal_subscription_expires_at"
+            "meal_subscription, meal_subscription_status, meal_subscription_started_at, meal_subscription_expires_at",
           )
           .eq("id", user.id)
           .single();
@@ -215,7 +215,12 @@ export default function MySubscriptionPage() {
             <p className="text-muted-foreground text-center mb-4">
               Subscribe to access premium features and content
             </p>
-            <Button>View Plans</Button>
+            <Button
+              onClick={() => router.push("/services/meal-plan-subscription")}
+              className="transition-all duration-200 hover:bg-primary/90 active:bg-primary/80 active:scale-95"
+            >
+              View Plans
+            </Button>
           </CardContent>
         </Card>
       </div>

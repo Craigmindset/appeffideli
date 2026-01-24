@@ -14,7 +14,7 @@ export default function MealPlanSubscriptionPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [loadingPlans, setLoadingPlans] = useState<Record<string, boolean>>({});
   const [subscriptionReference, setSubscriptionReference] =
     useState<string>("");
   const router = useRouter();
@@ -67,7 +67,7 @@ export default function MealPlanSubscriptionPage() {
   ];
 
   const handleGetStarted = async (plan: (typeof plans)[0]) => {
-    setIsLoading(true);
+    setLoadingPlans((prev) => ({ ...prev, [plan.id]: true }));
     try {
       // Check if user is logged in
       const supabase = createBrowserSupabaseClient();
@@ -97,7 +97,7 @@ export default function MealPlanSubscriptionPage() {
           alert(
             `You already have an active ${plan.name} subscription. Please cancel your current subscription before subscribing again.`,
           );
-          setIsLoading(false);
+          setLoadingPlans((prev) => ({ ...prev, [plan.id]: false }));
           return;
         }
 
@@ -121,7 +121,7 @@ export default function MealPlanSubscriptionPage() {
       console.error("Error:", error);
       alert("An error occurred. Please try again.");
     } finally {
-      setIsLoading(false);
+      setLoadingPlans((prev) => ({ ...prev, [plan.id]: false }));
     }
   };
 
@@ -301,14 +301,14 @@ export default function MealPlanSubscriptionPage() {
                 {/* CTA Button */}
                 <button
                   onClick={() => handleGetStarted(plan)}
-                  disabled={isLoading}
+                  disabled={loadingPlans[plan.id] || false}
                   className={`w-full py-2.5 px-4 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-sm mt-auto disabled:opacity-50 disabled:cursor-not-allowed ${
                     plan.popular
                       ? "bg-primary text-white hover:bg-primary/90 shadow-md hover:shadow-lg"
                       : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600"
                   }`}
                 >
-                  {isLoading ? (
+                  {loadingPlans[plan.id] ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
                       Loading...
