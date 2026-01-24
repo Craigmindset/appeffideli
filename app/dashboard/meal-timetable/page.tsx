@@ -41,6 +41,7 @@ export default function MealTimetablePage() {
   const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(
     null,
   );
+  const [subscriptionType, setSubscriptionType] = useState<string | null>(null);
   const supabase = createBrowserSupabaseClient();
   const timetableRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -63,7 +64,7 @@ export default function MealTimetablePage() {
         // Check subscription status from users_profile table
         const { data: profileData, error: profileError } = await supabase
           .from("users_profile")
-          .select("meal_subscription_status")
+          .select("meal_subscription_status, meal_subscription")
           .eq("id", user.id)
           .single();
 
@@ -75,7 +76,9 @@ export default function MealTimetablePage() {
         }
 
         const status = profileData?.meal_subscription_status;
+        const type = profileData?.meal_subscription;
         setSubscriptionStatus(status);
+        setSubscriptionType(type);
 
         // Only fetch meal timetable if subscription is active
         if (status === "active") {
@@ -93,6 +96,34 @@ export default function MealTimetablePage() {
 
     checkAuthAndSubscription();
   }, []);
+
+  // Get responsive grid classes based on number of meal columns
+  const getGridClasses = (columnCount: number) => {
+    if (columnCount <= 2) return "grid-cols-1 md:grid-cols-2";
+    if (columnCount <= 3) return "grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
+    if (columnCount <= 4) return "grid-cols-2 md:grid-cols-3 lg:grid-cols-4";
+    if (columnCount <= 6)
+      return "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6";
+    if (columnCount <= 7)
+      return "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7";
+    return "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8";
+  };
+
+  // Filter meal times based on subscription type
+  const filteredMealTimes = mealTimes.filter((mealTime) => {
+    if (subscriptionType === "meal_basic") {
+      // Basic users only see breakfast, lunch, and dinner
+      return ["breakfast", "lunch", "dinner"].includes(mealTime.key);
+    } else if (subscriptionType === "meal_premium") {
+      // Premium users see all except dessert
+      return mealTime.key !== "dessert";
+    } else if (subscriptionType === "meal_vip") {
+      // VIP users see all columns
+      return true;
+    }
+    // Default fallback - show all
+    return true;
+  });
 
   const fetchMealTimetable = async () => {
     try {
@@ -301,8 +332,10 @@ export default function MealTimetablePage() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-3 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8">
-                  {mealTimes.map((meal) => {
+                <div
+                  className={`grid gap-3 ${getGridClasses(filteredMealTimes.length)}`}
+                >
+                  {filteredMealTimes.map((meal) => {
                     const mealValue = plan[meal.key as keyof MealPlan];
                     if (!mealValue) return null;
                     return (

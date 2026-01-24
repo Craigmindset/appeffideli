@@ -4889,6 +4889,14 @@ video {
     grid-template-columns: repeat(8, minmax(0, 1fr));
   }
 
+  .xl\:grid-cols-6 {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .xl\:grid-cols-7 {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+
   .xl\:text-xl\/relaxed {
     font-size: 1.25rem;
     line-height: 1.625;

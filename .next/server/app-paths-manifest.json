@@ -1,8 +1,8 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
-  "/dashboard/onetime-infant-toddler/page": "app/dashboard/onetime-infant-toddler/page.js",
-  "/dashboard/household-cleaning/page": "app/dashboard/household-cleaning/page.js",
-  "/dashboard/my-downloads/page": "app/dashboard/my-downloads/page.js",
+  "/login/page": "app/login/page.js",
   "/dashboard/my-subscription/page": "app/dashboard/my-subscription/page.js",
-  "/services/meal-plan-subscription/page": "app/services/meal-plan-subscription/page.js"
+  "/services/meal-plan-subscription/page": "app/services/meal-plan-subscription/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/dashboard/meal-timetable/page": "app/dashboard/meal-timetable/page.js"
 }
