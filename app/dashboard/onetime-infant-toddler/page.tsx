@@ -3,9 +3,125 @@
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import { createBrowserSupabaseClient } from "@/lib/supabase";
+import { Calendar } from "lucide-react";
 
 export default function OnetimeInfantToddlerPage() {
+  const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(
+    null,
+  );
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const supabase = createBrowserSupabaseClient();
   const router = useRouter();
+
+  useEffect(() => {
+    const checkAuthAndSubscription = async () => {
+      try {
+        // Check if user is authenticated
+        const {
+          data: { user },
+          error: authError,
+        } = await supabase.auth.getUser();
+
+        if (authError || !user) {
+          setError("User not authenticated");
+          setIsLoading(false);
+          return;
+        }
+
+        // Check subscription status from users_profile table
+        const { data: profileData, error: profileError } = await supabase
+          .from("users_profile")
+          .select("meal_subscription_status")
+          .eq("id", user.id)
+          .single();
+
+        if (profileError) {
+          console.error("Error fetching user profile:", profileError);
+          setError("Failed to verify subscription status");
+          setIsLoading(false);
+          return;
+        }
+
+        const status = profileData?.meal_subscription_status;
+        setSubscriptionStatus(status);
+        setIsLoading(false);
+      } catch (err) {
+        console.error("Authentication check failed:", err);
+        setError("Authentication failed");
+        setIsLoading(false);
+      }
+    };
+
+    checkAuthAndSubscription();
+  }, []);
+
+  // Show loading state while checking authentication and subscription
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-primary">
+            One-Time Infant & Toddler Recipe Packs
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            Choose the perfect recipe pack for your little one. Our specialized
+            meal plans are designed for infants and toddlers.
+          </p>
+        </div>
+
+        <Card>
+          <CardContent className="p-12">
+            <div className="flex items-center justify-center">
+              <div className="text-muted-foreground">Loading...</div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Show subscription prompt if user doesn't have an active subscription
+  if (subscriptionStatus !== "active") {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-primary">
+            One-Time Infant & Toddler Recipe Packs
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            Choose the perfect recipe pack for your little one. Our specialized
+            meal plans are designed for infants and toddlers.
+          </p>
+        </div>
+
+        <Card>
+          <CardContent className="p-12">
+            <div className="flex flex-col items-center justify-center gap-4 text-center">
+              <Calendar className="h-16 w-16 text-muted-foreground" />
+              <div className="space-y-2">
+                <h3 className="text-xl font-semibold">
+                  You are currently not subscribed to any plan
+                </h3>
+                <p className="text-muted-foreground">
+                  Please click "Get Plan" to begin your download recipe request
+                </p>
+              </div>
+              <Button
+                onClick={() => router.push("/services/infant-recipes")}
+                size="lg"
+                className="mt-4"
+              >
+                Get Plan
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
