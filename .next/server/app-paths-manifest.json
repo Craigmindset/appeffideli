@@ -1,9 +1,9 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
-  "/page": "app/page.js",
-  "/dashboard/meal-timetable/page": "app/dashboard/meal-timetable/page.js",
-  "/dashboard/onetime-infant-toddler/page": "app/dashboard/onetime-infant-toddler/page.js",
-  "/services/infant-recipes/page": "app/services/infant-recipes/page.js",
+  "/login/page": "app/login/page.js",
   "/dashboard/overview/page": "app/dashboard/overview/page.js",
+  "/dashboard/onetime-infant-toddler/page": "app/dashboard/onetime-infant-toddler/page.js",
+  "/dashboard/meal-timetable/page": "app/dashboard/meal-timetable/page.js",
+  "/services/infant-recipes/page": "app/services/infant-recipes/page.js",
   "/dashboard/page": "app/dashboard/page.js"
 }

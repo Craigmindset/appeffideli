@@ -5,19 +5,22 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState, useEffect } from "react";
 import { createBrowserSupabaseClient } from "@/lib/supabase";
-import { Calendar } from "lucide-react";
+import { Calendar, Download } from "lucide-react";
+import { getUserInfantRecipePurchases } from "@/app/actions/infant-recipes";
 
 export default function OnetimeInfantToddlerPage() {
-  const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(
-    null,
-  );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [purchasedPacks, setPurchasedPacks] = useState<{
+    starter: boolean;
+    standard: boolean;
+  }>({ starter: false, standard: false });
+  const [hasAnyPurchase, setHasAnyPurchase] = useState(false);
   const supabase = createBrowserSupabaseClient();
   const router = useRouter();
 
   useEffect(() => {
-    const checkAuthAndSubscription = async () => {
+    const checkAuthAndPurchases = async () => {
       try {
         // Check if user is authenticated
         const {
@@ -31,22 +34,24 @@ export default function OnetimeInfantToddlerPage() {
           return;
         }
 
-        // Check subscription status from users_profile table
-        const { data: profileData, error: profileError } = await supabase
-          .from("users_profile")
-          .select("meal_subscription_status")
-          .eq("id", user.id)
-          .single();
-
-        if (profileError) {
-          console.error("Error fetching user profile:", profileError);
-          setError("Failed to verify subscription status");
-          setIsLoading(false);
-          return;
+        // Check for purchased infant recipe packs
+        const purchasesResult = await getUserInfantRecipePurchases();
+        if (purchasesResult.success && purchasesResult.data) {
+          const completedPurchases = purchasesResult.data.filter(
+            (p: any) => p.status === "completed"
+          );
+          const hasStarter = completedPurchases.some(
+            (p: any) => p.pack_type === "starter"
+          );
+          const hasStandard = completedPurchases.some(
+            (p: any) => p.pack_type === "standard"
+          );
+          setPurchasedPacks({ starter: hasStarter, standard: hasStandard });
+          setHasAnyPurchase(hasStarter || hasStandard);
+        } else {
+          setHasAnyPurchase(false);
         }
 
-        const status = profileData?.meal_subscription_status;
-        setSubscriptionStatus(status);
         setIsLoading(false);
       } catch (err) {
         console.error("Authentication check failed:", err);
@@ -55,10 +60,10 @@ export default function OnetimeInfantToddlerPage() {
       }
     };
 
-    checkAuthAndSubscription();
+    checkAuthAndPurchases();
   }, []);
 
-  // Show loading state while checking authentication and subscription
+  // Show loading state while checking authentication and purchases
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -83,8 +88,8 @@ export default function OnetimeInfantToddlerPage() {
     );
   }
 
-  // Show subscription prompt if user doesn't have an active subscription
-  if (subscriptionStatus !== "active") {
+  // Show prompt if user doesn't have any purchases
+  if (!hasAnyPurchase) {
     return (
       <div className="space-y-6">
         <div>
@@ -103,10 +108,10 @@ export default function OnetimeInfantToddlerPage() {
               <Calendar className="h-16 w-16 text-muted-foreground" />
               <div className="space-y-2">
                 <h3 className="text-xl font-semibold">
-                  You are currently not subscribed to any plan
+                  No recipe packs purchased yet
                 </h3>
                 <p className="text-muted-foreground">
-                  Please click "Get Plan" to begin your download recipe request
+                  Please click "Get Plan" to purchase an infant recipe pack
                 </p>
               </div>
               <Button
@@ -164,12 +169,28 @@ export default function OnetimeInfantToddlerPage() {
               </div>
             </div>
             <div className="mt-auto pt-9">
-              <Button
-                onClick={() => router.push("/services/infant-recipes")}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                Download Basic Pack - ₦15,000
-              </Button>
+              {purchasedPacks.starter ? (
+                <Button
+                  onClick={() => {
+                    window.open(
+                      "https://dohdf572hojoyskk.public.blob.vercel-storage.com/One-%20Time%20infant%20%26%20Toddler%20Recipe%20Pack%20%28BASIC%20PACK%29.pdf",
+                      "_blank"
+                    );
+                  }}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Download Basic Pack
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => router.push("/services/infant-recipes")}
+                  variant="outline"
+                  className="w-full border-blue-600 text-blue-600 hover:bg-blue-50"
+                >
+                  Purchase Basic Pack - ₦14,000
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -205,12 +226,28 @@ export default function OnetimeInfantToddlerPage() {
               </div>
             </div>
             <div className="mt-auto pt-4">
-              <Button
-                onClick={() => router.push("/services/infant-recipes")}
-                className="w-full bg-green-600 hover:bg-green-700 text-white"
-              >
-                Download Standard Pack - ₦25,000
-              </Button>
+              {purchasedPacks.standard ? (
+                <Button
+                  onClick={() => {
+                    window.open(
+                      "https://dohdf572hojoyskk.public.blob.vercel-storage.com/One-%20Time%20infant%20%26%20Toddler%20Recipe%20Pack%20%28STANDARD%20PACK%29.pdf",
+                      "_blank"
+                    );
+                  }}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Download Standard Pack
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => router.push("/services/infant-recipes")}
+                  variant="outline"
+                  className="w-full border-green-600 text-green-600 hover:bg-green-50"
+                >
+                  Purchase Standard Pack - ₦25,000
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>

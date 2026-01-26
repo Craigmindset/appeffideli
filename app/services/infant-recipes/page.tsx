@@ -5,18 +5,17 @@ import { useRouter } from "next/navigation";
 import { Check, ArrowRight, X, Loader2 } from "lucide-react";
 import { createBrowserSupabaseClient } from "@/lib/supabase";
 import {
-  createMealSubscription,
-  type MealPlanType,
-} from "@/app/actions/meal-subscription";
+  createInfantRecipePurchase,
+  type InfantRecipePackType,
+} from "@/app/actions/infant-recipes";
 import { usePaystack } from "@/hooks/use-paystack";
 
 export default function InfantRecipesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [subscriptionReference, setSubscriptionReference] =
-    useState<string>("");
+  const [loadingPlans, setLoadingPlans] = useState<Record<string, boolean>>({});
+  const [purchaseReference, setPurchaseReference] = useState<string>("");
   const router = useRouter();
 
   const plans = [
@@ -53,7 +52,7 @@ export default function InfantRecipesPage() {
   ];
 
   const handleGetStarted = async (plan: (typeof plans)[0]) => {
-    setIsLoading(true);
+    setLoadingPlans((prev) => ({ ...prev, [plan.id]: true }));
     try {
       // Check if user is logged in
       const supabase = createBrowserSupabaseClient();
@@ -75,39 +74,27 @@ export default function InfantRecipesPage() {
         .single();
 
       if (profile) {
-        // Check if user already has an active subscription to the same plan
-        if (
-          profile.meal_subscription === `meal_${plan.id}` &&
-          profile.meal_subscription_status === "active"
-        ) {
-          alert(
-            `You already have an active ${plan.name} subscription. Please cancel your current subscription before subscribing again.`,
-          );
-          setIsLoading(false);
-          return;
-        }
-
         setUserProfile(profile);
         setSelectedPlan(plan);
 
-        // Create subscription record
-        const result = await createMealSubscription(
-          plan.id as MealPlanType,
+        // Create purchase record
+        const result = await createInfantRecipePurchase(
+          plan.id as InfantRecipePackType,
           plan.amount,
         );
 
         if (result.success && result.reference) {
-          setSubscriptionReference(result.reference);
+          setPurchaseReference(result.reference);
           setIsModalOpen(true);
         } else {
-          alert(result.error || "Failed to create subscription");
+          alert(result.error || "Failed to create purchase record");
         }
       }
     } catch (error) {
       console.error("Error:", error);
       alert("An error occurred. Please try again.");
     } finally {
-      setIsLoading(false);
+      setLoadingPlans((prev) => ({ ...prev, [plan.id]: false }));
     }
   };
 
@@ -116,16 +103,16 @@ export default function InfantRecipesPage() {
     firstName: userProfile?.full_name?.split(" ")[0] || "",
     lastName: userProfile?.full_name?.split(" ").slice(1).join(" ") || "",
     phone: userProfile?.phone || "",
-    apartmentType: "studio", // Placeholder, not used for meal subscriptions
-    orderType: "subscription",
+    apartmentType: "infant-recipe",
+    orderType: "download",
     amount: selectedPlan?.amount || 0,
     planCode: selectedPlan?.planCode || "",
-    reference: subscriptionReference,
+    reference: purchaseReference,
     onSuccess: (response) => {
       console.log("Payment successful:", response);
       setIsModalOpen(false);
       router.push(
-        `/payment-success?reference=${subscriptionReference}&plan=${selectedPlan?.id}`,
+        `/payment-success?reference=${purchaseReference}&pack=${selectedPlan?.id}`,
       );
     },
     onClose: () => {
@@ -142,31 +129,27 @@ export default function InfantRecipesPage() {
     initializePayment({
       email: userProfile.email,
       amount: selectedPlan.amount,
-      ref: subscriptionReference,
+      ref: purchaseReference,
       plan: selectedPlan.planCode,
       firstname: userProfile.full_name?.split(" ")[0] || "",
       lastname: userProfile.full_name?.split(" ").slice(1).join(" ") || "",
       phone: userProfile.phone || "",
       metadata: {
-        plan_type: selectedPlan.id,
-        plan_code: selectedPlan.planCode,
+        pack_type: selectedPlan.id,
+        pack_name: selectedPlan.name,
         user_id: userProfile.id,
-        subscription_reference: subscriptionReference,
+        purchase_reference: purchaseReference,
+        order_type: "infant-recipe",
         custom_fields: [
           {
-            display_name: "Plan Type",
-            variable_name: "plan_type",
+            display_name: "Pack Type",
+            variable_name: "pack_type",
             value: selectedPlan.name,
           },
           {
-            display_name: "Plan Code",
-            variable_name: "plan_code",
-            value: selectedPlan.planCode,
-          },
-          {
-            display_name: "Subscription Reference",
-            variable_name: "subscription_reference",
-            value: subscriptionReference,
+            display_name: "Purchase Reference",
+            variable_name: "purchase_reference",
+            value: purchaseReference,
           },
         ],
       },
@@ -283,14 +266,14 @@ export default function InfantRecipesPage() {
                 {/* CTA Button */}
                 <button
                   onClick={() => handleGetStarted(plan)}
-                  disabled={isLoading}
+                  disabled={loadingPlans[plan.id]}
                   className={`w-full py-2.5 px-4 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-sm mt-auto disabled:opacity-50 disabled:cursor-not-allowed ${
                     plan.popular
                       ? "bg-primary text-white hover:bg-primary/90 shadow-md hover:shadow-lg"
                       : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600"
                   }`}
                 >
-                  {isLoading ? (
+                  {loadingPlans[plan.id] ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
                       Loading...
@@ -335,10 +318,10 @@ export default function InfantRecipesPage() {
             {/* Header */}
             <div className="text-center space-y-2">
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-                Confirm Subscription
+                Confirm Purchase
               </h3>
               <p className="text-gray-600 dark:text-gray-400 text-sm">
-                Review your subscription details
+                Review your purchase details
               </p>
             </div>
 
@@ -360,14 +343,14 @@ export default function InfantRecipesPage() {
               </div>
             </div>
 
-            {/* Subscription Details */}
+            {/* Purchase Details */}
             <div className="space-y-3 border border-primary rounded-lg p-4">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  Plan
+                  Pack
                 </span>
                 <span className="font-semibold text-gray-900 dark:text-white">
-                  Meal {selectedPlan.name} Plan
+                  {selectedPlan.name}
                 </span>
               </div>
               <div className="flex justify-between items-center">
@@ -383,8 +366,8 @@ export default function InfantRecipesPage() {
             {/* Description */}
             <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-4">
               <p className="text-sm text-gray-700 dark:text-gray-300 text-center">
-                You are now going to be subscribed to the{" "}
-                <strong>Meal {selectedPlan.name} Plan</strong>.
+                You are about to purchase the{" "}
+                <strong>{selectedPlan.name}</strong>.
               </p>
             </div>
 
