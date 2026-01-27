@@ -9,14 +9,50 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Download, CreditCard, Calendar } from "lucide-react";
+import { Download, CreditCard, Calendar, Activity } from "lucide-react";
 import { createBrowserSupabaseClient } from "@/lib/supabase";
+import {
+  getUserRecentActivities,
+  type UserActivity,
+} from "@/app/actions/user-activities";
 
 export default function OverviewPage() {
   const [subscriptionPlan, setSubscriptionPlan] = useState("Not Subscribed");
   const [subscriptionStatus, setSubscriptionStatus] = useState("inactive");
   const [isLoading, setIsLoading] = useState(true);
+  const [recentActivities, setRecentActivities] = useState<UserActivity[]>([]);
+  const [activitiesLoading, setActivitiesLoading] = useState(true);
   const router = useRouter();
+
+  // Function to format time ago
+  const formatTimeAgo = (date: string) => {
+    const now = new Date();
+    const activityDate = new Date(date);
+    const diffMs = now.getTime() - activityDate.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60)
+      return `${diffMins} minute${diffMins > 1 ? "s" : ""} ago`;
+    if (diffHours < 24)
+      return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
+    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
+    if (diffDays < 30)
+      return `${Math.floor(diffDays / 7)} week${Math.floor(diffDays / 7) > 1 ? "s" : ""} ago`;
+    return `${Math.floor(diffDays / 30)} month${Math.floor(diffDays / 30) > 1 ? "s" : ""} ago`;
+  };
+
+  // Fetch recent activities
+  const fetchActivities = async () => {
+    setActivitiesLoading(true);
+    const result = await getUserRecentActivities(5);
+    if (result.success && result.data) {
+      setRecentActivities(result.data);
+    }
+    setActivitiesLoading(false);
+  };
 
   useEffect(() => {
     const fetchSubscriptionData = async () => {
@@ -46,7 +82,7 @@ export default function OverviewPage() {
 
             setSubscriptionPlan(planName);
             setSubscriptionStatus(
-              profile.meal_subscription_status || "inactive"
+              profile.meal_subscription_status || "inactive",
             );
           } else {
             setSubscriptionPlan("Not Subscribed");
@@ -63,13 +99,19 @@ export default function OverviewPage() {
     };
 
     fetchSubscriptionData();
+    fetchActivities();
+
+    // Set up real-time updates for activities (poll every 30 seconds)
+    const intervalId = setInterval(fetchActivities, 30000);
+
+    return () => clearInterval(intervalId);
   }, []);
 
   // Mock data - replace with actual data from your database
   const stats = [
     {
       title: "Total Downloads",
-      value: "12",
+      value: "0",
       description: "PDFs downloaded this month",
       icon: Download,
       color: "bg-blue-50 border-blue-200",
@@ -86,7 +128,7 @@ export default function OverviewPage() {
     },
     {
       title: "Meal Table",
-      value: "4",
+      value: "1",
       description: "Active meal schedules",
       icon: Calendar,
       color: "bg-orange-50 border-orange-200",
@@ -162,38 +204,42 @@ export default function OverviewPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {[
-                {
-                  action: "Downloaded Infant Recipe PDF",
-                  time: "2 hours ago",
-                },
-                {
-                  action: "Updated meal timetable",
-                  time: "1 day ago",
-                },
-                {
-                  action: "Read article: Healthy Eating Tips",
-                  time: "3 days ago",
-                },
-                {
-                  action: "Renewed subscription",
-                  time: "1 week ago",
-                },
-              ].map((activity, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between border-b dark:border-gray-700 pb-3 last:border-0"
-                >
-                  <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      {activity.action}
-                    </p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">
-                      {activity.time}
-                    </p>
+              {activitiesLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    Loading activities...
                   </div>
                 </div>
-              ))}
+              ) : recentActivities.length > 0 ? (
+                recentActivities.map((activity) => (
+                  <div
+                    key={activity.id}
+                    className="flex items-center justify-between border-b dark:border-gray-700 pb-3 last:border-0"
+                  >
+                    <div className="flex items-start gap-3">
+                      <Activity className="h-4 w-4 text-primary mt-1" />
+                      <div>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {activity.activity_description}
+                        </p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">
+                          {formatTimeAgo(activity.created_at)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <Activity className="h-12 w-12 text-gray-300 dark:text-gray-600 mb-2" />
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    No recent activities
+                  </p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                    Your activities will appear here
+                  </p>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { createBrowserSupabaseClient } from "@/lib/supabase";
 import { Calendar, Download } from "lucide-react";
 import { getUserInfantRecipePurchases } from "@/app/actions/infant-recipes";
+import { logDownloadActivity } from "@/lib/activity-logger";
 
 export default function OnetimeInfantToddlerPage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -18,6 +19,17 @@ export default function OnetimeInfantToddlerPage() {
   const [hasAnyPurchase, setHasAnyPurchase] = useState(false);
   const supabase = createBrowserSupabaseClient();
   const router = useRouter();
+
+  const handleDownload = async (
+    packType: "starter" | "standard",
+    url: string,
+    fileName: string,
+  ) => {
+    // Log the download activity
+    await logDownloadActivity(fileName, packType);
+    // Open the download link
+    window.open(url, "_blank");
+  };
 
   useEffect(() => {
     const checkAuthAndPurchases = async () => {
@@ -38,13 +50,13 @@ export default function OnetimeInfantToddlerPage() {
         const purchasesResult = await getUserInfantRecipePurchases();
         if (purchasesResult.success && purchasesResult.data) {
           const completedPurchases = purchasesResult.data.filter(
-            (p: any) => p.status === "completed"
+            (p: any) => p.status === "completed",
           );
           const hasStarter = completedPurchases.some(
-            (p: any) => p.pack_type === "starter"
+            (p: any) => p.pack_type === "starter",
           );
           const hasStandard = completedPurchases.some(
-            (p: any) => p.pack_type === "standard"
+            (p: any) => p.pack_type === "standard",
           );
           setPurchasedPacks({ starter: hasStarter, standard: hasStandard });
           setHasAnyPurchase(hasStarter || hasStandard);
@@ -171,12 +183,13 @@ export default function OnetimeInfantToddlerPage() {
             <div className="mt-auto pt-9">
               {purchasedPacks.starter ? (
                 <Button
-                  onClick={() => {
-                    window.open(
+                  onClick={() =>
+                    handleDownload(
+                      "starter",
                       "https://dohdf572hojoyskk.public.blob.vercel-storage.com/One-%20Time%20infant%20%26%20Toddler%20Recipe%20Pack%20%28BASIC%20PACK%29.pdf",
-                      "_blank"
-                    );
-                  }}
+                      "Infant & Toddler Recipe Pack (Basic)",
+                    )
+                  }
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                 >
                   <Download className="w-4 h-4 mr-2" />
@@ -228,12 +241,13 @@ export default function OnetimeInfantToddlerPage() {
             <div className="mt-auto pt-4">
               {purchasedPacks.standard ? (
                 <Button
-                  onClick={() => {
-                    window.open(
+                  onClick={() =>
+                    handleDownload(
+                      "standard",
                       "https://dohdf572hojoyskk.public.blob.vercel-storage.com/One-%20Time%20infant%20%26%20Toddler%20Recipe%20Pack%20%28STANDARD%20PACK%29.pdf",
-                      "_blank"
-                    );
-                  }}
+                      "Infant & Toddler Recipe Pack (Standard)",
+                    )
+                  }
                   className="w-full bg-green-600 hover:bg-green-700 text-white"
                 >
                   <Download className="w-4 h-4 mr-2" />

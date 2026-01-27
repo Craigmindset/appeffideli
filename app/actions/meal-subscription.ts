@@ -6,6 +6,7 @@ import {
   generatePaystackReference,
   cancelPaystackSubscription,
 } from "@/lib/paystack";
+import { logUserActivity } from "./user-activities";
 
 export type MealPlanType = "basic" | "premium" | "vip";
 
@@ -20,7 +21,7 @@ export type MealSubscriptionResponse = {
  */
 export async function createMealSubscription(
   planType: MealPlanType,
-  amount: number
+  amount: number,
 ): Promise<MealSubscriptionResponse> {
   try {
     const supabase = await createServerSupabaseClient();
@@ -98,7 +99,7 @@ export async function createMealSubscription(
 export async function updateMealSubscriptionStatus(
   reference: string,
   paymentReference: string,
-  planType: MealPlanType
+  planType: MealPlanType,
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = await createServerSupabaseClient();
@@ -154,6 +155,18 @@ export async function updateMealSubscriptionStatus(
       };
     }
 
+    // Log subscription activity
+    const planName = planType.charAt(0).toUpperCase() + planType.slice(1);
+    await logUserActivity(
+      "subscription",
+      `Subscribed to ${planName} meal plan`,
+      {
+        plan_type: planType,
+        subscription_reference: reference,
+        payment_reference: paymentReference,
+      },
+    );
+
     return {
       success: true,
     };
@@ -184,7 +197,7 @@ export async function getUserMealSubscription() {
     const { data: profile } = await supabaseAdmin
       .from("users_profile")
       .select(
-        "meal_subscription, meal_subscription_status, meal_subscription_reference"
+        "meal_subscription, meal_subscription_status, meal_subscription_reference",
       )
       .eq("id", user.id)
       .single();
@@ -232,7 +245,7 @@ export async function cancelMealSubscription(): Promise<{
     const { data: profile } = await supabaseAdmin
       .from("users_profile")
       .select(
-        "meal_subscription, meal_subscription_status, paystack_subscription_code, paystack_email_token"
+        "meal_subscription, meal_subscription_status, paystack_subscription_code, paystack_email_token",
       )
       .eq("id", user.id)
       .single();
@@ -256,7 +269,7 @@ export async function cancelMealSubscription(): Promise<{
       try {
         await cancelPaystackSubscription(
           profile.paystack_subscription_code,
-          profile.paystack_email_token
+          profile.paystack_email_token,
         );
       } catch (paystackError) {
         console.error("Error cancelling on Paystack:", paystackError);
@@ -320,7 +333,7 @@ export async function cancelMealSubscription(): Promise<{
 export async function storePaystackSubscriptionDetails(
   subscriptionCode: string,
   emailToken: string,
-  planType: MealPlanType
+  planType: MealPlanType,
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = await createServerSupabaseClient();
@@ -351,7 +364,7 @@ export async function storePaystackSubscriptionDetails(
     if (subscriptionError) {
       console.error(
         "Error storing Paystack details in subscription:",
-        subscriptionError
+        subscriptionError,
       );
     }
 

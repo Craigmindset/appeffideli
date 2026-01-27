@@ -113,7 +113,10 @@ export default function Hero() {
                   asChild
                   className="h-12 px-6 text-white bg-primary hover:bg-primary/90 w-full sm:w-auto"
                 >
-                  <Link href="/get-started">
+                  <Link
+                    href="/signup
+                  "
+                  >
                     Get Started
                     <ChevronRight className="ml-2 h-5 w-5" />
                   </Link>

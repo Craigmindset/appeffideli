@@ -3,6 +3,7 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createBrowserSupabaseClient as createClient } from "@/lib/supabase";
+import { logLoginActivity } from "@/lib/activity-logger";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -45,7 +46,7 @@ export default function LoginPage() {
       // Check if email is verified
       if (!data.user.email_confirmed_at) {
         setError(
-          "Please verify your email address before signing in. Check your inbox for the verification link."
+          "Please verify your email address before signing in. Check your inbox for the verification link.",
         );
         setIsLoading(false);
         return;
@@ -61,7 +62,7 @@ export default function LoginPage() {
       // Store user data in localStorage for compatibility with existing code
       localStorage.setItem(
         "user",
-        JSON.stringify({ email: data.user.email, id: data.user.id })
+        JSON.stringify({ email: data.user.email, id: data.user.id }),
       );
       localStorage.setItem("userEmail", data.user.email || "");
       localStorage.setItem("userId", data.user.id);
@@ -73,6 +74,9 @@ export default function LoginPage() {
         localStorage.setItem("userLastName", profileData.last_name || "");
         localStorage.setItem("userRole", profileData.role || "user");
       }
+
+      // Log login activity
+      await logLoginActivity();
 
       // Role-based routing
       const userRole = profileData?.role || "user";

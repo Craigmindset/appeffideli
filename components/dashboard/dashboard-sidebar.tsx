@@ -47,14 +47,14 @@ const navItems = [
   },
 
   {
-    title: "Household Cleaning",
-    href: "/dashboard/household-cleaning",
-    icon: Home,
-  },
-  {
     title: "Infant & Toddler Pack",
     href: "/dashboard/onetime-infant-toddler",
     icon: Baby,
+  },
+  {
+    title: "Household Cleaning",
+    href: "/dashboard/household-cleaning",
+    icon: Home,
   },
   {
     title: "My Subscription",

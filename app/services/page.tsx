@@ -17,7 +17,7 @@ const slides = [
   {
     image:
       "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/2148484647.jpg-4Uuop9peBb5eAKu5kP1cE9gDcu6XAF.jpeg",
-    title: "Customized Meal Planning",
+    title: "Meal Plans",
     description:
       "Effideli’s Monthly Meal Plan Subscription provides a complete family-friendly menu of intercontinental, African-infused recipes—covering breakfast, snacks, lunch, and dinner—perfect for healthy families, working mums, private chefs, and anyone looking to spice up their home meals",
   },

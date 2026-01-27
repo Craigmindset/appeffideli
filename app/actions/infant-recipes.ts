@@ -3,6 +3,7 @@
 import { supabaseAdmin } from "@/lib/supabase";
 import { createServerSupabaseClient } from "@/lib/auth-server";
 import { generatePaystackReference } from "@/lib/paystack";
+import { logUserActivity } from "./user-activities";
 
 export type InfantRecipePackType = "starter" | "standard";
 
@@ -79,7 +80,7 @@ export async function updateInfantRecipePurchaseStatus(
     const paymentVerifiedAt =
       status === "completed" ? new Date().toISOString() : null;
 
-    const { error: updateError } = await supabaseAdmin
+    const { error: updateError, data: updateData } = await supabaseAdmin
       .from("infant_recipes_purchases")
       .update({
         payment_reference: paymentReference,
@@ -87,7 +88,9 @@ export async function updateInfantRecipePurchaseStatus(
         payment_verified_at: paymentVerifiedAt,
         updated_at: new Date().toISOString(),
       })
-      .eq("purchase_reference", reference);
+      .eq("purchase_reference", reference)
+      .select("pack_type, amount")
+      .single();
 
     if (updateError) {
       console.error("Error updating purchase status:", updateError);
@@ -95,6 +98,19 @@ export async function updateInfantRecipePurchaseStatus(
         success: false,
         error: "Failed to update purchase status",
       };
+    }
+
+    // Log activity if payment was completed
+    if (status === "completed" && updateData) {
+      await logUserActivity(
+        "purchase",
+        `Purchased ${updateData.pack_type === "starter" ? "Starter" : "Standard"} infant recipe pack`,
+        {
+          pack_type: updateData.pack_type,
+          amount: updateData.amount,
+          reference: paymentReference,
+        },
+      );
     }
 
     return { success: true };
