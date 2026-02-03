@@ -25,6 +25,16 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/services/meal-plan-subscription/page.js"
+    ],
+    "/services/saturday-breakfast-gloria/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/services/saturday-breakfast-gloria/page.js"
+    ],
+    "/services/kitchen-hacks-monday/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/services/kitchen-hacks-monday/page.js"
     ]
   }
 }

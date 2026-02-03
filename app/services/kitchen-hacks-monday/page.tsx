@@ -11,11 +11,6 @@ export default function KitchenHackMondayPage() {
         make cooking fun, flavorful, and educational, adding value to your
         home—tune in every Monday on social media and the Effideli website.
       </p>
-      <div className="text-center">
-        <span className="inline-block bg-primary text-white px-4 py-2 rounded-full font-semibold">
-          Coming Soon: Weekly Kitchen Tips!
-        </span>
-      </div>
 
       {/* Video Thumbnails Section */}
       <section className="mt-16">
