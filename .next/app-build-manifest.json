@@ -11,30 +11,15 @@
       "static/chunks/main-app.js",
       "static/chunks/app/page.js"
     ],
-    "/services/layout": [
+    "/contact/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/services/layout.js"
+      "static/chunks/app/contact/page.js"
     ],
-    "/services/infant-recipes/page": [
+    "/_not-found/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/services/infant-recipes/page.js"
-    ],
-    "/services/meal-plan-subscription/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/services/meal-plan-subscription/page.js"
-    ],
-    "/services/saturday-breakfast-gloria/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/services/saturday-breakfast-gloria/page.js"
-    ],
-    "/services/kitchen-hacks-monday/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/services/kitchen-hacks-monday/page.js"
+      "static/chunks/app/_not-found/page.js"
     ]
   }
 }

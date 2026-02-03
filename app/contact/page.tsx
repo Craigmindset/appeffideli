@@ -117,14 +117,14 @@ export default function ContactPage() {
                   <h3 className="text-xl font-semibold mb-4">Follow Us</h3>
                   <div className="flex space-x-4">
                     <a
-                      href="#"
+                      href="https://web.facebook.com/effideli"
                       className="p-2 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors"
                     >
                       <Facebook className="h-5 w-5" />
                       <span className="sr-only">Facebook</span>
                     </a>
                     <a
-                      href="#"
+                      href="https://www.youtube.com/@EffiDeli/videos"
                       className="p-2 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors"
                     >
                       <FaYoutube className="h-5 w-5" />
@@ -138,7 +138,7 @@ export default function ContactPage() {
                       <span className="sr-only">TikTok</span>
                     </a>
                     <a
-                      href="#"
+                      href="https://www.instagram.com/effideli?igsh=b3F5M3hmaXhic2Iz"
                       className="p-2 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors"
                     >
                       <Instagram className="h-5 w-5" />
