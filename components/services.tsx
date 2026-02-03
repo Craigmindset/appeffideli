@@ -26,7 +26,7 @@ export default function Services() {
         "Effideli’s One-Time Infant & Toddler Recipe Pack provides balanced, nutritious recipes tailored to a baby’s tooth stage, taste development, and potential allergies, helping mums introduce new foods and fruits safely during each stage of their baby’s transition.",
       image:
         "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/2149125810.jpg-pl5CDhf6uIFzqamjRctTgZyUV9SoBI.jpeg",
-      href: "/services/infant-recipe",
+      href: "/services/infant-recipes",
     },
     {
       title: "Kitchen Hacks Monday",

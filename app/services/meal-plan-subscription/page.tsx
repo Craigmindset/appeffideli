@@ -26,6 +26,7 @@ export default function MealPlanSubscriptionPage() {
       price: "₦3,500",
       period: "month",
       description: "Perfect to get started",
+      mealInclusions: "Breakfast | Lunch | Dinner",
       features: ["Weekly meal plans", "Simple shopping list", "Email support"],
       color: "border-blue-500",
       amount: 3500,
@@ -38,6 +39,7 @@ export default function MealPlanSubscriptionPage() {
       period: "month",
       description: "Most popular choice",
       popular: true,
+      mealInclusions: "All of Basic + Snack Bite & Snack / Tea",
       features: [
         "Expanded weekly meal plans",
         "Downloadable recipes",
@@ -54,6 +56,7 @@ export default function MealPlanSubscriptionPage() {
       price: "₦7,999",
       period: "month",
       description: "Premium experience",
+      mealInclusions: "All of Premium + Dessert",
       features: [
         "All Premium features",
         "Priority support",
@@ -272,6 +275,18 @@ export default function MealPlanSubscriptionPage() {
                     Best for: Private Chef, Catering, Patient food services, and
                     families who want personal guidance & highest value.
                   </p>
+                )}
+
+                {/* Meal Inclusions */}
+                {plan.mealInclusions && (
+                  <div className="bg-primary/10 dark:bg-primary/20 p-3 rounded-lg border border-primary/30">
+                    <p className="text-xs font-semibold text-primary dark:text-primary mb-1">
+                      Meals Plan Included:
+                    </p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {plan.mealInclusions}
+                    </p>
+                  </div>
                 )}
 
                 {/* Price */}
