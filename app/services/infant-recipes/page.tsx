@@ -98,7 +98,11 @@ export default function InfantRecipesPage() {
     }
   };
 
-  const { initializePayment, isLoading: isPaystackLoading } = usePaystack({
+  const {
+    initializePayment,
+    isLoading: isPaystackLoading,
+    isReady,
+  } = usePaystack({
     email: userProfile?.email || "",
     firstName: userProfile?.full_name?.split(" ")[0] || "",
     lastName: userProfile?.full_name?.split(" ").slice(1).join(" ") || "",
@@ -106,14 +110,24 @@ export default function InfantRecipesPage() {
     apartmentType: "infant-recipe",
     orderType: "download",
     amount: selectedPlan?.amount || 0,
-    planCode: selectedPlan?.planCode || "",
     reference: purchaseReference,
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
       console.log("Payment successful:", response);
       setIsModalOpen(false);
-      router.push(
-        `/payment-success?reference=${purchaseReference}&pack=${selectedPlan?.id}`,
-      );
+      try {
+        const res = await fetch(
+          `/api/verify-payment?reference=${purchaseReference}`,
+        );
+        const data = await res.json();
+        if (data.success) {
+          router.push("/dashboard/onetime-infant-toddler");
+        } else {
+          alert(data.error || "Payment verification failed");
+        }
+      } catch (e) {
+        console.error("Verification error", e);
+        alert("An error occurred during verification");
+      }
     },
     onClose: () => {
       console.log("Payment closed");
@@ -130,7 +144,6 @@ export default function InfantRecipesPage() {
       email: userProfile.email,
       amount: selectedPlan.amount,
       ref: purchaseReference,
-      plan: selectedPlan.planCode,
       firstname: userProfile.full_name?.split(" ")[0] || "",
       lastname: userProfile.full_name?.split(" ").slice(1).join(" ") || "",
       phone: userProfile.phone || "",
@@ -374,7 +387,7 @@ export default function InfantRecipesPage() {
             {/* Pay Button */}
             <button
               onClick={handlePay}
-              disabled={isPaystackLoading}
+              disabled={isPaystackLoading || !isReady}
               className="w-full bg-primary text-white py-3 px-6 rounded-lg font-semibold hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {isPaystackLoading ? (

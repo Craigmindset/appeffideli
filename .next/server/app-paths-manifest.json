@@ -1,5 +1,9 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
+  "/login/page": "app/login/page.js",
   "/page": "app/page.js",
-  "/contact/page": "app/contact/page.js"
+  "/dashboard/onetime-infant-toddler/page": "app/dashboard/onetime-infant-toddler/page.js",
+  "/dashboard/overview/page": "app/dashboard/overview/page.js",
+  "/services/infant-recipes/page": "app/services/infant-recipes/page.js",
+  "/dashboard/my-downloads/page": "app/dashboard/my-downloads/page.js"
 }

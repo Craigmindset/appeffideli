@@ -1,52 +1,126 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { getPdfUrl } from "@/app/actions/pdf"
-import { supabaseAdmin } from "@/lib/supabase"
+import { type NextRequest, NextResponse } from "next/server";
+import { supabaseAdmin } from "@/lib/supabase";
+import { getCurrentUser } from "@/lib/auth-server";
+import { getPdfUrl } from "@/app/actions/pdf";
+
+const INFANT_PACK_URLS: Record<string, string> = {
+  starter:
+    "https://dohdf572hojoyskk.public.blob.vercel-storage.com/One-%20Time%20infant%20%26%20Toddler%20Recipe%20Pack%20%28BASIC%20PACK%29.pdf",
+  standard:
+    "https://dohdf572hojoyskk.public.blob.vercel-storage.com/One-%20Time%20infant%20%26%20Toddler%20Recipe%20Pack%20%28STANDARD%20PACK%29.pdf",
+};
 
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams
-  const reference = searchParams.get("reference")
-  const preferences = searchParams.get("preferences") || ""
+  const searchParams = request.nextUrl.searchParams;
+  const reference = searchParams.get("reference");
+  const preferences = searchParams.get("preferences") || "";
 
   if (!reference) {
-    return NextResponse.json({ success: false, error: "Reference is required" }, { status: 400 })
+    return NextResponse.json(
+      { success: false, error: "Reference is required" },
+      { status: 400 },
+    );
+  }
+
+  const user = await getCurrentUser();
+  if (!user) {
+    return NextResponse.json(
+      { success: false, error: "Not authenticated" },
+      { status: 401 },
+    );
   }
 
   try {
-    // Verify the order exists and is successful
-    const { data: order, error } = await supabaseAdmin
+    // Try orders first
+    const { data: order } = await supabaseAdmin
       .from("orders")
-      .select("apartment_type, order_type, status")
+      .select("apartment_type, order_type, status, email, landmark")
       .eq("reference", reference)
-      .eq("status", "success")
-      .single()
+      .maybeSingle();
 
-    if (error || !order) {
-      return NextResponse.json({ success: false, error: "Order not found or payment not successful" }, { status: 404 })
-    }
-
-    // Get the PDF URL
-    const pdfUrl = await getPdfUrl(order.apartment_type, order.order_type, preferences)
-
-    // Return the PDF URL
-    return NextResponse.json({
-      success: true,
-      pdfUrl,
-      fileName:
+    if (order && order.status === "success" && order.email === user.email) {
+      const prefs =
+        typeof preferences === "string" && preferences.trim()
+          ? preferences
+          : order.landmark || "";
+      const pdfUrl = await getPdfUrl(
+        order.apartment_type,
+        order.order_type,
+        prefs,
+      );
+      const upstream = await fetch(pdfUrl);
+      if (!upstream.ok || !upstream.body) {
+        return NextResponse.json(
+          { success: false, error: "Failed to fetch PDF" },
+          { status: 502 },
+        );
+      }
+      const filename =
         order.apartment_type === "infant-recipe"
           ? "Effideli-Infant-Recipe-Plan.pdf"
-          : `Effideli-${order.apartment_type}-Routine.pdf`,
-    })
-  } catch (error) {
-    console.error("Error getting PDF URL:", error)
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Failed to get PDF URL",
-        // Provide a fallback URL
-        fallbackUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+          : `Effideli-${order.apartment_type}-Routine.pdf`;
+      return new NextResponse(upstream.body, {
+        status: 200,
+        headers: {
+          "Content-Type": "application/pdf",
+          "Content-Disposition": `attachment; filename="${filename}"`,
+          "Cache-Control": "no-store",
+        },
+      });
+    }
+
+    // Otherwise, check infant_recipes_purchases
+    const { data: purchase } = await supabaseAdmin
+      .from("infant_recipes_purchases")
+      .select("status, user_id, pack_type")
+      .eq("purchase_reference", reference)
+      .maybeSingle();
+
+    if (
+      !purchase ||
+      purchase.status !== "completed" ||
+      purchase.user_id !== user.id
+    ) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized or payment not successful" },
+        { status: 403 },
+      );
+    }
+
+    // Stream the actual blob file for the pack
+    const packUrl = INFANT_PACK_URLS[purchase.pack_type];
+    if (!packUrl) {
+      return NextResponse.json(
+        { success: false, error: "Unknown pack type" },
+        { status: 404 },
+      );
+    }
+    const upstream = await fetch(packUrl);
+    if (!upstream.ok || !upstream.body) {
+      return NextResponse.json(
+        { success: false, error: "Failed to fetch PDF" },
+        { status: 502 },
+      );
+    }
+
+    const filename =
+      purchase.pack_type === "starter"
+        ? "Effideli-Infant-Recipe-Plan-Basic.pdf"
+        : "Effideli-Infant-Recipe-Plan-Standard.pdf";
+
+    return new NextResponse(upstream.body, {
+      status: 200,
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename="${filename}"`,
+        "Cache-Control": "no-store",
       },
+    });
+  } catch (error) {
+    console.error("Secure download error:", error);
+    return NextResponse.json(
+      { success: false, error: "Unexpected error" },
       { status: 500 },
-    )
+    );
   }
 }
-

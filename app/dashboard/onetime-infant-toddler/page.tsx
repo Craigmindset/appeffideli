@@ -8,6 +8,7 @@ import { createBrowserSupabaseClient } from "@/lib/supabase";
 import { Calendar, Download } from "lucide-react";
 import { getUserInfantRecipePurchases } from "@/app/actions/infant-recipes";
 import { logDownloadActivity } from "@/lib/activity-logger";
+import { toast } from "@/components/ui/use-toast";
 
 export default function OnetimeInfantToddlerPage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -152,7 +153,7 @@ export default function OnetimeInfantToddlerPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
         {/* Basic Pack */}
         <Card className="bg-blue-50/50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800 flex flex-col h-full transition-all duration-300 hover:shadow-lg hover:shadow-blue-200/50 dark:hover:shadow-blue-900/50 hover:scale-[1.02] hover:border-blue-300 dark:hover:border-blue-700 cursor-pointer">
           <CardHeader>
@@ -197,7 +198,13 @@ export default function OnetimeInfantToddlerPage() {
                 </Button>
               ) : (
                 <Button
-                  onClick={() => router.push("/services/infant-recipes")}
+                  onClick={() => {
+                    toast({ title: "Kindly Purchase this Pack to download" });
+                    setTimeout(
+                      () => router.push("/services/infant-recipes"),
+                      2000,
+                    );
+                  }}
                   variant="outline"
                   className="w-full border-blue-600 text-blue-600 hover:bg-blue-50"
                 >
@@ -255,7 +262,13 @@ export default function OnetimeInfantToddlerPage() {
                 </Button>
               ) : (
                 <Button
-                  onClick={() => router.push("/services/infant-recipes")}
+                  onClick={() => {
+                    toast({ title: "Kindly Purchase this Pack to download" });
+                    setTimeout(
+                      () => router.push("/services/infant-recipes"),
+                      2000,
+                    );
+                  }}
                   variant="outline"
                   className="w-full border-green-600 text-green-600 hover:bg-green-50"
                 >

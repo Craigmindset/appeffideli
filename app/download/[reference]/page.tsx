@@ -1,24 +1,24 @@
-import { supabaseAdmin } from "@/lib/supabase"
-import { CheckCircle, ArrowLeft } from "lucide-react"
-import Link from "next/link"
-import Navbar from "@/components/navbar"
-import Footer from "@/components/footer"
-import { getPdfUrl } from "@/app/actions/pdf"
-import DownloadButtonEnhanced from "@/components/download-button-enhanced"
-import { DirectPdfLink } from "@/components/direct-pdf-link"
+import { supabaseAdmin } from "@/lib/supabase";
+import { CheckCircle, ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import Navbar from "@/components/navbar";
+import Footer from "@/components/footer";
+import { getPdfUrl } from "@/app/actions/pdf";
+import DownloadButtonEnhanced from "@/components/download-button-enhanced";
+import { DirectPdfLink } from "@/components/direct-pdf-link";
 
 // Force dynamic rendering
-export const dynamic = "force-dynamic"
-export const revalidate = 0
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function DownloadPage({
   params,
   searchParams,
 }: {
-  params: { reference: string }
-  searchParams: { [key: string]: string | string[] | undefined }
+  params: { reference: string };
+  searchParams: { [key: string]: string | string[] | undefined };
 }) {
-  const reference = params.reference
+  const reference = params.reference;
 
   // Fetch order details to verify payment and get apartment type
   const { data: order, error } = await supabaseAdmin
@@ -27,7 +27,7 @@ export default async function DownloadPage({
     .eq("reference", reference)
     .eq("status", "success") // Only allow downloads for successful payments
     .eq("order_type", "download") // Only for download orders
-    .single()
+    .single();
 
   // If order not found or not successful, show error
   if (error || !order) {
@@ -36,9 +36,12 @@ export default async function DownloadPage({
         <Navbar />
         <main className="flex-grow container py-10">
           <div className="max-w-lg mx-auto bg-white p-8 rounded-lg shadow-md">
-            <h1 className="text-2xl font-bold mb-6 text-center">Download Unavailable</h1>
+            <h1 className="text-2xl font-bold mb-6 text-center">
+              Download Unavailable
+            </h1>
             <p className="text-center mb-6">
-              We couldn't find a valid download for this reference. This could be because:
+              We couldn't find a valid download for this reference. This could
+              be because:
             </p>
             <ul className="list-disc pl-6 mb-6 space-y-2">
               <li>The payment was not successful</li>
@@ -58,20 +61,24 @@ export default async function DownloadPage({
         </main>
         <Footer />
       </div>
-    )
+    );
   }
 
   // Get the PDF URL based on apartment type and order details
-  const preferences = typeof searchParams.preferences === "string" ? searchParams.preferences : order.landmark || ""
+  const preferences =
+    typeof searchParams.preferences === "string"
+      ? searchParams.preferences
+      : order.landmark || "";
 
   // Get PDF URL with error handling
-  let pdfUrl
+  let pdfUrl;
   try {
-    pdfUrl = await getPdfUrl(order.apartment_type, "download", preferences)
+    pdfUrl = await getPdfUrl(order.apartment_type, "download", preferences);
   } catch (pdfError) {
-    console.error("Error getting PDF URL:", pdfError)
+    console.error("Error getting PDF URL:", pdfError);
     // Fallback to a known working PDF
-    pdfUrl = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+    pdfUrl =
+      "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
   }
 
   // Log the PDF URL and order details for debugging
@@ -80,9 +87,9 @@ export default async function DownloadPage({
     orderType: "download",
     preferences,
     pdfUrl,
-  })
+  });
 
-  const isInfantRecipe = order.apartment_type === "infant-recipe"
+  const isInfantRecipe = order.apartment_type === "infant-recipe";
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -96,7 +103,9 @@ export default async function DownloadPage({
           </div>
 
           <h1 className="text-2xl font-bold mb-2 text-center">
-            {isInfantRecipe ? "Your Infant Recipe Plan is Ready!" : "Your Download is Ready!"}
+            {isInfantRecipe
+              ? "Your Infant Recipe Plan is Ready!"
+              : "Your Download is Ready!"}
           </h1>
           <p className="text-center text-gray-600 mb-8">
             {isInfantRecipe
@@ -108,39 +117,44 @@ export default async function DownloadPage({
             <div className="bg-gray-50 p-4 rounded-md mb-6">
               <h2 className="font-semibold mb-2">Recipe Plan Details:</h2>
               <p>
-                <span className="font-medium">Reference:</span> {order.reference}
+                <span className="font-medium">Reference:</span>{" "}
+                {order.reference}
               </p>
               <p>
                 <span className="font-medium">Preferences:</span>{" "}
                 {preferences
                   .split(",")
-                  .map((pref) =>
-                    pref === "allergies"
-                      ? "Allergies Conscious"
-                      : pref === "sweet"
-                        ? "Sweet Tooth Preferences"
-                        : pref === "nutrition"
-                          ? "Nutrition Goals"
-                          : pref,
-                  )
+                  .map((p) => {
+                    const labels: Record<string, string> = {
+                      allergies: "Allergies Conscious",
+                      sweet: "Sweet Tooth Preferences",
+                      nutrition: "Nutrition Goals",
+                    };
+                    return labels[p] || p;
+                  })
                   .join(", ")}
               </p>
               <p>
-                <span className="font-medium">Date:</span> {new Date(order.created_at).toLocaleDateString()}
+                <span className="font-medium">Date:</span>{" "}
+                {new Date(order.created_at).toLocaleDateString()}
               </p>
             </div>
           ) : (
             <div className="bg-gray-50 p-4 rounded-md mb-6">
               <h2 className="font-semibold mb-2">Order Details:</h2>
               <p>
-                <span className="font-medium">Reference:</span> {order.reference}
+                <span className="font-medium">Reference:</span>{" "}
+                {order.reference}
               </p>
               <p>
                 <span className="font-medium">Home Type:</span>{" "}
-                {order.apartment_type.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                {order.apartment_type
+                  .replace(/-/g, " ")
+                  .replace(/\b\w/g, (char) => char.toUpperCase())}
               </p>
               <p>
-                <span className="font-medium">Date:</span> {new Date(order.created_at).toLocaleDateString()}
+                <span className="font-medium">Date:</span>{" "}
+                {new Date(order.created_at).toLocaleDateString()}
               </p>
             </div>
           )}
@@ -149,7 +163,9 @@ export default async function DownloadPage({
             <DownloadButtonEnhanced
               pdfUrl={pdfUrl}
               fileName={
-                isInfantRecipe ? `Effideli-Infant-Recipe-Plan.pdf` : `Effideli-${order.apartment_type}-Routine.pdf`
+                isInfantRecipe
+                  ? `Effideli-Infant-Recipe-Plan.pdf`
+                  : `Effideli-${order.apartment_type}-Routine.pdf`
               }
               autoDownload={true}
               showStatus={true}
@@ -157,14 +173,23 @@ export default async function DownloadPage({
           </div>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-500 mb-2">If the download button doesn't work, you can also:</p>
+            <p className="text-sm text-gray-500 mb-2">
+              If the download button doesn't work, you can also:
+            </p>
             <DirectPdfLink reference={reference} preferences={preferences} />
           </div>
 
           {/* Add direct PDF link as fallback */}
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-500 mb-2">If the download button doesn't work, you can also:</p>
-            <a href={pdfUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+            <p className="text-sm text-gray-500 mb-2">
+              If the download button doesn't work, you can also:
+            </p>
+            <a
+              href={pdfUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
               Open PDF directly in browser
             </a>
           </div>
@@ -176,6 +201,5 @@ export default async function DownloadPage({
       </main>
       <Footer />
     </div>
-  )
+  );
 }
-
