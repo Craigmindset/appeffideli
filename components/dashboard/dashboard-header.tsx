@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { LogOut, User, Home, Headphones, Menu } from "lucide-react";
+import { LogOut, User, Home, Headphones, Menu, Loader2 } from "lucide-react";
 
 import { DashboardThemeToggle } from "./dashboard-theme-toggle";
 import { createBrowserSupabaseClient } from "@/lib/supabase";
@@ -27,6 +27,7 @@ export function DashboardHeader() {
   const { setIsMobileMenuOpen } = useSidebar();
   const [firstName, setFirstName] = useState("User");
   const [userEmail, setUserEmail] = useState("");
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -58,6 +59,9 @@ export function DashboardHeader() {
   }, []);
 
   const handleLogout = async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+
     try {
       localStorage.clear();
       sessionStorage.clear();
@@ -69,6 +73,8 @@ export function DashboardHeader() {
       router.push("/");
     } catch (error) {
       router.push("/");
+    } finally {
+      setIsLoggingOut(false);
     }
   };
 
@@ -153,8 +159,13 @@ export function DashboardHeader() {
             onClick={handleLogout}
             title="Logout"
             className="hidden md:inline-flex text-foreground hover:text-red-600"
+            disabled={isLoggingOut}
           >
-            <LogOut className="h-5 w-5" />
+            {isLoggingOut ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <LogOut className="h-5 w-5" />
+            )}
           </Button>
 
           {/* User Dropdown (Desktop Only) */}
@@ -190,8 +201,16 @@ export function DashboardHeader() {
                 <span>Settings</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout} className="text-red-600">
-                <LogOut className="mr-2 h-4 w-4" />
+              <DropdownMenuItem
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="text-red-600"
+              >
+                {isLoggingOut ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <LogOut className="mr-2 h-4 w-4" />
+                )}
                 <span>Logout</span>
               </DropdownMenuItem>
             </DropdownMenuContent>

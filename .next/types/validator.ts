@@ -479,6 +479,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../app/api/keepalive/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/keepalive">> = Specific
+  const handler = {} as typeof import("../../app/api/keepalive/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../app/api/payment-complete/route.ts
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/payment-complete">> = Specific

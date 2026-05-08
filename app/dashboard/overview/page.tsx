@@ -192,7 +192,49 @@ export default function OverviewPage() {
         })}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4">
+        <Card className="bg-gray-50 border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+          <CardHeader>
+            <CardTitle className="text-gray-900 dark:text-white">
+              Quick Actions
+            </CardTitle>
+            <CardDescription className="dark:text-gray-400">
+              Common tasks and shortcuts
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-3 md:grid-cols-3">
+              <a
+                href="/dashboard/my-downloads"
+                className="flex items-center gap-2 rounded-lg border border-blue-100 bg-blue-50/70 p-3 text-gray-900 transition-all hover:bg-blue-100/70 hover:shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
+              >
+                <Download className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+                <span className="text-sm font-medium text-gray-900 dark:text-white">
+                  View Downloads
+                </span>
+              </a>
+              <a
+                href="/dashboard/meal-timetable"
+                className="flex items-center gap-2 rounded-lg border border-amber-100 bg-amber-50/70 p-3 text-gray-900 transition-all hover:bg-amber-100/70 hover:shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
+              >
+                <Calendar className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+                <span className="text-sm font-medium text-gray-900 dark:text-white">
+                  Manage Meal Plans
+                </span>
+              </a>
+              <a
+                href="/dashboard/my-subscription"
+                className="flex items-center gap-2 rounded-lg border border-emerald-100 bg-emerald-50/70 p-3 text-gray-900 transition-all hover:bg-emerald-100/70 hover:shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
+              >
+                <CreditCard className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+                <span className="text-sm font-medium text-gray-900 dark:text-white">
+                  Subscription Details
+                </span>
+              </a>
+            </div>
+          </CardContent>
+        </Card>
+
         <Card className="bg-slate-50 border-slate-200 dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
             <CardTitle className="text-gray-900 dark:text-white">
@@ -211,7 +253,7 @@ export default function OverviewPage() {
                   </div>
                 </div>
               ) : recentActivities.length > 0 ? (
-                recentActivities.map((activity) => (
+                recentActivities.slice(0, 5).map((activity) => (
                   <div
                     key={activity.id}
                     className="flex items-center justify-between border-b dark:border-gray-700 pb-3 last:border-0"
@@ -240,48 +282,6 @@ export default function OverviewPage() {
                   </p>
                 </div>
               )}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gray-50 border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-          <CardHeader>
-            <CardTitle className="text-gray-900 dark:text-white">
-              Quick Actions
-            </CardTitle>
-            <CardDescription className="dark:text-gray-400">
-              Common tasks and shortcuts
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-2">
-              <a
-                href="/dashboard/my-downloads"
-                className="flex items-center gap-2 rounded-lg border dark:border-gray-700 p-3 hover:bg-accent dark:hover:bg-gray-700 transition-colors"
-              >
-                <Download className="h-5 w-5 text-gray-700 dark:text-gray-300" />
-                <span className="text-sm font-medium text-gray-900 dark:text-white">
-                  View Downloads
-                </span>
-              </a>
-              <a
-                href="/dashboard/meal-timetable"
-                className="flex items-center gap-2 rounded-lg border dark:border-gray-700 p-3 hover:bg-accent dark:hover:bg-gray-700 transition-colors"
-              >
-                <Calendar className="h-5 w-5 text-gray-700 dark:text-gray-300" />
-                <span className="text-sm font-medium text-gray-900 dark:text-white">
-                  Manage Meal Plans
-                </span>
-              </a>
-              <a
-                href="/dashboard/my-subscription"
-                className="flex items-center gap-2 rounded-lg border dark:border-gray-700 p-3 hover:bg-accent dark:hover:bg-gray-700 transition-colors"
-              >
-                <CreditCard className="h-5 w-5 text-gray-700 dark:text-gray-300" />
-                <span className="text-sm font-medium text-gray-900 dark:text-white">
-                  Subscription Details
-                </span>
-              </a>
             </div>
           </CardContent>
         </Card>

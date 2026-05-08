@@ -16,6 +16,7 @@ import {
   ChevronRight,
   Home,
   Baby,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -74,6 +75,7 @@ export function DashboardSidebar() {
   const { isCollapsed, setIsCollapsed, isMobileMenuOpen, setIsMobileMenuOpen } =
     useSidebar();
   const [firstName, setFirstName] = useState("User");
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -108,6 +110,9 @@ export function DashboardSidebar() {
   }, []);
 
   const handleLogout = async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+
     try {
       // Clear client-side storage
       localStorage.clear();
@@ -122,6 +127,8 @@ export function DashboardSidebar() {
       console.error("Logout error:", error);
       // Even if server signout fails, redirect to home page
       router.push("/");
+    } finally {
+      setIsLoggingOut(false);
     }
   };
 
@@ -225,10 +232,23 @@ export function DashboardSidebar() {
               )}
               onClick={handleLogout}
               title={isCollapsed ? "Logout" : undefined}
+              disabled={isLoggingOut}
             >
-              <LogOut
-                className={cn("h-5 w-5 flex-shrink-0", !isCollapsed && "mr-3")}
-              />
+              {isLoggingOut ? (
+                <Loader2
+                  className={cn(
+                    "h-5 w-5 flex-shrink-0 animate-spin",
+                    !isCollapsed && "mr-3",
+                  )}
+                />
+              ) : (
+                <LogOut
+                  className={cn(
+                    "h-5 w-5 flex-shrink-0",
+                    !isCollapsed && "mr-3",
+                  )}
+                />
+              )}
               <span className={cn(isCollapsed && "md:hidden")}>Logout</span>
             </Button>
           </div>

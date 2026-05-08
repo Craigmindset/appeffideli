@@ -1,0 +1,27 @@
+name: Supabase Keepalive
+
+on:
+  schedule:
+    # Every 5 hours (UTC). Note: GitHub may delay scheduled runs slightly.
+    - cron: "0 */5 * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call keepalive endpoint
+        env:
+          KEEPALIVE_URL: ${{ secrets.KEEPALIVE_URL }}
+          KEEPALIVE_TOKEN: ${{ secrets.KEEPALIVE_TOKEN }}
+        run: |
+          if [ -z "$KEEPALIVE_URL" ]; then
+            echo "Missing KEEPALIVE_URL secret" >&2
+            exit 1
+          fi
+
+          if [ -n "$KEEPALIVE_TOKEN" ]; then
+            curl -fsS -H "x-keepalive-token: $KEEPALIVE_TOKEN" "$KEEPALIVE_URL"
+          else
+            curl -fsS "$KEEPALIVE_URL"
+          fi
