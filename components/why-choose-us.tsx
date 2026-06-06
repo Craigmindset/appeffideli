@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function WhyChooseUs() {
   const reasons = [
@@ -6,6 +7,7 @@ export default function WhyChooseUs() {
       title: "Meal Plans Made for You",
       description:
         " Recipes that fit your family, your taste, and your schedule. Stree-free and super tasty!",
+      href: "/services/meal-plan-subscription",
       icon: (
         <Image
           src="/images/Event.png"
@@ -20,6 +22,7 @@ export default function WhyChooseUs() {
       title: "Kitchen Hacks & Tips",
       description:
         "Learn practical tips, techniques, and hacks that simplify cokking and elevate your culinary skills",
+      href: "/services/kitchen-hacks-monday",
       icon: (
         <Image
           src="/images/Frying.png"
@@ -34,6 +37,7 @@ export default function WhyChooseUs() {
       title: "Flavour Meets Culture",
       description:
         "From global favorites to African-inspired dishes, we bring culture and excitement to every meal.",
+      href: "/services/saturday-breakfast-gloria",
       icon: (
         <Image
           src="/images/Chili Pepper.png"
@@ -63,18 +67,19 @@ export default function WhyChooseUs() {
         {/* Reasons Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {reasons.map((reason, index) => (
-            <div
+            <Link
               key={index}
-              className="flex flex-col items-center text-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
+              href={reason.href}
+              className="group flex flex-col items-center text-center p-6 bg-white rounded-lg shadow-md transition-all hover:-translate-y-1 hover:shadow-lg"
             >
-              <div className="mb-4 p-3 rounded-full bg-primary/10">
+              <div className="mb-4 p-3 rounded-full bg-primary/10 transition-colors group-hover:bg-primary/20">
                 {reason.icon}
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">
                 {reason.title}
               </h3>
               <p className="text-gray-600">{reason.description}</p>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

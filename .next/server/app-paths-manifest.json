@@ -1,8 +1,7 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
   "/page": "app/page.js",
-  "/login/page": "app/login/page.js",
+  "/services/infant-recipes/page": "app/services/infant-recipes/page.js",
   "/dashboard/overview/page": "app/dashboard/overview/page.js",
-  "/services/saturday-breakfast-gloria/page": "app/services/saturday-breakfast-gloria/page.js",
-  "/dashboard/page": "app/dashboard/page.js"
+  "/dashboard/my-downloads/page": "app/dashboard/my-downloads/page.js",
+  "/dashboard/household-cleaning/page": "app/dashboard/household-cleaning/page.js"
 }

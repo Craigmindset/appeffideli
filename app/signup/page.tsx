@@ -2,6 +2,7 @@
 import Link from "next/link";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { createBrowserSupabaseClient as createClient } from "@/lib/supabase";
 import { signUp } from "@/app/actions/auth";
 
@@ -10,7 +11,12 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const searchParams = useSearchParams();
   const togglePassword = () => setShowPassword((v) => !v);
+
+  const prefillFirstName = searchParams.get("firstName") || "";
+  const prefillLastName = searchParams.get("lastName") || "";
+  const prefillEmail = searchParams.get("email") || "";
 
   // Format phone number to only accept 11 numeric digits
   const handlePhoneInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,6 +97,8 @@ export default function SignupPage() {
                   name="firstName"
                   type="text"
                   autoComplete="given-name"
+                  required
+                  defaultValue={prefillFirstName}
                   className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
                   placeholder="First Name"
                 />
@@ -104,6 +112,8 @@ export default function SignupPage() {
                   name="lastName"
                   type="text"
                   autoComplete="family-name"
+                  required
+                  defaultValue={prefillLastName}
                   className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
                   placeholder="Last Name"
                 />
@@ -140,6 +150,7 @@ export default function SignupPage() {
                 type="email"
                 autoComplete="email"
                 required
+                defaultValue={prefillEmail}
                 className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
                 placeholder="Email address"
               />

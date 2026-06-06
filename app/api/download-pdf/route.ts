@@ -23,12 +23,6 @@ export async function GET(request: NextRequest) {
   }
 
   const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json(
-      { success: false, error: "Not authenticated" },
-      { status: 401 },
-    );
-  }
 
   try {
     // Try orders first
@@ -38,7 +32,15 @@ export async function GET(request: NextRequest) {
       .eq("reference", reference)
       .maybeSingle();
 
-    if (order && order.status === "success" && order.email === user.email) {
+    if (order && order.status === "success" && order.order_type === "download") {
+      // If a user is signed in, enforce ownership. If not signed in, allow access by valid paid reference.
+      if (user?.email && order.email !== user.email) {
+        return NextResponse.json(
+          { success: false, error: "Unauthorized download for this account" },
+          { status: 403 },
+        );
+      }
+
       const prefs =
         typeof preferences === "string" && preferences.trim()
           ? preferences
@@ -75,6 +77,13 @@ export async function GET(request: NextRequest) {
       .select("status, user_id, pack_type")
       .eq("purchase_reference", reference)
       .maybeSingle();
+
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: "Not authenticated" },
+        { status: 401 },
+      );
+    }
 
     if (
       !purchase ||

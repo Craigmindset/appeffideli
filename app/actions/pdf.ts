@@ -11,7 +11,8 @@ export async function getPdfUrl(apartmentType: string, orderType = "download", p
   // For this example, we'll return static URLs based on apartment type
   const pdfUrls = {
     studio: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/sample-pdf-studio.pdf",
-    apartment: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/sample-pdf-apartment.pdf",
+    apartment:
+      "https://ykgflxwoazlklogjzeoi.supabase.co/storage/v1/object/public/House%20Cleaning%20Files/Apartment_Household%20Cleaning%20Routine_.pdf",
     bungalow: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/sample-pdf-bungalow.pdf",
     "duplex-terrace": "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/sample-pdf-duplex-terrace.pdf",
     "duplex-balcony": "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/sample-pdf-duplex-balcony.pdf",

@@ -3,9 +3,7 @@ import { CheckCircle, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
-import { getPdfUrl } from "@/app/actions/pdf";
 import DownloadButtonEnhanced from "@/components/download-button-enhanced";
-import { DirectPdfLink } from "@/components/direct-pdf-link";
 
 // Force dynamic rendering
 export const dynamic = "force-dynamic";
@@ -64,29 +62,19 @@ export default async function DownloadPage({
     );
   }
 
-  // Get the PDF URL based on apartment type and order details
   const preferences =
     typeof searchParams.preferences === "string"
       ? searchParams.preferences
       : order.landmark || "";
 
-  // Get PDF URL with error handling
-  let pdfUrl;
-  try {
-    pdfUrl = await getPdfUrl(order.apartment_type, "download", preferences);
-  } catch (pdfError) {
-    console.error("Error getting PDF URL:", pdfError);
-    // Fallback to a known working PDF
-    pdfUrl =
-      "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
-  }
+  const secureDownloadUrl = `/api/download-pdf?reference=${encodeURIComponent(reference)}&preferences=${encodeURIComponent(preferences)}`;
 
   // Log the PDF URL and order details for debugging
   console.log("Download details:", {
     apartmentType: order.apartment_type,
     orderType: "download",
     preferences,
-    pdfUrl,
+    secureDownloadUrl,
   });
 
   const isInfantRecipe = order.apartment_type === "infant-recipe";
@@ -161,7 +149,7 @@ export default async function DownloadPage({
 
           <div className="flex justify-center">
             <DownloadButtonEnhanced
-              pdfUrl={pdfUrl}
+              pdfUrl={secureDownloadUrl}
               fileName={
                 isInfantRecipe
                   ? `Effideli-Infant-Recipe-Plan.pdf`
@@ -170,28 +158,6 @@ export default async function DownloadPage({
               autoDownload={true}
               showStatus={true}
             />
-          </div>
-
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-500 mb-2">
-              If the download button doesn't work, you can also:
-            </p>
-            <DirectPdfLink reference={reference} preferences={preferences} />
-          </div>
-
-          {/* Add direct PDF link as fallback */}
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-500 mb-2">
-              If the download button doesn't work, you can also:
-            </p>
-            <a
-              href={pdfUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:underline"
-            >
-              Open PDF directly in browser
-            </a>
           </div>
 
           <div className="mt-6 text-center text-sm text-gray-500">

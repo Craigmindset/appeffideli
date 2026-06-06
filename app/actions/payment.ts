@@ -4,6 +4,60 @@ import { supabaseAdmin } from "@/lib/supabase";
 import { revalidatePath } from "next/cache";
 import { createSubscriptionAccess } from "./subscription";
 import { updateInfantRecipePurchaseStatus } from "./infant-recipes";
+import {
+  updateInfantRecipeGuestPurchaseStatus,
+  getInfantGuestPurchaseByReference,
+} from "./infant-recipes";
+
+function getDownloadTitle(apartmentType?: string) {
+  const titleMap: Record<string, string> = {
+    studio: "Studio Household Cleaning Routine",
+    apartment: "Apartment Household Cleaning Routine",
+    bungalow: "Bungalow Household Cleaning Routine",
+    "duplex-terrace": "Duplex/Terrace Household Cleaning Routine",
+    "duplex-balcony": "Duplex with Balcony Household Cleaning Routine",
+    "infant-recipe": "Infant Recipe Plan",
+  };
+
+  return apartmentType ? titleMap[apartmentType] || "Purchased Package" : "Purchased Package";
+}
+
+async function upsertPurchasedDownload(params: {
+  reference: string;
+  email: string;
+  apartmentType?: string;
+  paymentVerified: boolean;
+  amount?: number;
+}) {
+  try {
+    const { data: profile } = await supabaseAdmin
+      .from("users_profile")
+      .select("id")
+      .eq("email", params.email)
+      .maybeSingle();
+
+    const packageUrl = `/download/${params.reference}`;
+    const payload = {
+      user_id: profile?.id || null,
+      email: params.email,
+      reference: params.reference,
+      title: getDownloadTitle(params.apartmentType),
+      package_url: packageUrl,
+      payment_verified: params.paymentVerified,
+      amount: params.amount ?? 0,
+    };
+
+    const { error } = await supabaseAdmin
+      .from("purchased_downloads")
+      .upsert(payload, { onConflict: "reference" });
+
+    if (error) {
+      console.error("Failed to upsert purchased download:", error);
+    }
+  } catch (error) {
+    console.error("Unexpected error upserting purchased download:", error);
+  }
+}
 
 export async function createOrder(orderData: {
   reference: string;
@@ -38,6 +92,15 @@ export async function createOrder(orderData: {
     const { error } = await supabaseAdmin.from("orders").insert([dbOrderData]);
     if (error) {
       console.error("Error creating order:", error);
+
+      if (error.code === "PGRST205") {
+        return {
+          success: false,
+          error:
+            "Orders table is missing in Supabase (public.orders). Run database/create-orders-table.sql in your Supabase SQL editor, then retry.",
+        };
+      }
+
       return { success: false, error: error.message };
     }
     return { success: true };
@@ -81,7 +144,7 @@ export async function verifyPayment(reference: string) {
       // Get order details to check if it's a download order
       const { data: orderData, error: orderError } = await supabaseAdmin
         .from("orders")
-        .select("order_type, email, apartment_type, landmark")
+        .select("order_type, email, apartment_type, landmark, amount")
         .eq("reference", reference)
         .maybeSingle(); // Use maybeSingle instead of single to handle case where no order is found
 
@@ -128,6 +191,12 @@ export async function verifyPayment(reference: string) {
         .eq("purchase_reference", reference)
         .maybeSingle();
 
+      const { data: infantGuestPurchase } = await supabaseAdmin
+        .from("infant_recipes_guest_purchases")
+        .select("pack_type")
+        .eq("purchase_reference", reference)
+        .maybeSingle();
+
       if (status === "success" && infantPurchase) {
         await updateInfantRecipePurchaseStatus(
           reference,
@@ -147,10 +216,39 @@ export async function verifyPayment(reference: string) {
         };
       }
 
+      if (infantGuestPurchase) {
+        await updateInfantRecipeGuestPurchaseStatus(
+          reference,
+          reference,
+          status === "success" ? "completed" : "failed",
+        );
+
+        if (status === "success") {
+          const guestDataResult = await getInfantGuestPurchaseByReference(reference);
+          return {
+            success: true,
+            data,
+            orderData,
+            redirectUrl: `/services/infant-recipes?guestSuccess=1&reference=${reference}`,
+            guestPurchase: guestDataResult.success ? guestDataResult.data : null,
+          };
+        }
+      }
+
       // For download orders, redirect to download page instead of success page
       const isDownloadOrder = orderData?.order_type === "download";
       const isSubscriptionOrder = orderData?.order_type === "subscription";
       const isInfantRecipeOrder = orderData?.apartment_type === "infant-recipe";
+
+      if (orderData?.order_type === "download" && orderData?.email) {
+        await upsertPurchasedDownload({
+          reference,
+          email: orderData.email,
+          apartmentType: orderData.apartment_type,
+          paymentVerified: status === "success",
+          amount: orderData.amount ?? 0,
+        });
+      }
 
       // Determine the appropriate redirect URL
       let redirectUrl = `/payment/failed?reference=${reference}`;

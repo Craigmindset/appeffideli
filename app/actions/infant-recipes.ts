@@ -13,6 +13,12 @@ export type InfantRecipePurchaseResponse = {
   reference?: string;
 };
 
+export type InfantGuestPurchaseResponse = {
+  success: boolean;
+  error?: string;
+  reference?: string;
+};
+
 /**
  * Create an infant recipe pack purchase record
  */
@@ -61,6 +67,54 @@ export async function createInfantRecipePurchase(
     };
   } catch (error) {
     console.error("Error in createInfantRecipePurchase:", error);
+    return {
+      success: false,
+      error: "An unexpected error occurred",
+    };
+  }
+}
+
+/**
+ * Create an infant recipe purchase record for guest checkout
+ */
+export async function createInfantRecipeGuestPurchase(
+  packType: InfantRecipePackType,
+  amount: number,
+  firstName: string,
+  lastName: string,
+  email: string,
+  phone?: string,
+): Promise<InfantGuestPurchaseResponse> {
+  try {
+    const purchaseReference = generatePaystackReference();
+
+    const { error: insertError } = await supabaseAdmin
+      .from("infant_recipes_guest_purchases")
+      .insert({
+        first_name: firstName,
+        last_name: lastName,
+        email,
+        phone: phone || null,
+        purchase_reference: purchaseReference,
+        pack_type: packType,
+        amount,
+        status: "pending",
+      });
+
+    if (insertError) {
+      console.error("Error creating infant guest purchase:", insertError);
+      return {
+        success: false,
+        error: "Failed to create guest purchase record",
+      };
+    }
+
+    return {
+      success: true,
+      reference: purchaseReference,
+    };
+  } catch (error) {
+    console.error("Error in createInfantRecipeGuestPurchase:", error);
     return {
       success: false,
       error: "An unexpected error occurred",
@@ -120,6 +174,67 @@ export async function updateInfantRecipePurchaseStatus(
       success: false,
       error: "An unexpected error occurred",
     };
+  }
+}
+
+/**
+ * Update infant recipe guest purchase status after successful payment
+ */
+export async function updateInfantRecipeGuestPurchaseStatus(
+  reference: string,
+  paymentReference: string,
+  status: "completed" | "failed",
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const paymentVerifiedAt =
+      status === "completed" ? new Date().toISOString() : null;
+
+    const { error: updateError } = await supabaseAdmin
+      .from("infant_recipes_guest_purchases")
+      .update({
+        payment_reference: paymentReference,
+        status,
+        payment_verified_at: paymentVerifiedAt,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("purchase_reference", reference);
+
+    if (updateError) {
+      console.error("Error updating guest purchase status:", updateError);
+      return {
+        success: false,
+        error: "Failed to update guest purchase status",
+      };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error in updateInfantRecipeGuestPurchaseStatus:", error);
+    return {
+      success: false,
+      error: "An unexpected error occurred",
+    };
+  }
+}
+
+/**
+ * Get guest infant recipe purchase by reference
+ */
+export async function getInfantGuestPurchaseByReference(reference: string) {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("infant_recipes_guest_purchases")
+      .select("first_name, last_name, email, phone, pack_type, amount, status")
+      .eq("purchase_reference", reference)
+      .maybeSingle();
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: "Unexpected error" };
   }
 }
 

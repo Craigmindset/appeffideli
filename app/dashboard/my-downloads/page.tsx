@@ -10,62 +10,61 @@ import {
 import { Button } from "@/components/ui/button";
 import { Download, FileText, Calendar } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+const formatCurrency = (amount: number) =>
+  new Intl.NumberFormat("en-NG", {
+    style: "currency",
+    currency: "NGN",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
 
 interface DownloadItem {
   id: string;
   title: string;
-  type: string;
-  downloadedAt: string;
-  fileSize: string;
+  amount: number;
+  createdAt: string;
   downloadUrl: string;
 }
 
 export default function MyDownloadsPage() {
   const [downloads, setDownloads] = useState<DownloadItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
-    // Mock data - replace with actual API call
-    const mockDownloads: DownloadItem[] = [
-      {
-        id: "1",
-        title: "Infant Recipe Guide",
-        type: "PDF",
-        downloadedAt: "2024-12-20",
-        fileSize: "2.4 MB",
-        downloadUrl: "#",
-      },
-      {
-        id: "2",
-        title: "Weekly Meal Plan - December",
-        type: "PDF",
-        downloadedAt: "2024-12-18",
-        fileSize: "1.8 MB",
-        downloadUrl: "#",
-      },
-      {
-        id: "3",
-        title: "Nutrition Guide for Toddlers",
-        type: "PDF",
-        downloadedAt: "2024-12-15",
-        fileSize: "3.1 MB",
-        downloadUrl: "#",
-      },
-      {
-        id: "4",
-        title: "Healthy Snacks Ideas",
-        type: "PDF",
-        downloadedAt: "2024-12-10",
-        fileSize: "1.5 MB",
-        downloadUrl: "#",
-      },
-    ];
+    const fetchDownloads = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch("/api/my-downloads", {
+          cache: "no-store",
+        });
 
-    setDownloads(mockDownloads);
+        if (!response.ok) {
+          setDownloads([]);
+          return;
+        }
+
+        const data = await response.json();
+        if (data.success && Array.isArray(data.downloads)) {
+          setDownloads(data.downloads);
+        } else {
+          setDownloads([]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch downloads:", error);
+        setDownloads([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDownloads();
   }, []);
 
   const handleDownload = (item: DownloadItem) => {
-    // Implement download logic
-    console.log("Downloading:", item.title);
+    router.push(item.downloadUrl);
   };
 
   return (
@@ -81,18 +80,18 @@ export default function MyDownloadsPage() {
         <CardHeader>
           <CardTitle>Download History</CardTitle>
           <CardDescription>
-            {downloads.length} item{downloads.length !== 1 ? "s" : ""} in your
-            download history
+            {isLoading
+              ? "Loading your purchased downloads..."
+              : `${downloads.length} item${downloads.length !== 1 ? "s" : ""} in your download history`}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {downloads.length === 0 ? (
+          {!isLoading && downloads.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <FileText className="h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No downloads yet</h3>
-              <p className="text-muted-foreground">
-                Your downloaded files will appear here
-              </p>
+              <h3 className="text-lg font-semibold mb-2">
+                You have no active download
+              </h3>
             </div>
           ) : (
             <div className="space-y-4">
@@ -111,12 +110,12 @@ export default function MyDownloadsPage() {
                         <div className="flex flex-wrap items-center gap-4 mt-1 text-sm text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <Calendar className="h-3 w-3" />
-                            {new Date(item.downloadedAt).toLocaleDateString()}
+                            {new Date(item.createdAt).toLocaleDateString()}
                           </span>
-                          <span>{item.fileSize}</span>
-                          <span className="uppercase text-xs font-medium">
-                            {item.type}
+                          <span className="font-medium text-primary">
+                            {formatCurrency(item.amount)}
                           </span>
+                          <span className="uppercase text-xs font-medium">PDF</span>
                         </div>
                       </div>
                     </div>

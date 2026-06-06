@@ -16,17 +16,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { X } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { usePaystack } from "@/hooks/use-paystack";
 import { useRouter } from "next/navigation";
-import { createOrder, verifyPayment } from "@/app/actions/payment";
+import { createOrder } from "@/app/actions/payment";
+import { generatePaystackReference } from "@/lib/paystack";
 
 const nigerianStates = [
   "Abia",
@@ -100,8 +94,6 @@ const formSchema = z.object({
 
 export default function HouseholdCleaningPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [selectedCharge, setSelectedCharge] = useState(0);
   const [userEmail, setUserEmail] = useState("");
   const [userName, setUserName] = useState("");
   const [userPhone, setUserPhone] = useState("");
@@ -118,6 +110,9 @@ export default function HouseholdCleaningPage() {
     },
   });
 
+  const selectedApartmentType = form.watch("apartmentType");
+  const selectedOrderType = form.watch("orderType");
+
   useEffect(() => {
     // Get user data from session/localStorage
     const userData = localStorage.getItem("userDetails");
@@ -131,12 +126,19 @@ export default function HouseholdCleaningPage() {
 
   const handlePaymentCallback = async (response: any) => {
     try {
-      const verified = await verifyPayment(response.reference);
-      if (verified) {
+      const verificationResult = await fetch(
+        `/api/verify-payment?reference=${response.reference}`,
+      );
+      const data = await verificationResult.json();
+
+      if (data.success && data.redirectUrl) {
+        window.location.href = data.redirectUrl;
+      } else {
         router.push(`/payment-success?reference=${response.reference}`);
       }
     } catch (error) {
       console.error("Payment verification failed:", error);
+      setIsSubmitting(false);
     }
   };
 
@@ -148,7 +150,7 @@ export default function HouseholdCleaningPage() {
     apartmentType: "studio",
     orderType: "download",
     onSuccess: handlePaymentCallback,
-    onClose: () => setShowPaymentModal(false),
+    onClose: () => setIsSubmitting(false),
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -156,51 +158,67 @@ export default function HouseholdCleaningPage() {
 
     try {
       const charge = serviceCharges[values.apartmentType];
-      setSelectedCharge(charge);
+      const reference = generatePaystackReference();
 
-      if (values.orderType === "download") {
-        // Direct download - generate a reference for the order
-        const reference = `HC-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      const result = await createOrder({
+        reference,
+        email: userEmail,
+        firstName: userName.split(" ")[0] || "",
+        lastName: userName.split(" ")[1] || "",
+        phone: userPhone,
+        state: values.state,
+        apartmentType: values.apartmentType,
+        orderType: values.orderType,
+        deliveryAddress: "",
+        landmark: "",
+        amount: charge,
+      });
 
-        const result = await createOrder({
-          reference: reference,
-          email: userEmail,
-          firstName: userName.split(" ")[0] || "",
-          lastName: userName.split(" ")[1] || "",
-          phone: userPhone,
-          state: values.state,
-          apartmentType: values.apartmentType,
-          orderType: values.orderType,
-          deliveryAddress: "",
-          landmark: "",
-          amount: charge,
-        });
+      if (!result.success) {
+        throw new Error(result.error || "Failed to create order");
+      }
 
-        // Redirect to payment success
-        if (result.success) {
-          router.push(`/payment-success?reference=${reference}`);
-        }
-      } else {
-        // Show payment modal for print and deliver
-        setShowPaymentModal(true);
+      const paymentInitialized = initializePayment({
+        email: userEmail,
+        amount: charge,
+        ref: reference,
+        firstname: userName.split(" ")[0] || "",
+        lastname: userName.split(" ")[1] || "",
+        phone: userPhone,
+        metadata: {
+          custom_fields: [
+            {
+              display_name: "Service",
+              variable_name: "service",
+              value: "household-cleaning",
+            },
+            {
+              display_name: "Apartment Type",
+              variable_name: "apartment_type",
+              value: values.apartmentType,
+            },
+            {
+              display_name: "Order Type",
+              variable_name: "order_type",
+              value: values.orderType,
+            },
+            {
+              display_name: "State",
+              variable_name: "state",
+              value: values.state,
+            },
+          ],
+        },
+      });
+
+      if (!paymentInitialized) {
+        throw new Error("Payment initialization failed");
       }
     } catch (error) {
       console.error("Error:", error);
-    } finally {
       setIsSubmitting(false);
     }
   }
-
-  const handlePayNow = () => {
-    const charge = serviceCharges[form.getValues("apartmentType")];
-    initializePayment({
-      amount: charge,
-      metadata: {
-        service: "household-cleaning",
-        details: form.getValues(),
-      },
-    });
-  };
 
   return (
     <div className="space-y-6">
@@ -412,7 +430,7 @@ export default function HouseholdCleaningPage() {
               {/* Pay Now Button */}
               <Button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !selectedApartmentType || !selectedOrderType}
                 className="w-full bg-primary hover:bg-primary/90"
               >
                 {isSubmitting ? "Processing..." : "Pay Now"}
@@ -421,32 +439,6 @@ export default function HouseholdCleaningPage() {
           </Form>
         </CardContent>
       </Card>
-
-      {/* Payment Modal */}
-      <Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Complete Payment</DialogTitle>
-            <DialogDescription>
-              Complete your payment to receive the printed guide
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="bg-gray-100 p-4 rounded-lg">
-              <p className="text-sm text-gray-600 mb-1">Amount Due:</p>
-              <p className="text-2xl font-bold text-primary">
-                {formatCurrency(selectedCharge)}
-              </p>
-            </div>
-            <Button
-              onClick={handlePayNow}
-              className="w-full bg-primary hover:bg-primary/90"
-            >
-              Proceed to Payment
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
