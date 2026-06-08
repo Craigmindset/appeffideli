@@ -177,10 +177,10 @@ export default function InfantRecipesClient() {
         setGuestProfileExists(!!result.profileExists);
         latestPaymentReferenceRef.current = result.reference;
         return result.reference;
-      } else {
-        alert(result.error || "Failed to start purchase");
-        return null;
       }
+
+      alert(result.error || "Failed to start purchase");
+      return null;
     } catch (error) {
       console.error(error);
       alert("Unable to start purchase. Please try again.");
@@ -598,7 +598,6 @@ export default function InfantRecipesClient() {
           </div>
         </div>
       )}
-
     </>
   );
 }
