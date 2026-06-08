@@ -4,10 +4,6 @@ import { supabaseAdmin } from "@/lib/supabase";
 import { revalidatePath } from "next/cache";
 import { createSubscriptionAccess } from "./subscription";
 import { updateInfantRecipePurchaseStatus } from "./infant-recipes";
-import {
-  updateInfantRecipeGuestPurchaseStatus,
-  getInfantGuestPurchaseByReference,
-} from "./infant-recipes";
 
 function getDownloadTitle(apartmentType?: string) {
   const titleMap: Record<string, string> = {
@@ -191,11 +187,7 @@ export async function verifyPayment(reference: string) {
         .eq("purchase_reference", reference)
         .maybeSingle();
 
-      const { data: infantGuestPurchase } = await supabaseAdmin
-        .from("infant_recipes_guest_purchases")
-        .select("pack_type")
-        .eq("purchase_reference", reference)
-        .maybeSingle();
+      const isGuestCheckout = Boolean(data?.data?.metadata?.is_guest_checkout);
 
       if (status === "success" && infantPurchase) {
         await updateInfantRecipePurchaseStatus(
@@ -203,7 +195,9 @@ export async function verifyPayment(reference: string) {
           reference,
           "completed",
         );
-        const redirectUrl = "/dashboard/onetime-infant-toddler";
+        const redirectUrl = isGuestCheckout
+          ? `/services/infant-recipes?guestSuccess=1&reference=${reference}`
+          : "/dashboard/onetime-infant-toddler";
         console.log(
           "Infant recipe purchase verified. Redirecting to:",
           redirectUrl,
@@ -214,25 +208,6 @@ export async function verifyPayment(reference: string) {
           orderData,
           redirectUrl,
         };
-      }
-
-      if (infantGuestPurchase) {
-        await updateInfantRecipeGuestPurchaseStatus(
-          reference,
-          reference,
-          status === "success" ? "completed" : "failed",
-        );
-
-        if (status === "success") {
-          const guestDataResult = await getInfantGuestPurchaseByReference(reference);
-          return {
-            success: true,
-            data,
-            orderData,
-            redirectUrl: `/services/infant-recipes?guestSuccess=1&reference=${reference}`,
-            guestPurchase: guestDataResult.success ? guestDataResult.data : null,
-          };
-        }
       }
 
       // For download orders, redirect to download page instead of success page

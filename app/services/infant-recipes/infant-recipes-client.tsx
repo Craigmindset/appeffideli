@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import {
   Check,
   ArrowRight,
@@ -19,19 +19,13 @@ import {
 import { usePaystack } from "@/hooks/use-paystack";
 
 export default function InfantRecipesClient() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [loadingPlans, setLoadingPlans] = useState<Record<string, boolean>>({});
   const [purchaseReference, setPurchaseReference] = useState<string>("");
   const [isGuestFlow, setIsGuestFlow] = useState(false);
-  const [showGuestSuccessModal, setShowGuestSuccessModal] = useState(false);
-  const [guestSuccessData, setGuestSuccessData] = useState<{
-    firstName: string;
-    lastName: string;
-    email: string;
-    reference: string;
-  } | null>(null);
+  const [guestProfileExists, setGuestProfileExists] = useState(false);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [previewImages, setPreviewImages] = useState<string[]>([]);
   const [previewIndex, setPreviewIndex] = useState(0);
@@ -39,9 +33,10 @@ export default function InfantRecipesClient() {
     firstName: "",
     lastName: "",
     email: "",
+    phone: "",
   });
+  const latestPaymentReferenceRef = useRef<string>("");
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   const plans = [
     {
@@ -88,23 +83,10 @@ export default function InfantRecipesClient() {
     },
   ];
 
-  useEffect(() => {
-    const guestSuccess = searchParams.get("guestSuccess");
-    const reference = searchParams.get("reference");
-    const firstName = searchParams.get("firstName");
-    const lastName = searchParams.get("lastName");
-    const email = searchParams.get("email");
-
-    if (guestSuccess === "1" && reference && firstName && lastName && email) {
-      setGuestSuccessData({
-        firstName,
-        lastName,
-        email,
-        reference,
-      });
-      setShowGuestSuccessModal(true);
-    }
-  }, [searchParams]);
+  const handleGuestPhoneInput = (value: string) => {
+    const sanitized = value.replace(/\D/g, "").slice(0, 11);
+    setGuestForm((prev) => ({ ...prev, phone: sanitized }));
+  };
 
   const openPreviewModal = (images: string[], index: number) => {
     setPreviewImages(images);
@@ -133,7 +115,7 @@ export default function InfantRecipesClient() {
       if (!user) {
         setSelectedPlan(plan);
         setIsGuestFlow(true);
-        setIsModalOpen(true);
+        setIsCheckoutOpen(true);
         return;
       }
 
@@ -155,7 +137,7 @@ export default function InfantRecipesClient() {
 
         if (result.success && result.reference) {
           setPurchaseReference(result.reference);
-          setIsModalOpen(true);
+          setIsCheckoutOpen(true);
         } else {
           alert(result.error || "Failed to create purchase record");
         }
@@ -168,11 +150,16 @@ export default function InfantRecipesClient() {
     }
   };
 
-  const handleGuestPurchaseStart = async () => {
-    if (!selectedPlan) return;
+  const handleGuestPurchaseStart = async (): Promise<string | null> => {
+    if (!selectedPlan) return null;
     if (!guestForm.firstName || !guestForm.lastName || !guestForm.email) {
       alert("Please provide first name, last name, and email.");
-      return;
+      return null;
+    }
+
+    if (guestForm.phone && guestForm.phone.length !== 11) {
+      alert("Phone number must be 11 digits.");
+      return null;
     }
 
     try {
@@ -182,16 +169,22 @@ export default function InfantRecipesClient() {
         guestForm.firstName,
         guestForm.lastName,
         guestForm.email,
+        guestForm.phone,
       );
 
       if (result.success && result.reference) {
         setPurchaseReference(result.reference);
+        setGuestProfileExists(!!result.profileExists);
+        latestPaymentReferenceRef.current = result.reference;
+        return result.reference;
       } else {
         alert(result.error || "Failed to start purchase");
+        return null;
       }
     } catch (error) {
       console.error(error);
       alert("Unable to start purchase. Please try again.");
+      return null;
     }
   };
 
@@ -208,24 +201,49 @@ export default function InfantRecipesClient() {
     orderType: "download",
     amount: selectedPlan?.amount || 0,
     reference: purchaseReference,
-    onSuccess: async () => {
-      setIsModalOpen(false);
+    onSuccess: async (response: { reference?: string }) => {
+      setIsCheckoutOpen(false);
       try {
+        const resolvedReference =
+          response?.reference ||
+          latestPaymentReferenceRef.current ||
+          purchaseReference;
+
+        if (!resolvedReference) {
+          alert("Payment reference missing. Please contact support.");
+          return;
+        }
+
         const res = await fetch(
-          `/api/verify-payment?reference=${purchaseReference}`,
+          `/api/verify-payment?reference=${encodeURIComponent(resolvedReference)}`,
         );
         const data = await res.json();
-        if (data.success && isGuestFlow) {
+        const paymentStatus = data?.data?.data?.status;
+        const paymentSucceeded = data.success && paymentStatus === "success";
+
+        if (paymentSucceeded && isGuestFlow) {
           const query = new URLSearchParams({
-            guestSuccess: "1",
-            reference: purchaseReference,
+            reference: resolvedReference,
             firstName: guestForm.firstName,
             lastName: guestForm.lastName,
             email: guestForm.email,
+            phone: guestForm.phone,
+            profileExists: guestProfileExists ? "1" : "0",
+            isGuest: "1",
           });
-          router.replace(`/services/infant-recipes?${query.toString()}`);
-        } else if (data.success) {
-          router.push("/dashboard/onetime-infant-toddler");
+          router.replace(`/services/infant-recipes/success?${query.toString()}`);
+        } else if (paymentSucceeded) {
+          const fullName = userProfile?.full_name || "";
+          const [firstName = "", ...lastNameParts] = fullName.split(" ");
+          const query = new URLSearchParams({
+            reference: resolvedReference,
+            firstName,
+            lastName: lastNameParts.join(" "),
+            email: userProfile?.email || "",
+            phone: userProfile?.phone || "",
+            isGuest: "0",
+          });
+          router.push(`/services/infant-recipes/success?${query.toString()}`);
         } else {
           alert(data.error || "Payment verification failed");
         }
@@ -237,14 +255,14 @@ export default function InfantRecipesClient() {
     onClose: () => {},
   });
 
-  const handlePay = () => {
+  const handlePay = (referenceOverride?: string) => {
     if (!selectedPlan) return;
 
     const checkoutProfile = isGuestFlow
       ? {
           email: guestForm.email,
           full_name: `${guestForm.firstName} ${guestForm.lastName}`,
-          phone: "",
+          phone: guestForm.phone,
           id: "guest",
         }
       : userProfile;
@@ -254,10 +272,17 @@ export default function InfantRecipesClient() {
       return;
     }
 
+    const resolvedReference = referenceOverride || purchaseReference;
+    if (!resolvedReference) {
+      alert("Unable to start payment. Missing purchase reference.");
+      return;
+    }
+    latestPaymentReferenceRef.current = resolvedReference;
+
     initializePayment({
       email: checkoutProfile.email,
       amount: selectedPlan.amount,
-      ref: purchaseReference,
+      ref: resolvedReference,
       firstname: checkoutProfile.full_name?.split(" ")[0] || guestForm.firstName,
       lastname:
         checkoutProfile.full_name?.split(" ").slice(1).join(" ") ||
@@ -267,26 +292,12 @@ export default function InfantRecipesClient() {
         pack_type: selectedPlan.id,
         pack_name: selectedPlan.name,
         user_id: checkoutProfile.id,
-        purchase_reference: purchaseReference,
+        purchase_reference: resolvedReference,
         order_type: "infant-recipe",
         is_guest_checkout: isGuestFlow,
+        profile_exists: guestProfileExists,
       },
     });
-  };
-
-  const handleDownloadNow = () => {
-    if (!guestSuccessData) return;
-    window.location.href = `/download/${guestSuccessData.reference}`;
-  };
-
-  const handleGoToDashboardSignup = () => {
-    if (!guestSuccessData) return;
-    const query = new URLSearchParams({
-      firstName: guestSuccessData.firstName,
-      lastName: guestSuccessData.lastName,
-      email: guestSuccessData.email,
-    });
-    router.push(`/signup?${query.toString()}`);
   };
 
   return (
@@ -311,14 +322,14 @@ export default function InfantRecipesClient() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto justify-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 max-w-6xl mx-auto">
           {plans.map((plan) => (
             <div
               key={plan.id}
               className={`relative bg-white dark:bg-gray-800 rounded-xl shadow-lg border-2 ${
                 plan.color
               } transition-all duration-300 hover:shadow-xl ${
-                plan.popular ? "md:scale-105" : ""
+                plan.popular ? "md:scale-[1.01]" : ""
               }`}
             >
               {plan.popular && (
@@ -330,43 +341,67 @@ export default function InfantRecipesClient() {
               )}
 
               <div
-                className={`p-6 space-y-4 flex flex-col h-full ${
+                className={`p-4 md:p-5 flex flex-col md:flex-row gap-4 h-full ${
                   plan.popular ? "pt-8" : ""
                 }`}
               >
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
-                    {plan.name}
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {plan.description}
-                  </p>
-                </div>
-
-                <div className="border-t border-b border-gray-200 dark:border-gray-700 py-4">
-                  <div className="flex items-baseline">
-                    <span className="text-3xl font-bold text-gray-900 dark:text-white">
-                      {plan.price}
-                    </span>
-                    <span className="text-gray-500 dark:text-gray-400 ml-1 text-sm">
-                      /{plan.period}
-                    </span>
+                <div className="md:w-1/2 flex flex-col gap-3 min-w-0">
+                  <div>
+                    <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-1 leading-tight">
+                      {plan.name}
+                    </h3>
+                    <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                      {plan.description}
+                    </p>
                   </div>
+
+                  <div className="border-t border-b border-gray-200 dark:border-gray-700 py-3">
+                    <div className="flex items-baseline">
+                      <span className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+                        {plan.price}
+                      </span>
+                      <span className="text-gray-500 dark:text-gray-400 ml-1 text-xs md:text-sm">
+                        /{plan.period}
+                      </span>
+                    </div>
+                  </div>
+
+                  <ul className="space-y-1.5 flex-1">
+                    {plan.features.map((feature, index) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-xs md:text-sm text-gray-600 dark:text-gray-400 leading-snug">
+                          {feature}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <button
+                    onClick={() => handleGetStarted(plan)}
+                    disabled={loadingPlans[plan.id]}
+                    className={`w-full py-2.5 px-4 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-sm mt-auto disabled:opacity-50 disabled:cursor-not-allowed ${
+                      plan.popular
+                        ? "bg-primary text-white hover:bg-primary/90 shadow-md hover:shadow-lg"
+                        : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600"
+                    }`}
+                  >
+                    {loadingPlans[plan.id] ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Loading...
+                      </>
+                    ) : (
+                      <>
+                        Pay Now
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    )}
+                  </button>
                 </div>
 
-                <ul className="space-y-2 flex-1">
-                  {plan.features.map((feature, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
-                        {feature}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="space-y-2">
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                <div className="md:w-1/2 space-y-2">
+                  <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">
                     Preview
                   </p>
                   <button
@@ -376,7 +411,7 @@ export default function InfantRecipesClient() {
                     <img
                       src={plan.previews[0]}
                       alt={`${plan.name} preview`}
-                      className="w-full h-44 object-cover hover:scale-[1.02] transition-transform duration-300"
+                      className="w-full h-36 md:h-40 object-cover hover:scale-[1.02] transition-transform duration-300"
                     />
                   </button>
                   <div className="grid grid-cols-4 gap-2">
@@ -389,63 +424,42 @@ export default function InfantRecipesClient() {
                         <img
                           src={preview}
                           alt={`${plan.name} thumbnail ${index + 1}`}
-                          className="w-full h-16 object-cover"
+                          className="w-full h-14 md:h-16 object-cover"
                         />
                       </button>
                     ))}
                   </div>
                 </div>
-
-                <button
-                  onClick={() => handleGetStarted(plan)}
-                  disabled={loadingPlans[plan.id]}
-                  className={`w-full py-2.5 px-4 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-sm mt-auto disabled:opacity-50 disabled:cursor-not-allowed ${
-                    plan.popular
-                      ? "bg-primary text-white hover:bg-primary/90 shadow-md hover:shadow-lg"
-                      : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600"
-                  }`}
-                >
-                  {loadingPlans[plan.id] ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Loading...
-                    </>
-                  ) : (
-                    <>
-                      Pay Now
-                      <ArrowRight className="w-4 h-4" />
-                    </>
-                  )}
-                </button>
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      {isModalOpen && selectedPlan && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-6 relative">
+      {isCheckoutOpen && selectedPlan && (
+        <div className="fixed inset-0 z-50 bg-white dark:bg-gray-900 overflow-y-auto">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
             <button
-              onClick={() => setIsModalOpen(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+              onClick={() => setIsCheckoutOpen(false)}
+              className="inline-flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
             >
-              <X className="w-6 h-6" />
+              <ChevronLeft className="w-4 h-4" />
+              Back to plans
             </button>
 
-            <div className="text-center space-y-2">
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-                Confirm Purchase
+            <div className="space-y-1">
+              <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                Checkout
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">
-                Review your purchase details
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Review your details and complete payment.
               </p>
             </div>
 
-            <div className="space-y-3 bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <div className="space-y-3 bg-gray-50 dark:bg-gray-800 rounded-xl p-4 sm:p-5">
               {isGuestFlow ? (
                 <div className="space-y-3">
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <input
                       placeholder="First Name"
                       value={guestForm.firstName}
@@ -481,6 +495,15 @@ export default function InfantRecipesClient() {
                     }
                     className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
                   />
+                  <input
+                    type="tel"
+                    inputMode="numeric"
+                    maxLength={11}
+                    placeholder="Phone Number (11 digits)"
+                    value={guestForm.phone}
+                    onChange={(e) => handleGuestPhoneInput(e.target.value)}
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                  />
                 </div>
               ) : (
                 <>
@@ -500,14 +523,14 @@ export default function InfantRecipesClient() {
               )}
             </div>
 
-            <div className="space-y-3 border border-primary rounded-lg p-4">
-              <div className="flex justify-between items-center">
+            <div className="space-y-3 border border-primary rounded-xl p-4 sm:p-5">
+              <div className="flex justify-between items-center gap-3">
                 <span className="text-sm text-gray-600 dark:text-gray-400">Pack</span>
-                <span className="font-semibold text-gray-900 dark:text-white">
+                <span className="font-semibold text-gray-900 dark:text-white text-right">
                   {selectedPlan.name}
                 </span>
               </div>
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center gap-3">
                 <span className="text-sm text-gray-600 dark:text-gray-400">Amount</span>
                 <span className="text-lg font-bold text-primary">{selectedPlan.price}</span>
               </div>
@@ -515,11 +538,15 @@ export default function InfantRecipesClient() {
 
             <button
               onClick={async () => {
+                let guestReference: string | null = null;
                 if (isGuestFlow && !purchaseReference) {
-                  await handleGuestPurchaseStart();
+                  guestReference = await handleGuestPurchaseStart();
+                  if (!guestReference) {
+                    return;
+                  }
                 }
                 setTimeout(() => {
-                  handlePay();
+                  handlePay(guestReference || purchaseReference);
                 }, 150);
               }}
               disabled={isPaystackLoading || !isReady}
@@ -572,38 +599,6 @@ export default function InfantRecipesClient() {
         </div>
       )}
 
-      {showGuestSuccessModal && guestSuccessData && (
-        <div className="fixed inset-0 z-[70] bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-5 relative">
-            <button
-              onClick={() => setShowGuestSuccessModal(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
-            >
-              <X className="w-5 h-5" />
-            </button>
-            <div className="text-center">
-              <h3 className="text-2xl font-bold text-gray-900">Payment Successful</h3>
-              <p className="text-sm text-gray-500 mt-1">
-                Your pack is ready. Choose what you want to do next.
-              </p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <button
-                onClick={handleDownloadNow}
-                className="w-full bg-primary text-white py-2.5 rounded-lg font-semibold"
-              >
-                Download Now
-              </button>
-              <button
-                onClick={handleGoToDashboardSignup}
-                className="w-full border border-gray-300 py-2.5 rounded-lg font-semibold"
-              >
-                Go to Dashboard
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }

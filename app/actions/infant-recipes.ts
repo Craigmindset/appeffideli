@@ -17,7 +17,95 @@ export type InfantGuestPurchaseResponse = {
   success: boolean;
   error?: string;
   reference?: string;
+  profileExists?: boolean;
 };
+
+async function resolveOrCreateUserProfileByEmail(params: {
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone?: string;
+}): Promise<{ success: boolean; userId?: string; profileExists?: boolean; error?: string }> {
+  const email = params.email.trim().toLowerCase();
+  const fullName = `${params.firstName} ${params.lastName}`.trim();
+  const phone = params.phone || null;
+
+  const { data: existingProfile, error: profileLookupError } = await supabaseAdmin
+    .from("users_profile")
+    .select("id")
+    .eq("email", email)
+    .maybeSingle();
+
+  if (profileLookupError) {
+    return { success: false, error: "Failed to check existing profile" };
+  }
+
+  if (existingProfile?.id) {
+    return { success: true, userId: existingProfile.id, profileExists: true };
+  }
+
+  let userId: string | undefined;
+  const tempPassword = `Tmp!${Math.random().toString(36).slice(2)}A1`;
+
+  const { data: createdUserData, error: createUserError } =
+    await supabaseAdmin.auth.admin.createUser({
+      email,
+      password: tempPassword,
+      email_confirm: false,
+      user_metadata: {
+        full_name: fullName || null,
+        phone,
+      },
+    });
+
+  if (createUserError) {
+    const alreadyExists = /already/i.test(createUserError.message || "");
+    if (!alreadyExists) {
+      return { success: false, error: "Failed to create guest user" };
+    }
+
+    const { data: listedUsers, error: listUsersError } =
+      await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 });
+
+    if (listUsersError) {
+      return { success: false, error: "Failed to resolve existing user" };
+    }
+
+    const matchedUser = listedUsers.users.find(
+      (u) => (u.email || "").toLowerCase() === email,
+    );
+
+    if (!matchedUser?.id) {
+      return { success: false, error: "Unable to resolve existing user" };
+    }
+
+    userId = matchedUser.id;
+  } else {
+    userId = createdUserData.user?.id;
+  }
+
+  if (!userId) {
+    return { success: false, error: "Unable to create user profile" };
+  }
+
+  const { error: profileInsertError } = await supabaseAdmin
+    .from("users_profile")
+    .upsert(
+      {
+        id: userId,
+        email,
+        full_name: fullName || null,
+        phone,
+      },
+      { onConflict: "id" },
+    );
+
+  if (profileInsertError) {
+    return { success: false, error: "Failed to create profile" };
+  }
+
+  return { success: true, userId, profileExists: false };
+}
 
 /**
  * Create an infant recipe pack purchase record
@@ -88,13 +176,24 @@ export async function createInfantRecipeGuestPurchase(
   try {
     const purchaseReference = generatePaystackReference();
 
+    const profileResult = await resolveOrCreateUserProfileByEmail({
+      email,
+      firstName,
+      lastName,
+      phone,
+    });
+
+    if (!profileResult.success || !profileResult.userId) {
+      return {
+        success: false,
+        error: profileResult.error || "Failed to resolve user profile",
+      };
+    }
+
     const { error: insertError } = await supabaseAdmin
-      .from("infant_recipes_guest_purchases")
+      .from("infant_recipes_purchases")
       .insert({
-        first_name: firstName,
-        last_name: lastName,
-        email,
-        phone: phone || null,
+        user_id: profileResult.userId,
         purchase_reference: purchaseReference,
         pack_type: packType,
         amount,
@@ -112,6 +211,7 @@ export async function createInfantRecipeGuestPurchase(
     return {
       success: true,
       reference: purchaseReference,
+      profileExists: !!profileResult.profileExists,
     };
   } catch (error) {
     console.error("Error in createInfantRecipeGuestPurchase:", error);

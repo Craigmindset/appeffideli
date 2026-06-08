@@ -78,20 +78,17 @@ export async function GET(request: NextRequest) {
       .eq("purchase_reference", reference)
       .maybeSingle();
 
-    if (!user) {
+    if (!purchase || purchase.status !== "completed") {
       return NextResponse.json(
-        { success: false, error: "Not authenticated" },
-        { status: 401 },
+        { success: false, error: "Unauthorized or payment not successful" },
+        { status: 403 },
       );
     }
 
-    if (
-      !purchase ||
-      purchase.status !== "completed" ||
-      purchase.user_id !== user.id
-    ) {
+    // If signed in, enforce ownership. If not signed in, allow valid paid reference download.
+    if (user?.id && purchase.user_id !== user.id) {
       return NextResponse.json(
-        { success: false, error: "Unauthorized or payment not successful" },
+        { success: false, error: "Unauthorized download for this account" },
         { status: 403 },
       );
     }

@@ -16,6 +16,12 @@ export default function SignupForm() {
   const prefillFirstName = searchParams.get("firstName") || "";
   const prefillLastName = searchParams.get("lastName") || "";
   const prefillEmail = searchParams.get("email") || "";
+  const prefillReference = searchParams.get("reference") || "";
+  const hasPrefilledProfile =
+    Boolean(prefillReference) &&
+    Boolean(prefillFirstName) &&
+    Boolean(prefillLastName) &&
+    Boolean(prefillEmail);
 
   const handlePhoneInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/\D/g, "");
@@ -34,6 +40,7 @@ export default function SignupForm() {
     const firstName = formData.get("firstName") as string;
     const lastName = formData.get("lastName") as string;
     const phone = formData.get("phone") as string;
+    const purchaseReference = formData.get("purchaseReference") as string;
 
     if (phone && phone.replace(/\D/g, "").length !== 11) {
       setError("Phone number must be 11 digits");
@@ -42,7 +49,14 @@ export default function SignupForm() {
     }
 
     try {
-      const result = await signUp(email, password, firstName, lastName, phone);
+      const result = await signUp(
+        email,
+        password,
+        firstName,
+        lastName,
+        phone,
+        purchaseReference || undefined,
+      );
 
       if (!result.success) {
         setError(result.error || "Failed to create account");
@@ -82,74 +96,89 @@ export default function SignupForm() {
         )}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm flex flex-col gap-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="first-name" className="sr-only">
-                  First Name
-                </label>
-                <input
-                  id="first-name"
-                  name="firstName"
-                  type="text"
-                  autoComplete="given-name"
-                  required
-                  defaultValue={prefillFirstName}
-                  className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
-                  placeholder="First Name"
-                />
-              </div>
-              <div>
-                <label htmlFor="last-name" className="sr-only">
-                  Last Name
-                </label>
-                <input
-                  id="last-name"
-                  name="lastName"
-                  type="text"
-                  autoComplete="family-name"
-                  required
-                  defaultValue={prefillLastName}
-                  className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
-                  placeholder="Last Name"
-                />
-              </div>
-            </div>
-            <div>
-              <label htmlFor="phone" className="sr-only">
-                Phone Number
-              </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-3 flex items-center text-gray-500 pointer-events-none">
-                  +234
-                </span>
-                <input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  autoComplete="tel"
-                  inputMode="numeric"
-                  onInput={handlePhoneInput}
-                  maxLength={11}
-                  className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
-                  placeholder="Phone Number"
-                />
-              </div>
-            </div>
-            <div>
-              <label htmlFor="email-address" className="sr-only">
-                Email address
-              </label>
-              <input
-                id="email-address"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                defaultValue={prefillEmail}
-                className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
-                placeholder="Email address"
-              />
-            </div>
+            {hasPrefilledProfile ? (
+              <>
+                <div className="rounded-md bg-blue-50 p-3 text-sm text-blue-900">
+                  Completing account for <strong>{prefillFirstName} {prefillLastName}</strong> ({prefillEmail}).
+                </div>
+                <input name="firstName" type="hidden" value={prefillFirstName} />
+                <input name="lastName" type="hidden" value={prefillLastName} />
+                <input name="email" type="hidden" value={prefillEmail} />
+                <input name="phone" type="hidden" value="" />
+                <input name="purchaseReference" type="hidden" value={prefillReference} />
+              </>
+            ) : (
+              <>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="first-name" className="sr-only">
+                      First Name
+                    </label>
+                    <input
+                      id="first-name"
+                      name="firstName"
+                      type="text"
+                      autoComplete="given-name"
+                      required
+                      defaultValue={prefillFirstName}
+                      className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
+                      placeholder="First Name"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="last-name" className="sr-only">
+                      Last Name
+                    </label>
+                    <input
+                      id="last-name"
+                      name="lastName"
+                      type="text"
+                      autoComplete="family-name"
+                      required
+                      defaultValue={prefillLastName}
+                      className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
+                      placeholder="Last Name"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor="phone" className="sr-only">
+                    Phone Number
+                  </label>
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-3 flex items-center text-gray-500 pointer-events-none">
+                      +234
+                    </span>
+                    <input
+                      id="phone"
+                      name="phone"
+                      type="tel"
+                      autoComplete="tel"
+                      inputMode="numeric"
+                      onInput={handlePhoneInput}
+                      maxLength={11}
+                      className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
+                      placeholder="Phone Number"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor="email-address" className="sr-only">
+                    Email address
+                  </label>
+                  <input
+                    id="email-address"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    defaultValue={prefillEmail}
+                    className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
+                    placeholder="Email address"
+                  />
+                </div>
+              </>
+            )}
             <div className="relative">
               <label htmlFor="password" className="sr-only">
                 Password

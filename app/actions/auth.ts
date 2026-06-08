@@ -32,7 +32,8 @@ export async function signUp(
   password: string,
   firstName?: string,
   lastName?: string,
-  phone?: string
+  phone?: string,
+  purchaseReference?: string,
 ): Promise<AuthResponse> {
   try {
     // Validate environment variables
@@ -76,6 +77,78 @@ export async function signUp(
       });
 
     if (authError) {
+      const alreadyRegistered = /already registered/i.test(authError.message || "");
+      if (alreadyRegistered && purchaseReference) {
+        const normalizedEmail = email.trim().toLowerCase();
+
+        const { data: purchase, error: purchaseError } = await supabaseAdmin
+          .from("infant_recipes_purchases")
+          .select("user_id, status")
+          .eq("purchase_reference", purchaseReference)
+          .eq("status", "completed")
+          .maybeSingle();
+
+        if (purchaseError || !purchase?.user_id) {
+          return {
+            success: false,
+            error: "Unable to validate purchase reference for account completion.",
+          };
+        }
+
+        const { data: profile, error: profileError } = await supabaseAdmin
+          .from("users_profile")
+          .select("id, email")
+          .eq("id", purchase.user_id)
+          .maybeSingle();
+
+        if (
+          profileError ||
+          !profile ||
+          (profile.email || "").toLowerCase() !== normalizedEmail
+        ) {
+          return {
+            success: false,
+            error: "This purchase reference does not match the provided email.",
+          };
+        }
+
+        const { error: updateUserError } = await supabaseAdmin.auth.admin.updateUserById(
+          purchase.user_id,
+          {
+            password,
+            email_confirm: true,
+            user_metadata: {
+              full_name: fullName,
+              phone: formattedPhone,
+            },
+          },
+        );
+
+        if (updateUserError) {
+          return {
+            success: false,
+            error: "Failed to complete account setup. Please try again.",
+          };
+        }
+
+        await supabaseAdmin
+          .from("users_profile")
+          .update({
+            email: normalizedEmail,
+            full_name: fullName,
+            phone: formattedPhone,
+          })
+          .eq("id", purchase.user_id);
+
+        return {
+          success: true,
+          user: {
+            id: purchase.user_id,
+            email: normalizedEmail,
+          },
+        };
+      }
+
       console.error("Sign up error:", authError);
       return {
         success: false,
