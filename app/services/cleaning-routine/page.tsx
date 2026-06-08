@@ -25,6 +25,7 @@ export default function CleaningRoutinePage() {
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isProceedLoading, setIsProceedLoading] = useState(false);
   const [subscriptionReference, setSubscriptionReference] =
     useState<string>("");
   const router = useRouter();
@@ -183,6 +184,24 @@ export default function CleaningRoutinePage() {
     });
   };
 
+  const handleProceed = async () => {
+    setIsProceedLoading(true);
+    try {
+      const supabase = createBrowserSupabaseClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        router.push("/dashboard/household-cleaning");
+      } else {
+        router.push("/login");
+      }
+    } finally {
+      setIsProceedLoading(false);
+    }
+  };
+
   return (
     <>
       {/* Hero Section */}
@@ -260,17 +279,19 @@ export default function CleaningRoutinePage() {
         <div className="flex justify-center mt-6">
           <button
             className="bg-primary text-white font-semibold px-8 py-3 rounded-lg shadow-md hover:bg-primary/90 transition-all duration-300 flex items-center gap-2 text-lg"
-            onClick={() => {
-              // Scroll to the next section or trigger the next action
-              const nextSection = document.getElementById(
-                "subscription-section",
-              );
-              if (nextSection) {
-                nextSection.scrollIntoView({ behavior: "smooth" });
-              }
-            }}
+            onClick={handleProceed}
+            disabled={isProceedLoading}
           >
-            Proceed <ArrowRight className="w-5 h-5" />
+            {isProceedLoading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Checking...
+              </>
+            ) : (
+              <>
+                Proceed <ArrowRight className="w-5 h-5" />
+              </>
+            )}
           </button>
         </div>
       </section>
