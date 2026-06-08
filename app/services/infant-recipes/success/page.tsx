@@ -1,10 +1,11 @@
 "use client";
 
+import { Suspense } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CheckCircle2, Download, UserRoundPlus, LayoutDashboard, X } from "lucide-react";
 
-export default function InfantRecipeSuccessPage() {
+function InfantRecipeSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [showModal, setShowModal] = useState(false);
@@ -154,5 +155,21 @@ export default function InfantRecipeSuccessPage() {
         </div>
       )}
     </div>
+  );
+}
+
+function SuccessPageFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-white px-4">
+      <p className="text-sm text-slate-600">Loading your purchase details...</p>
+    </div>
+  );
+}
+
+export default function InfantRecipeSuccessPage() {
+  return (
+    <Suspense fallback={<SuccessPageFallback />}>
+      <InfantRecipeSuccessContent />
+    </Suspense>
   );
 }

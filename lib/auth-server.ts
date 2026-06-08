@@ -3,6 +3,15 @@ import { createServerClient } from "@supabase/ssr";
 import { cache } from "react";
 import type { User } from "@supabase/supabase-js";
 
+function isDynamicServerUsageError(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "digest" in error &&
+    (error as { digest?: string }).digest === "DYNAMIC_SERVER_USAGE"
+  );
+}
+
 /**
  * Create a Supabase client for server-side operations with cookie handling
  * This is used in Server Components, Route Handlers, and Server Actions
@@ -58,7 +67,9 @@ export const getCurrentUser = cache(async (): Promise<User | null> => {
 
     return user;
   } catch (error) {
-    console.error("Error getting current user:", error);
+    if (!isDynamicServerUsageError(error)) {
+      console.error("Error getting current user:", error);
+    }
     return null;
   }
 });
@@ -81,7 +92,9 @@ export const getSession = cache(async () => {
 
     return session;
   } catch (error) {
-    console.error("Error getting session:", error);
+    if (!isDynamicServerUsageError(error)) {
+      console.error("Error getting session:", error);
+    }
     return null;
   }
 });
