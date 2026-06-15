@@ -1,7 +1,7 @@
 {
-  "/forgot/page": "app/forgot/page.js",
-  "/reset-password/page": "app/reset-password/page.js",
-  "/dashboard/overview/page": "app/dashboard/overview/page.js",
-  "/dashboard/household-cleaning/page": "app/dashboard/household-cleaning/page.js",
-  "/dashboard/onetime-infant-toddler/page": "app/dashboard/onetime-infant-toddler/page.js"
+  "/download/[reference]/page": "app/download/[reference]/page.js",
+  "/services/infant-recipes/page": "app/services/infant-recipes/page.js",
+  "/household-purchase/page": "app/household-purchase/page.js",
+  "/services/cleaning-routine/page": "app/services/cleaning-routine/page.js",
+  "/household-purchase/payment/page": "app/household-purchase/payment/page.js"
 }

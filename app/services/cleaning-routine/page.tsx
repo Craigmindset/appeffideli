@@ -195,7 +195,7 @@ export default function CleaningRoutinePage() {
       if (user) {
         router.push("/dashboard/household-cleaning");
       } else {
-        router.push("/login");
+        router.push("/household-purchase");
       }
     } finally {
       setIsProceedLoading(false);

@@ -272,6 +272,24 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../app/household-purchase/page.tsx
+{
+  type __IsExpected<Specific extends AppPageConfig<"/household-purchase">> = Specific
+  const handler = {} as typeof import("../../app/household-purchase/page.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../app/household-purchase/payment/page.tsx
+{
+  type __IsExpected<Specific extends AppPageConfig<"/household-purchase/payment">> = Specific
+  const handler = {} as typeof import("../../app/household-purchase/payment/page.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../app/login/page.tsx
 {
   type __IsExpected<Specific extends AppPageConfig<"/login">> = Specific
@@ -568,6 +586,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   type __IsExpected<Specific extends LayoutConfig<"/dashboard">> = Specific
   const handler = {} as typeof import("../../app/dashboard/layout.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../app/household-purchase/layout.tsx
+{
+  type __IsExpected<Specific extends LayoutConfig<"/household-purchase">> = Specific
+  const handler = {} as typeof import("../../app/household-purchase/layout.js")
   type __Check = __IsExpected<typeof handler>
   // @ts-ignore
   type __Unused = __Check
