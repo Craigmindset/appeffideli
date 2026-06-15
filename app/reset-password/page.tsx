@@ -13,6 +13,12 @@ export default function ResetPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const passwordsMatch =
+    password.length > 0 &&
+    confirmPassword.length > 0 &&
+    password === confirmPassword;
+  const passwordHasValidLength = password.length >= 6;
+  const canSubmit = !isLoading && passwordsMatch && passwordHasValidLength;
 
   useEffect(() => {
     // Get email from session storage
@@ -61,7 +67,7 @@ export default function ResetPasswordPage() {
 
       // Password updated successfully, redirect to login
       alert(
-        "Password updated successfully! Please login with your new password."
+        "Password updated successfully! Please login with your new password.",
       );
       router.push("/login");
     } catch (err) {
@@ -180,13 +186,23 @@ export default function ResetPasswordPage() {
                 placeholder="Confirm Password"
                 disabled={isLoading}
               />
+              {confirmPassword.length > 0 && password !== confirmPassword && (
+                <p className="mt-2 text-xs text-red-600">
+                  Passwords do not match
+                </p>
+              )}
+              {password.length > 0 && !passwordHasValidLength && (
+                <p className="mt-2 text-xs text-red-600">
+                  Password must be at least 6 characters long
+                </p>
+              )}
             </div>
           </div>
 
           <div>
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={!canSubmit}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-full text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? "Updating..." : "Update Password"}

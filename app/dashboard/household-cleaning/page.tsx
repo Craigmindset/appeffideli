@@ -21,6 +21,8 @@ import { usePaystack } from "@/hooks/use-paystack";
 import { useRouter } from "next/navigation";
 import { createOrder } from "@/app/actions/payment";
 import { generatePaystackReference } from "@/lib/paystack";
+import { Checkbox } from "@/components/ui/checkbox";
+import { createBrowserSupabaseClient } from "@/lib/supabase";
 
 const nigerianStates = [
   "Abia",
@@ -62,13 +64,67 @@ const nigerianStates = [
   "Zamfara",
 ];
 
-const serviceCharges = {
-  studio: 15000,
-  apartment: 20000,
-  bungalow: 25000,
-  "duplex-terrace": 35000,
-  "duplex-balcony": 30000,
-} as const;
+type HomeTypeKey =
+  | "studio"
+  | "apartment"
+  | "bungalow"
+  | "duplex-terrace"
+  | "duplex-balcony";
+
+type HouseholdPriceRate = {
+  id: number;
+  apartment_type: HomeTypeKey;
+  home_type: string;
+  pdf_rate: number;
+  audio_rate: number;
+  vat: number | null;
+};
+
+const HOME_TYPE_ORDER: HomeTypeKey[] = [
+  "studio",
+  "apartment",
+  "bungalow",
+  "duplex-terrace",
+  "duplex-balcony",
+];
+
+const DEFAULT_HOME_TYPE_LABELS: Record<HomeTypeKey, string> = {
+  studio: "Studio",
+  apartment: "Apartment",
+  bungalow: "Bungalow",
+  "duplex-terrace": "Duplex/Terrace",
+  "duplex-balcony": "Duplex with Balcony",
+};
+
+const isHomeTypeKey = (value: string): value is HomeTypeKey => {
+  return HOME_TYPE_ORDER.includes(value as HomeTypeKey);
+};
+
+const normalizeApartmentType = (value: string): HomeTypeKey | null => {
+  const normalized = value.trim().toLowerCase();
+  return isHomeTypeKey(normalized) ? normalized : null;
+};
+
+const buildPriceRateMap = (rates: HouseholdPriceRate[]) => {
+  const mapped: Partial<Record<HomeTypeKey, HouseholdPriceRate>> = {};
+
+  for (const rate of rates) {
+    const normalizedApartmentType = normalizeApartmentType(
+      String(rate.apartment_type || ""),
+    );
+
+    if (normalizedApartmentType) {
+      mapped[normalizedApartmentType] = {
+        ...rate,
+        apartment_type: normalizedApartmentType,
+        home_type:
+          rate.home_type || DEFAULT_HOME_TYPE_LABELS[normalizedApartmentType],
+      };
+    }
+  }
+
+  return mapped as Record<HomeTypeKey, HouseholdPriceRate>;
+};
 
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat("en-NG", {
@@ -79,18 +135,22 @@ const formatCurrency = (amount: number) => {
   }).format(amount);
 };
 
-const formSchema = z.object({
-  state: z.string().min(1, "Please select a state"),
-  apartmentType: z.enum(
-    ["studio", "apartment", "bungalow", "duplex-terrace", "duplex-balcony"],
-    {
-      required_error: "Please select a home type",
-    },
-  ),
-  orderType: z.enum(["download", "print-deliver"], {
-    required_error: "Please select an order type",
-  }),
-});
+const formSchema = z
+  .object({
+    state: z.string().min(1, "Please select a state"),
+    apartmentType: z.enum(
+      ["studio", "apartment", "bungalow", "duplex-terrace", "duplex-balcony"],
+      {
+        required_error: "Please select a home type",
+      },
+    ),
+    addPdf: z.boolean(),
+    addAudio: z.boolean(),
+  })
+  .refine((values) => values.addPdf || values.addAudio, {
+    message: "Please select at least one order type",
+    path: ["addPdf"],
+  });
 
 export default function HouseholdCleaningPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -99,19 +159,36 @@ export default function HouseholdCleaningPage() {
   const [userPhone, setUserPhone] = useState("");
   const [filteredStates, setFilteredStates] = useState<string[]>([]);
   const [showStateSuggestions, setShowStateSuggestions] = useState(false);
+  const [priceRates, setPriceRates] = useState<
+    Record<HomeTypeKey, HouseholdPriceRate>
+  >({} as Record<HomeTypeKey, HouseholdPriceRate>);
+  const [isPriceLoading, setIsPriceLoading] = useState(true);
   const router = useRouter();
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<
+    z.input<typeof formSchema>,
+    any,
+    z.output<typeof formSchema>
+  >({
     resolver: zodResolver(formSchema),
     defaultValues: {
       state: "",
       apartmentType: undefined,
-      orderType: undefined,
+      addPdf: false,
+      addAudio: false,
     },
   });
 
   const selectedApartmentType = form.watch("apartmentType");
-  const selectedOrderType = form.watch("orderType");
+  const addPdf = form.watch("addPdf");
+  const addAudio = form.watch("addAudio");
+  const selectedRate = selectedApartmentType
+    ? priceRates[selectedApartmentType]
+    : null;
+  const totalAmount = selectedRate
+    ? (addPdf ? selectedRate.pdf_rate : 0) +
+      (addAudio ? selectedRate.audio_rate : 0)
+    : 0;
 
   useEffect(() => {
     // Get user data from session/localStorage
@@ -122,6 +199,126 @@ export default function HouseholdCleaningPage() {
       setUserName(parsed.name || `${parsed.firstName} ${parsed.lastName}`);
       setUserPhone(parsed.phone);
     }
+  }, []);
+
+  useEffect(() => {
+    const loadPriceRates = async () => {
+      const cacheKey = "household_pricing_rates_v1";
+      const cacheTtlMs = 1000 * 60 * 60 * 24;
+      let isMounted = true;
+      const supabase = createBrowserSupabaseClient();
+
+      const cacheRates = (rates: HouseholdPriceRate[]) => {
+        const mappedRates = buildPriceRateMap(rates);
+
+        if (!isMounted) {
+          return;
+        }
+
+        setPriceRates(mappedRates);
+        localStorage.setItem(
+          cacheKey,
+          JSON.stringify({
+            timestamp: Date.now(),
+            rates: mappedRates,
+          }),
+        );
+      };
+
+      const fetchLatestRates = async () => {
+        const { data, error } = await supabase
+          .schema("public")
+          .from("price_rate_household")
+          .select("id, apartment_type, home_type, pdf_rate, audio_rate, vat")
+          .order("id", { ascending: true });
+
+        if (!error && Array.isArray(data) && data.length > 0) {
+          cacheRates(data as HouseholdPriceRate[]);
+          return;
+        }
+
+        const response = await fetch("/api/household-pricing", {
+          cache: "no-store",
+        });
+
+        const result = await response.json();
+        if (!response.ok || !result.success || !Array.isArray(result.rates)) {
+          throw error || new Error("Unable to fetch household pricing rates");
+        }
+
+        cacheRates(result.rates as HouseholdPriceRate[]);
+      };
+
+      try {
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+          const parsedCache = JSON.parse(cached) as {
+            timestamp: number;
+            rates:
+              | HouseholdPriceRate[]
+              | Record<HomeTypeKey, HouseholdPriceRate>;
+          };
+
+          const isFresh = Date.now() - parsedCache.timestamp < cacheTtlMs;
+          if (isFresh) {
+            const cachedRates = Array.isArray(parsedCache.rates)
+              ? buildPriceRateMap(parsedCache.rates)
+              : parsedCache.rates;
+
+            if (Object.keys(cachedRates).length > 0) {
+              setPriceRates(
+                cachedRates as Record<HomeTypeKey, HouseholdPriceRate>,
+              );
+              setIsPriceLoading(false);
+            }
+          }
+        }
+
+        await fetchLatestRates();
+      } catch (error) {
+        console.error("Failed to load household pricing rates:", error);
+      } finally {
+        if (isMounted) {
+          setIsPriceLoading(false);
+        }
+      }
+
+      const channel = supabase
+        .channel("price_rate_household_changes")
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "price_rate_household",
+          },
+          async () => {
+            try {
+              await fetchLatestRates();
+            } catch (error) {
+              console.error("Realtime pricing refresh failed:", error);
+            }
+          },
+        )
+        .subscribe();
+
+      return () => {
+        isMounted = false;
+        supabase.removeChannel(channel);
+      };
+    };
+
+    let cleanup: (() => void) | undefined;
+
+    loadPriceRates().then((cleanupFn) => {
+      cleanup = cleanupFn;
+    });
+
+    return () => {
+      if (cleanup) {
+        cleanup();
+      }
+    };
   }, []);
 
   const handlePaymentCallback = async (response: any) => {
@@ -153,11 +350,24 @@ export default function HouseholdCleaningPage() {
     onClose: () => setIsSubmitting(false),
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.output<typeof formSchema>) {
     setIsSubmitting(true);
 
     try {
-      const charge = serviceCharges[values.apartmentType];
+      const selectedPricing = priceRates[values.apartmentType];
+
+      if (!selectedPricing) {
+        throw new Error("Selected home type pricing is unavailable");
+      }
+
+      const charge =
+        (values.addPdf ? selectedPricing.pdf_rate : 0) +
+        (values.addAudio ? selectedPricing.audio_rate : 0);
+
+      if (!charge || charge <= 0) {
+        throw new Error("Invalid amount calculated for this order");
+      }
+
       const reference = generatePaystackReference();
 
       const result = await createOrder({
@@ -168,9 +378,14 @@ export default function HouseholdCleaningPage() {
         phone: userPhone,
         state: values.state,
         apartmentType: values.apartmentType,
-        orderType: values.orderType,
+        orderType: "download",
         deliveryAddress: "",
-        landmark: "",
+        landmark:
+          values.addPdf && values.addAudio
+            ? "download-pdf-and-audio"
+            : values.addPdf
+              ? "download-pdf-only"
+              : "download-audio-only",
         amount: charge,
       });
 
@@ -200,12 +415,27 @@ export default function HouseholdCleaningPage() {
             {
               display_name: "Order Type",
               variable_name: "order_type",
-              value: values.orderType,
+              value:
+                values.addPdf && values.addAudio
+                  ? "Download PDF (Printable) + Download Audio Version"
+                  : values.addPdf
+                    ? "Download PDF (Printable)"
+                    : "Download Audio Version",
             },
             {
               display_name: "State",
               variable_name: "state",
               value: values.state,
+            },
+            {
+              display_name: "PDF Selected",
+              variable_name: "pdf_selected",
+              value: values.addPdf ? "yes" : "no",
+            },
+            {
+              display_name: "Audio Selected",
+              variable_name: "audio_selected",
+              value: values.addAudio ? "yes" : "no",
             },
           ],
         },
@@ -251,43 +481,41 @@ export default function HouseholdCleaningPage() {
                         onValueChange={field.onChange}
                       >
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {[
-                            { value: "studio", label: "Studio" },
-                            { value: "apartment", label: "Apartment" },
-                            {
-                              value: "bungalow",
-                              label: "Bungalow",
-                            },
-                            {
-                              value: "duplex-terrace",
-                              label: "Duplex/Terrace",
-                            },
-                            {
-                              value: "duplex-balcony",
-                              label: "Duplex with Balcony",
-                            },
-                          ].map((option) => (
-                            <div
-                              key={option.value}
-                              className="flex items-center space-x-2"
-                            >
-                              <RadioGroupItem
-                                value={option.value}
-                                id={option.value}
-                              />
-                              <label
-                                htmlFor={option.value}
-                                className="font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                          {HOME_TYPE_ORDER.map((homeType) => {
+                            const option = priceRates[homeType];
+
+                            return (
+                              <div
+                                key={homeType}
+                                className="flex items-center space-x-2"
                               >
-                                {option.label} -{" "}
-                                {formatCurrency(
-                                  serviceCharges[
-                                    option.value as keyof typeof serviceCharges
-                                  ],
-                                )}
-                              </label>
-                            </div>
-                          ))}
+                                <RadioGroupItem
+                                  value={homeType}
+                                  id={homeType}
+                                />
+                                <label
+                                  htmlFor={homeType}
+                                  className="font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                                >
+                                  {option?.home_type ||
+                                    DEFAULT_HOME_TYPE_LABELS[homeType]}{" "}
+                                  ( PDF ={" "}
+                                  {option
+                                    ? formatCurrency(option.pdf_rate)
+                                    : isPriceLoading
+                                      ? "Loading..."
+                                      : "N/A"}{" "}
+                                  Audio ={" "}
+                                  {option
+                                    ? formatCurrency(option.audio_rate)
+                                    : isPriceLoading
+                                      ? "Loading..."
+                                      : "N/A"}
+                                  )
+                                </label>
+                              </div>
+                            );
+                          })}
                         </div>
                       </RadioGroup>
                     </FormControl>
@@ -384,56 +612,75 @@ export default function HouseholdCleaningPage() {
               />
 
               {/* Order Type */}
-              <FormField
-                control={form.control}
-                name="orderType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-base font-semibold">
-                      Order Type
-                    </FormLabel>
-                    <FormControl>
-                      <RadioGroup
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      >
-                        <div className="space-y-3">
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="download" id="download" />
-                            <label
-                              htmlFor="download"
-                              className="font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                            >
-                              Download (Get instant PDF)
-                            </label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem
-                              value="print-deliver"
-                              id="print-deliver"
-                            />
-                            <label
-                              htmlFor="print-deliver"
-                              className="font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                            >
-                              Print & Deliver (Physical copy)
-                            </label>
-                          </div>
-                        </div>
-                      </RadioGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <FormItem>
+                <FormLabel className="text-base font-semibold">
+                  Order Type
+                </FormLabel>
+                <div className="space-y-3">
+                  <FormField
+                    control={form.control}
+                    name="addPdf"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={(checked) =>
+                              field.onChange(Boolean(checked))
+                            }
+                          />
+                        </FormControl>
+                        <FormLabel className="font-medium leading-none cursor-pointer">
+                          Download PDF (Printable)
+                        </FormLabel>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="addAudio"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={(checked) =>
+                              field.onChange(Boolean(checked))
+                            }
+                          />
+                        </FormControl>
+                        <FormLabel className="font-medium leading-none cursor-pointer">
+                          Download Audio Version
+                        </FormLabel>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="addPdf"
+                    render={() => <FormMessage />}
+                  />
+                </div>
+              </FormItem>
 
               {/* Pay Now Button */}
               <Button
                 type="submit"
-                disabled={isSubmitting || !selectedApartmentType || !selectedOrderType}
+                disabled={
+                  isSubmitting ||
+                  isPriceLoading ||
+                  !selectedApartmentType ||
+                  (!addPdf && !addAudio) ||
+                  !selectedRate ||
+                  totalAmount <= 0
+                }
                 className="w-full bg-primary hover:bg-primary/90"
               >
-                {isSubmitting ? "Processing..." : "Pay Now"}
+                {isSubmitting
+                  ? "Processing..."
+                  : `Pay Now ${formatCurrency(totalAmount)}`}
               </Button>
             </form>
           </Form>
