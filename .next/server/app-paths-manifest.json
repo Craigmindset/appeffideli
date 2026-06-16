@@ -1,7 +1,8 @@
 {
+  "/api/household-pricing/route": "app/api/household-pricing/route.js",
+  "/page": "app/page.js",
   "/download/[reference]/page": "app/download/[reference]/page.js",
-  "/services/infant-recipes/page": "app/services/infant-recipes/page.js",
-  "/household-purchase/page": "app/household-purchase/page.js",
   "/services/cleaning-routine/page": "app/services/cleaning-routine/page.js",
+  "/household-purchase/page": "app/household-purchase/page.js",
   "/household-purchase/payment/page": "app/household-purchase/payment/page.js"
 }

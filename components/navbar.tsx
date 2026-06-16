@@ -122,7 +122,7 @@ export default function Navbar() {
     },
     {
       name: "Household Cleaning Routine",
-      href: "/services/cleaning-routine",
+      href: "/household-purchase",
       icon: <ClipboardList className="h-4 w-4" />,
     },
     {

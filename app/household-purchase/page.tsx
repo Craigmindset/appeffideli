@@ -88,15 +88,15 @@ const formatCurrency = (amount: number) => {
 
 const HOME_TYPE_DESCRIPTION: Record<HomeTypeKey, string> = {
   studio:
-    "This package consist of a well documented cleaning routine for a studio home type. Kindly select choice of output, PDF or Audio version.",
+    "A simple and efficient cleaning routine tailored for studio living. This format covers the sitting room, bedroom, kitchen, and laundry area, making it easy to maintain a tidy and functional space.",
   apartment:
-    "This package consist of a well documented cleaning routine for an apartment home type. Kindly select choice of output, PDF or Audio version.",
+    "A comprehensive cleaning routine designed for apartment living. This format includes structured cleaning schedules and checklists for the sitting room, adult bedroom, baby bedroom, toddler & teen bedroom, playroom, kitchen, and laundry area to help keep your home clean, organized, and stress-free.",
   bungalow:
-    "This package consist of a well documented cleaning routine for a bungalow home type. Kindly select choice of output, PDF or Audio version.",
+    "A family-friendly cleaning routine designed for bungalow homes. This format includes the sitting room, adult bedroom, baby bedroom, toddler & teen bedroom, playroom, kitchen, laundry room, and garden, helping you maintain a clean, comfortable, and welcoming environment indoors and outdoors.",
   "duplex-balcony":
-    "This package consist of a well documented cleaning routine for a duplex with balcony home type. Kindly select choice of output, PDF or Audio version.",
+    "A practical cleaning routine for duplex homes. The format covers the sitting room, adult bedroom, dressing room, baby bedroom, toddler & teen bedroom, playroom, kitchen, laundry room, and balcony, providing a complete home maintenance guide.",
   "duplex-terrace":
-    "This package consist of a well documented cleaning routine for a duplex/terrace home type. Kindly select choice of output, PDF or Audio version.",
+    "A detailed cleaning routine created for larger family homes. This format includes the sitting room, adult bedroom, dressing room, baby bedroom, toddler & teen bedroom, playroom, laundry room, balcony, and terrace, ensuring every area of your home remains fresh and well-maintained.",
 };
 
 const HOME_TYPE_IMAGES: Partial<Record<HomeTypeKey, string>> = {
@@ -458,18 +458,16 @@ export default function HouseholdPurchasePage() {
           Home Type
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 max-w-6xl mx-auto">
           {renderHomeTypeCard("studio")}
           {renderHomeTypeCard("apartment")}
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 max-w-5xl mx-auto">
           {renderHomeTypeCard("bungalow")}
-          {renderHomeTypeCard("duplex-balcony")}
         </div>
 
-        <div className="grid grid-cols-1 gap-3 md:gap-4 max-w-2xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 max-w-6xl mx-auto">
+          {renderHomeTypeCard("duplex-balcony")}
           {renderHomeTypeCard("duplex-terrace")}
+          <div className="hidden md:block" aria-hidden="true" />
         </div>
       </section>
     </div>
