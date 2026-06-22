@@ -85,6 +85,7 @@ const formatCurrency = (amount: number) => {
 
 export default function HouseholdPurchasePaymentPage() {
   const [draft, setDraft] = useState<CheckoutDraft | null>(null);
+  const [authUserId, setAuthUserId] = useState<string | null>(null);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -112,8 +113,11 @@ export default function HouseholdPurchasePaymentPage() {
       } = await supabase.auth.getUser();
 
       if (!user) {
+        setAuthUserId(null);
         return;
       }
+
+      setAuthUserId(user.id);
 
       const { data: profile } = await supabase
         .from("users_profile")
@@ -209,6 +213,7 @@ export default function HouseholdPurchasePaymentPage() {
         apartmentType: draft.apartmentType,
         orderType: "download",
         deliveryAddress: "",
+        authUserId: authUserId || undefined,
         landmark:
           draft.addPdf && draft.addAudio
             ? "download-pdf-and-audio"
@@ -220,6 +225,12 @@ export default function HouseholdPurchasePaymentPage() {
 
       if (!result.success) {
         throw new Error(result.error || "Failed to create order");
+      }
+
+      if (result.verificationEmailSent) {
+        alert(
+          "We created your account profile and sent a verification email. Please verify your email after completing payment.",
+        );
       }
 
       const paymentInitialized = initializePayment({

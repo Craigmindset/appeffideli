@@ -5,6 +5,241 @@ import { revalidatePath } from "next/cache";
 import { createSubscriptionAccess } from "./subscription";
 import { updateInfantRecipePurchaseStatus } from "./infant-recipes";
 
+type ResolvedOrderUser = {
+  userId: string | null;
+  profileCreated: boolean;
+  verificationEmailSent: boolean;
+};
+
+function generateTemporaryPassword() {
+  const suffix = Math.random().toString(36).slice(2);
+  return `Tmp!${suffix}A1`;
+}
+
+async function findAuthUserByEmail(email: string) {
+  const normalizedEmail = email.trim().toLowerCase();
+  let page = 1;
+
+  while (page <= 10) {
+    const { data, error } = await supabaseAdmin.auth.admin.listUsers({
+      page,
+      perPage: 1000,
+    });
+
+    if (error) {
+      return { user: null, error: error.message };
+    }
+
+    const matchedUser =
+      data.users.find((user) => (user.email || "").toLowerCase() === normalizedEmail) ||
+      null;
+
+    if (matchedUser) {
+      return { user: matchedUser, error: null };
+    }
+
+    if (data.users.length < 1000) {
+      break;
+    }
+
+    page += 1;
+  }
+
+  return { user: null, error: null };
+}
+
+async function ensureUserProfile(params: {
+  userId: string;
+  email: string;
+  fullName: string;
+  phone: string;
+}) {
+  const { data: existingProfile, error: profileLookupError } = await supabaseAdmin
+    .from("users_profile")
+    .select("id")
+    .eq("id", params.userId)
+    .maybeSingle();
+
+  if (profileLookupError) {
+    return {
+      success: false,
+      profileCreated: false,
+      error: "Failed to check existing user profile",
+    };
+  }
+
+  if (existingProfile?.id) {
+    return { success: true, profileCreated: false };
+  }
+
+  const { error: insertProfileError } = await supabaseAdmin
+    .from("users_profile")
+    .insert({
+      id: params.userId,
+      email: params.email,
+      full_name: params.fullName || null,
+      phone: params.phone || null,
+    });
+
+  if (insertProfileError) {
+    return {
+      success: false,
+      profileCreated: false,
+      error: insertProfileError.message,
+    };
+  }
+
+  return { success: true, profileCreated: true };
+}
+
+async function resolveOrderUser(params: {
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  authUserId?: string;
+}) : Promise<{ success: boolean; data?: ResolvedOrderUser; error?: string }> {
+  const normalizedEmail = params.email.trim().toLowerCase();
+  const fullName = `${params.firstName} ${params.lastName}`.trim();
+
+  if (params.authUserId) {
+    const { data: authUserData, error: authUserError } =
+      await supabaseAdmin.auth.admin.getUserById(params.authUserId);
+
+    if (authUserError || !authUserData.user) {
+      return {
+        success: false,
+        error: "Could not validate the authenticated user.",
+      };
+    }
+
+    if ((authUserData.user.email || "").toLowerCase() !== normalizedEmail) {
+      return {
+        success: false,
+        error: "The email entered does not match your signed-in account.",
+      };
+    }
+
+    const profileResult = await ensureUserProfile({
+      userId: authUserData.user.id,
+      email: normalizedEmail,
+      fullName,
+      phone: params.phone,
+    });
+
+    if (!profileResult.success) {
+      return { success: false, error: profileResult.error };
+    }
+
+    return {
+      success: true,
+      data: {
+        userId: authUserData.user.id,
+        profileCreated: profileResult.profileCreated,
+        verificationEmailSent: false,
+      },
+    };
+  }
+
+  const { data: existingProfile, error: profileError } = await supabaseAdmin
+    .from("users_profile")
+    .select("id")
+    .eq("email", normalizedEmail)
+    .maybeSingle();
+
+  if (profileError) {
+    return { success: false, error: "Failed to check existing profile by email." };
+  }
+
+  if (existingProfile?.id) {
+    const { data: authUserData, error: authUserError } =
+      await supabaseAdmin.auth.admin.getUserById(existingProfile.id);
+
+    if (authUserError || !authUserData.user) {
+      return {
+        success: false,
+        error: "Profile exists but linked auth account could not be verified.",
+      };
+    }
+
+    return {
+      success: true,
+      data: {
+        userId: existingProfile.id,
+        profileCreated: false,
+        verificationEmailSent: false,
+      },
+    };
+  }
+
+  const existingAuthLookup = await findAuthUserByEmail(normalizedEmail);
+  if (existingAuthLookup.error) {
+    return { success: false, error: "Failed to validate auth user by email." };
+  }
+
+  if (existingAuthLookup.user?.id) {
+    const profileResult = await ensureUserProfile({
+      userId: existingAuthLookup.user.id,
+      email: normalizedEmail,
+      fullName,
+      phone: params.phone,
+    });
+
+    if (!profileResult.success) {
+      return { success: false, error: profileResult.error };
+    }
+
+    return {
+      success: true,
+      data: {
+        userId: existingAuthLookup.user.id,
+        profileCreated: profileResult.profileCreated,
+        verificationEmailSent: false,
+      },
+    };
+  }
+
+  const signUpResult = await supabaseAdmin.auth.signUp({
+    email: normalizedEmail,
+    password: generateTemporaryPassword(),
+    options: {
+      data: {
+        full_name: fullName || null,
+        phone: params.phone || null,
+      },
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/login?verified=true`,
+    },
+  });
+
+  if (signUpResult.error || !signUpResult.data.user?.id) {
+    return {
+      success: false,
+      error: signUpResult.error?.message || "Failed to create auth user for this order.",
+    };
+  }
+
+  const createdUserId = signUpResult.data.user.id;
+  const profileResult = await ensureUserProfile({
+    userId: createdUserId,
+    email: normalizedEmail,
+    fullName,
+    phone: params.phone,
+  });
+
+  if (!profileResult.success) {
+    return { success: false, error: profileResult.error };
+  }
+
+  return {
+    success: true,
+    data: {
+      userId: createdUserId,
+      profileCreated: true,
+      verificationEmailSent: true,
+    },
+  };
+}
+
 function getDownloadTitle(apartmentType?: string) {
   const titleMap: Record<string, string> = {
     studio: "Studio Household Cleaning Routine",
@@ -67,12 +302,28 @@ export async function createOrder(orderData: {
   deliveryAddress: string;
   landmark: string;
   amount: number;
+  authUserId?: string;
 }) {
   try {
-    // Map camelCase properties to snake_case column names
-    const dbOrderData = {
-      reference: orderData.reference,
+    const resolvedUser = await resolveOrderUser({
       email: orderData.email,
+      firstName: orderData.firstName,
+      lastName: orderData.lastName,
+      phone: orderData.phone,
+      authUserId: orderData.authUserId,
+    });
+
+    if (!resolvedUser.success) {
+      return {
+        success: false,
+        error: resolvedUser.error || "Unable to prepare user profile for this order.",
+      };
+    }
+
+    // Map camelCase properties to snake_case column names
+    const dbOrderData: Record<string, unknown> = {
+      reference: orderData.reference,
+      email: orderData.email.trim().toLowerCase(),
       first_name: orderData.firstName,
       last_name: orderData.lastName,
       phone: orderData.phone,
@@ -85,7 +336,21 @@ export async function createOrder(orderData: {
       status: "pending", // Default status
     };
 
-    const { error } = await supabaseAdmin.from("orders").insert([dbOrderData]);
+    if (resolvedUser.data?.userId) {
+      dbOrderData.user_id = resolvedUser.data.userId;
+    }
+
+    let { error } = await supabaseAdmin.from("orders").insert([dbOrderData]);
+
+    // If orders.user_id is not yet present in this environment, fallback gracefully.
+    if (error && /(user_id|column.*user_id|schema cache)/i.test(error.message)) {
+      const { user_id, ...orderWithoutUserId } = dbOrderData;
+      const fallbackResult = await supabaseAdmin
+        .from("orders")
+        .insert([orderWithoutUserId]);
+      error = fallbackResult.error;
+    }
+
     if (error) {
       console.error("Error creating order:", error);
 
@@ -99,7 +364,12 @@ export async function createOrder(orderData: {
 
       return { success: false, error: error.message };
     }
-    return { success: true };
+
+    return {
+      success: true,
+      profileCreated: Boolean(resolvedUser.data?.profileCreated),
+      verificationEmailSent: Boolean(resolvedUser.data?.verificationEmailSent),
+    };
   } catch (error) {
     console.error("Error creating order:", error);
     return { success: false, error: "Failed to create order" };

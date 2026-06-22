@@ -4,10 +4,17 @@ import Link from "next/link";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import DownloadButtonEnhanced from "@/components/download-button-enhanced";
+import HouseholdDownloadClient from "@/components/household-download-client";
 
 // Force dynamic rendering
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
+
+type DownloadFile = {
+  type: "pdf" | "audio";
+  url: string;
+  fileName: string;
+};
 
 export default async function DownloadPage({
   params,
@@ -67,6 +74,120 @@ export default async function DownloadPage({
       ? searchParams.preferences
       : order.landmark || "";
 
+  const isInfantRecipe = order.apartment_type === "infant-recipe";
+
+  // For household purchases, fetch files from price_rate_household table
+  if (!isInfantRecipe) {
+    const { data: priceRate } = await supabaseAdmin
+      .from("price_rate_household")
+      .select("pdf_file, audio_file, home_type")
+      .eq("apartment_type", order.apartment_type)
+      .maybeSingle();
+
+    if (!priceRate) {
+      return (
+        <div className="min-h-screen flex flex-col">
+          <Navbar />
+          <main className="flex-grow container py-10">
+            <div className="max-w-lg mx-auto bg-white p-8 rounded-lg shadow-md">
+              <h1 className="text-2xl font-bold mb-6 text-center">
+                Download Unavailable
+              </h1>
+              <p className="text-center mb-6">
+                We couldn't find the files for your purchase. Please contact support.
+              </p>
+              <div className="flex justify-center">
+                <Link
+                  href="/"
+                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Return to Home
+                </Link>
+              </div>
+            </div>
+          </main>
+          <Footer />
+        </div>
+      );
+    }
+
+    // Determine which files to download based on landmark field
+    const downloadFiles: DownloadFile[] = [];
+    const landmark = order.landmark || "";
+
+    if (
+      landmark === "download-pdf-only" ||
+      landmark === "download-pdf-and-audio"
+    ) {
+      if (priceRate.pdf_file) {
+        downloadFiles.push({
+          type: "pdf",
+          url: priceRate.pdf_file,
+          fileName: `Effideli-${order.apartment_type}-Routine.pdf`,
+        });
+      }
+    }
+
+    if (
+      landmark === "download-audio-only" ||
+      landmark === "download-pdf-and-audio"
+    ) {
+      if (priceRate.audio_file) {
+        downloadFiles.push({
+          type: "audio",
+          url: priceRate.audio_file,
+          fileName: `Effideli-${order.apartment_type}-Routine-Audio.mp3`,
+        });
+      }
+    }
+
+    // If no files found, show error
+    if (downloadFiles.length === 0) {
+      return (
+        <div className="min-h-screen flex flex-col">
+          <Navbar />
+          <main className="flex-grow container py-10">
+            <div className="max-w-lg mx-auto bg-white p-8 rounded-lg shadow-md">
+              <h1 className="text-2xl font-bold mb-6 text-center">
+                Download Unavailable
+              </h1>
+              <p className="text-center mb-6">
+                The requested files are not available yet. Please contact support.
+              </p>
+              <div className="flex justify-center">
+                <Link
+                  href="/"
+                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Return to Home
+                </Link>
+              </div>
+            </div>
+          </main>
+          <Footer />
+        </div>
+      );
+    }
+
+    // Render household download client
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <HouseholdDownloadClient
+          orderReference={order.reference}
+          apartmentType={order.apartment_type}
+          orderDate={new Date(order.created_at).toLocaleDateString()}
+          files={downloadFiles}
+          autoDownload={true}
+        />
+        <Footer />
+      </div>
+    );
+  }
+
+  // Infant recipe logic (existing code)
   const secureDownloadUrl = `/api/download-pdf?reference=${encodeURIComponent(reference)}&preferences=${encodeURIComponent(preferences)}`;
 
   // Log the PDF URL and order details for debugging
@@ -76,8 +197,6 @@ export default async function DownloadPage({
     preferences,
     secureDownloadUrl,
   });
-
-  const isInfantRecipe = order.apartment_type === "infant-recipe";
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -91,70 +210,42 @@ export default async function DownloadPage({
           </div>
 
           <h1 className="text-2xl font-bold mb-2 text-center">
-            {isInfantRecipe
-              ? "Your Infant Recipe Plan is Ready!"
-              : "Your Download is Ready!"}
+            Your Infant Recipe Plan is Ready!
           </h1>
           <p className="text-center text-gray-600 mb-8">
-            {isInfantRecipe
-              ? "Thank you for your purchase. Your 6-Month to 1-Year Infant Recipe Plan is ready to download."
-              : "Thank you for your purchase. Your Household Chore Routine Management PDF is ready to download."}
+            Thank you for your purchase. Your 6-Month to 1-Year Infant Recipe Plan is ready to download.
           </p>
 
-          {isInfantRecipe ? (
-            <div className="bg-gray-50 p-4 rounded-md mb-6">
-              <h2 className="font-semibold mb-2">Recipe Plan Details:</h2>
-              <p>
-                <span className="font-medium">Reference:</span>{" "}
-                {order.reference}
-              </p>
-              <p>
-                <span className="font-medium">Preferences:</span>{" "}
-                {preferences
-                  .split(",")
-                  .map((p) => {
-                    const labels: Record<string, string> = {
-                      allergies: "Allergies Conscious",
-                      sweet: "Sweet Tooth Preferences",
-                      nutrition: "Nutrition Goals",
-                    };
-                    return labels[p] || p;
-                  })
-                  .join(", ")}
-              </p>
-              <p>
-                <span className="font-medium">Date:</span>{" "}
-                {new Date(order.created_at).toLocaleDateString()}
-              </p>
-            </div>
-          ) : (
-            <div className="bg-gray-50 p-4 rounded-md mb-6">
-              <h2 className="font-semibold mb-2">Order Details:</h2>
-              <p>
-                <span className="font-medium">Reference:</span>{" "}
-                {order.reference}
-              </p>
-              <p>
-                <span className="font-medium">Home Type:</span>{" "}
-                {order.apartment_type
-                  .replace(/-/g, " ")
-                  .replace(/\b\w/g, (char) => char.toUpperCase())}
-              </p>
-              <p>
-                <span className="font-medium">Date:</span>{" "}
-                {new Date(order.created_at).toLocaleDateString()}
-              </p>
-            </div>
-          )}
+          <div className="bg-gray-50 p-4 rounded-md mb-6">
+            <h2 className="font-semibold mb-2">Recipe Plan Details:</h2>
+            <p>
+              <span className="font-medium">Reference:</span>{" "}
+              {order.reference}
+            </p>
+            <p>
+              <span className="font-medium">Preferences:</span>{" "}
+              {preferences
+                .split(",")
+                .map((p) => {
+                  const labels: Record<string, string> = {
+                    allergies: "Allergies Conscious",
+                    sweet: "Sweet Tooth Preferences",
+                    nutrition: "Nutrition Goals",
+                  };
+                  return labels[p] || p;
+                })
+                .join(", ")}
+            </p>
+            <p>
+              <span className="font-medium">Date:</span>{" "}
+              {new Date(order.created_at).toLocaleDateString()}
+            </p>
+          </div>
 
           <div className="flex justify-center">
             <DownloadButtonEnhanced
               pdfUrl={secureDownloadUrl}
-              fileName={
-                isInfantRecipe
-                  ? `Effideli-Infant-Recipe-Plan.pdf`
-                  : `Effideli-${order.apartment_type}-Routine.pdf`
-              }
+              fileName={`Effideli-Infant-Recipe-Plan.pdf`}
               autoDownload={true}
               showStatus={true}
             />

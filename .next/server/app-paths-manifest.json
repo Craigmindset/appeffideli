@@ -1,8 +1,10 @@
 {
+  "/_not-found/page": "app/_not-found/page.js",
   "/api/household-pricing/route": "app/api/household-pricing/route.js",
   "/page": "app/page.js",
-  "/download/[reference]/page": "app/download/[reference]/page.js",
-  "/services/cleaning-routine/page": "app/services/cleaning-routine/page.js",
-  "/household-purchase/page": "app/household-purchase/page.js",
-  "/household-purchase/payment/page": "app/household-purchase/payment/page.js"
+  "/login/page": "app/login/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/dashboard/my-subscription/page": "app/dashboard/my-subscription/page.js",
+  "/services/meal-plan-subscription/page": "app/services/meal-plan-subscription/page.js",
+  "/household-purchase/page": "app/household-purchase/page.js"
 }
