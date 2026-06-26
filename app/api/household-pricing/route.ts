@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
-import { unstable_cache } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase";
 
-const getHouseholdPricingRates = unstable_cache(
-  async () => {
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+export async function GET() {
+  try {
     const { data, error } = await supabaseAdmin
       .from("price_rate_household")
       .select("id, apartment_type, home_type, pdf_rate, audio_rate, vat")
@@ -13,27 +15,14 @@ const getHouseholdPricingRates = unstable_cache(
       throw new Error(error.message);
     }
 
-    return data ?? [];
-  },
-  ["household-price-rates"],
-  {
-    revalidate: 60 * 60 * 6,
-  },
-);
-
-export async function GET() {
-  try {
-    const rates = await getHouseholdPricingRates();
-
     return NextResponse.json(
       {
         success: true,
-        rates,
+        rates: data ?? [],
       },
       {
         headers: {
-          "Cache-Control":
-            "public, max-age=300, s-maxage=21600, stale-while-revalidate=86400",
+          "Cache-Control": "no-store, max-age=0",
         },
       },
     );

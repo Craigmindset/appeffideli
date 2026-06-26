@@ -432,6 +432,10 @@ export default function HouseholdPurchasePaymentPage() {
               {draft.addPdf && (
                 <p className="inline-flex items-center gap-2">
                   <FileText className="h-4 w-4 text-[#174969]" /> PDF selected
+                  {/* Added whitespace-nowrap here */}
+                  <span className="text-[11px] font-normal text-red-900 whitespace-nowrap">
+                    (we advise you print in A5 landscape)
+                  </span>
                 </p>
               )}
               {draft.addAudio && (

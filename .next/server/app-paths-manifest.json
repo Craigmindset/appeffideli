@@ -1,5 +1,4 @@
 {
-  "/api/verify-payment/route": "app/api/verify-payment/route.js",
   "/page": "app/page.js",
   "/download/[reference]/page": "app/download/[reference]/page.js",
   "/services/infant-recipes/page": "app/services/infant-recipes/page.js",

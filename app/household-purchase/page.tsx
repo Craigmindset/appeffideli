@@ -162,7 +162,8 @@ export default function HouseholdPurchasePage() {
   useEffect(() => {
     const loadPriceRates = async () => {
       const cacheKey = "household_pricing_rates_v1";
-      const cacheTtlMs = 1000 * 60 * 60 * 24;
+      const cacheTtlMs = 1000 * 60 * 5;
+      const refreshIntervalMs = 1000 * 60;
       let isMounted = true;
       const supabase = createBrowserSupabaseClient();
 
@@ -260,8 +261,30 @@ export default function HouseholdPurchasePage() {
         )
         .subscribe();
 
+      const refreshRates = async () => {
+        try {
+          await fetchLatestRates();
+        } catch (error) {
+          console.error("Scheduled pricing refresh failed:", error);
+        }
+      };
+
+      const intervalId = window.setInterval(() => {
+        void refreshRates();
+      }, refreshIntervalMs);
+
+      const onVisibilityChange = () => {
+        if (document.visibilityState === "visible") {
+          void refreshRates();
+        }
+      };
+
+      document.addEventListener("visibilitychange", onVisibilityChange);
+
       return () => {
         isMounted = false;
+        window.clearInterval(intervalId);
+        document.removeEventListener("visibilitychange", onVisibilityChange);
         supabase.removeChannel(channel);
       };
     };
@@ -446,10 +469,14 @@ export default function HouseholdPurchasePage() {
     <div className="space-y-8 sm:space-y-10">
       <div className="text-center rounded-2xl bg-gradient-to-br from-[#174969] to-[#2d6d96] px-4 py-10 sm:py-12 text-white">
         <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
-          Request Form
+          Welcome to the Effideli Household Cleaning Routine!
         </h1>
         <p className="mt-3 text-sm sm:text-base text-blue-50 max-w-2xl mx-auto">
-          Household Cleaning Routine - Customized cleaning guide for your home
+          Discover simple weekly cleaning routines to keep your home fresh,
+          organized, and Effideliciously clean. Each room also includes a
+          voice-guided daily cleaning routine, making it easy for maids,
+          nannies, and household staff to maintain the same high cleaning
+          standard every day.
         </p>
       </div>
 
