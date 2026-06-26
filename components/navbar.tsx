@@ -126,6 +126,11 @@ export default function Navbar() {
       icon: <ClipboardList className="h-4 w-4" />,
     },
     {
+      name: "Recipe Vault",
+      href: "/recipe-vault",
+      icon: <UtensilsCrossed className="h-4 w-4" />,
+    },
+    {
       name: "Kitchen Hacks Monday",
       href: "/services/kitchen-hacks-monday",
       icon: <UtensilsCrossed className="h-4 w-4" />,
@@ -168,7 +173,7 @@ export default function Navbar() {
               href="/"
               className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                 pathname === "/"
-                  ? "text-red-600"
+                  ? "text-[#174969] bg-[#174969]/10 font-semibold"
                   : "text-foreground hover:text-primary hover:bg-accent"
               }`}
             >
@@ -178,7 +183,11 @@ export default function Navbar() {
             <div className="relative">
               <button
                 onClick={() => setIsServicesOpen(!isServicesOpen)}
-                className="px-3 py-2 rounded-md text-sm font-medium text-foreground hover:text-primary hover:bg-accent transition-colors inline-flex items-center gap-1"
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors inline-flex items-center gap-1 ${
+                  pathname.startsWith("/services") || pathname === "/household-purchase" || pathname === "/recipe-vault"
+                    ? "text-[#174969] bg-[#174969]/10 font-semibold"
+                    : "text-foreground hover:text-primary hover:bg-accent"
+                }`}
               >
                 Services
                 <ChevronDown className="h-4 w-4" />
@@ -196,9 +205,17 @@ export default function Navbar() {
                         <Link
                           key={link.name}
                           href={link.href}
-                          className="group flex items-center px-4 py-3 text-sm text-popover-foreground hover:bg-accent hover:text-accent-foreground"
+                          className={`group flex items-center px-4 py-3 text-sm transition-colors ${
+                            pathname === link.href
+                              ? "bg-[#174969]/10 text-[#174969] font-semibold"
+                              : "text-popover-foreground hover:bg-accent hover:text-accent-foreground"
+                          }`}
                         >
-                          <span className="mr-3 text-muted-foreground group-hover:text-primary">
+                          <span className={`mr-3 ${
+                            pathname === link.href
+                              ? "text-[#174969]"
+                              : "text-muted-foreground group-hover:text-primary"
+                          }`}>
                             {link.icon}
                           </span>
                           {link.name}
@@ -216,7 +233,7 @@ export default function Navbar() {
                 href={link.href}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors inline-flex items-center ${
                   pathname === link.href
-                    ? "text-red-600"
+                    ? "text-[#174969] bg-[#174969]/10 font-semibold"
                     : "text-foreground hover:text-primary hover:bg-accent"
                 }`}
               >
@@ -326,7 +343,7 @@ export default function Navbar() {
               href="/"
               className={`block px-4 py-3 rounded-lg text-base font-medium transition-all ${
                 pathname === "/"
-                  ? "bg-amber-100 text-amber-900"
+                  ? "bg-[#174969]/10 text-[#174969] font-semibold"
                   : "text-gray-700 hover:bg-gray-100"
               }`}
               onClick={() => setIsMenuOpen(false)}
@@ -364,7 +381,7 @@ export default function Navbar() {
                   href={link.href}
                   className={`flex items-center px-4 py-2 text-sm transition-colors rounded-lg ${
                     pathname === link.href
-                      ? "bg-amber-100 text-amber-900"
+                      ? "bg-[#174969]/10 text-[#174969] font-semibold"
                       : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                   }`}
                   onClick={() => {
@@ -386,7 +403,7 @@ export default function Navbar() {
                 href={link.href}
                 className={`flex w-full px-4 py-3 rounded-lg text-base font-medium transition-all items-center justify-between ${
                   pathname === link.href
-                    ? "bg-amber-100 text-amber-900"
+                    ? "bg-[#174969]/10 text-[#174969] font-semibold"
                     : "text-gray-700 hover:bg-gray-100"
                 }`}
                 onClick={() => setIsMenuOpen(false)}

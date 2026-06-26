@@ -207,7 +207,7 @@ async function resolveOrderUser(params: {
         full_name: fullName || null,
         phone: params.phone || null,
       },
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/login?verified=true`,
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/auth/confirm?next=/create-password`,
     },
   });
 

@@ -1,7 +1,7 @@
 {
   "/page": "app/page.js",
-  "/download/[reference]/page": "app/download/[reference]/page.js",
-  "/services/infant-recipes/page": "app/services/infant-recipes/page.js",
-  "/household-purchase/page": "app/household-purchase/page.js",
-  "/household-purchase/payment/page": "app/household-purchase/payment/page.js"
+  "/login/page": "app/login/page.js",
+  "/household-purchase/payment/page": "app/household-purchase/payment/page.js",
+  "/recipe-vault/page": "app/recipe-vault/page.js",
+  "/household-purchase/page": "app/household-purchase/page.js"
 }

@@ -164,6 +164,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../app/create-password/page.tsx
+{
+  type __IsExpected<Specific extends AppPageConfig<"/create-password">> = Specific
+  const handler = {} as typeof import("../../app/create-password/page.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../app/dashboard/household-cleaning/page.tsx
 {
   type __IsExpected<Specific extends AppPageConfig<"/dashboard/household-cleaning">> = Specific
@@ -339,6 +348,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   type __IsExpected<Specific extends AppPageConfig<"/payment/success">> = Specific
   const handler = {} as typeof import("../../app/payment/success/page.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../app/recipe-vault/page.tsx
+{
+  type __IsExpected<Specific extends AppPageConfig<"/recipe-vault">> = Specific
+  const handler = {} as typeof import("../../app/recipe-vault/page.js")
   type __Check = __IsExpected<typeof handler>
   // @ts-ignore
   type __Unused = __Check
@@ -542,6 +560,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../app/api/recipe-vault/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/recipe-vault">> = Specific
+  const handler = {} as typeof import("../../app/api/recipe-vault/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../app/api/subscription/process/route.ts
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/subscription/process">> = Specific
@@ -573,6 +600,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/webhook/paystack">> = Specific
   const handler = {} as typeof import("../../app/api/webhook/paystack/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../app/auth/confirm/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/auth/confirm">> = Specific
+  const handler = {} as typeof import("../../app/auth/confirm/route.js")
   type __Check = __IsExpected<typeof handler>
   // @ts-ignore
   type __Unused = __Check
@@ -622,6 +658,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   type __IsExpected<Specific extends LayoutConfig<"/payment">> = Specific
   const handler = {} as typeof import("../../app/payment/layout.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../app/recipe-vault/layout.tsx
+{
+  type __IsExpected<Specific extends LayoutConfig<"/recipe-vault">> = Specific
+  const handler = {} as typeof import("../../app/recipe-vault/layout.js")
   type __Check = __IsExpected<typeof handler>
   // @ts-ignore
   type __Unused = __Check

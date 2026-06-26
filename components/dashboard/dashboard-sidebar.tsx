@@ -6,12 +6,10 @@ import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
   Download,
-  CreditCard,
   Calendar,
   Settings,
   LogOut,
   Menu,
-  ShoppingCart,
   ChevronLeft,
   ChevronRight,
   Home,
@@ -36,11 +34,11 @@ const navItems = [
     href: "/dashboard/my-downloads",
     icon: Download,
   },
-  {
-    title: "Shop List",
-    href: "/dashboard/shop-list",
-    icon: ShoppingCart,
-  },
+  // {
+  //   title: "Shop List",
+  //   href: "/dashboard/shop-list",
+  //   icon: ShoppingCart,
+  // },
   {
     title: "Meal Timetable",
     href: "/dashboard/meal-timetable",
@@ -57,11 +55,11 @@ const navItems = [
     href: "/dashboard/household-cleaning",
     icon: Home,
   },
-  {
-    title: "My Subscription",
-    href: "/dashboard/my-subscription",
-    icon: CreditCard,
-  },
+  // {
+  //   title: "My Subscription",
+  //   href: "/dashboard/my-subscription",
+  //   icon: CreditCard,
+  // },
   {
     title: "Settings",
     href: "/dashboard/settings",
