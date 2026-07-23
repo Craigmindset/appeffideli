@@ -29,6 +29,13 @@ export default function Services() {
       href: "/services/infant-recipes",
     },
     {
+      title: "Effidelicious Recipe Vault",
+      description:
+        "A premium collection of tested recipes, meal plans, and cooking guides designed to help you create memorable meals with confidence, whether you are cooking for family, babies, or special occasions.",
+      image: "/newgloria.jpg",
+      href: "/recipe-vault",
+    },
+    {
       title: "Kitchen Hacks Monday",
       description:
         "Kitchen Hacks Monday is an Effideli brand program that shares tips to make cooking fun, flavorful, and educational, adding value to your home—tune in every Monday on social media and the Effideli website.",

@@ -2,8 +2,8 @@ name: Supabase Keepalive
 
 on:
   schedule:
-    # Every 5 hours (UTC). Note: GitHub may delay scheduled runs slightly.
-    - cron: "0 */5 * * *"
+    # Every 5 days at midnight UTC (keeps Supabase from pausing after 7 days of inactivity)
+    - cron: "0 0 */5 * *"
   workflow_dispatch:
 
 jobs:

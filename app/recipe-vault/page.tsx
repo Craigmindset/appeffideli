@@ -18,11 +18,31 @@ interface Recipe {
   title: string;
   description: string;
   recipe_suit: string;
+  price: number | string | null;
   image_url: string;
   pdf_file: string;
   youtube_link: string;
   created_at: string;
 }
+
+const formatPrice = (price: number | string | null) => {
+  if (price === null || price === undefined || price === "") {
+    return null;
+  }
+
+  const numericPrice = Number(price);
+
+  if (Number.isNaN(numericPrice)) {
+    return String(price);
+  }
+
+  return new Intl.NumberFormat("en-NG", {
+    style: "currency",
+    currency: "NGN",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(numericPrice);
+};
 
 export default function RecipeVaultPage() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -232,11 +252,16 @@ export default function RecipeVaultPage() {
                   </p>
 
                   {/* Recipe Suit Badge */}
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-between gap-3">
                     <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-xs font-medium">
                       <FileText className="h-3 w-3" />
                       {recipe.recipe_suit}
                     </span>
+                    {formatPrice(recipe.price) && (
+                      <span className="text-sm font-semibold text-gray-900 dark:text-white text-right">
+                        Price: {formatPrice(recipe.price)}
+                      </span>
+                    )}
                   </div>
 
                   {/* Action Links */}

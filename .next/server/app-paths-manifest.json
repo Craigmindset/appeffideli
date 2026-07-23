@@ -1,7 +1,6 @@
 {
+  "/api/recipe-vault/route": "app/api/recipe-vault/route.js",
   "/page": "app/page.js",
-  "/login/page": "app/login/page.js",
-  "/household-purchase/payment/page": "app/household-purchase/payment/page.js",
-  "/recipe-vault/page": "app/recipe-vault/page.js",
-  "/household-purchase/page": "app/household-purchase/page.js"
+  "/about/page": "app/about/page.js",
+  "/recipe-vault/page": "app/recipe-vault/page.js"
 }

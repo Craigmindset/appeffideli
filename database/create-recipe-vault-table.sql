@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS recipe_vault (
   title TEXT NOT NULL,
   description TEXT,
   recipe_suit TEXT,
+  price NUMERIC(10,2),
   image_url TEXT,
   pdf_file TEXT,
   youtube_link TEXT,
@@ -32,7 +33,7 @@ FOR EACH ROW
 EXECUTE FUNCTION update_recipe_vault_updated_at();
 
 -- Insert sample data
-INSERT INTO recipe_vault (title, description, recipe_suit, image_url, pdf_file, youtube_link) VALUES
-('Classic Jollof Rice', 'A beloved West African one-pot rice dish cooked in a rich tomato sauce with aromatic spices and vegetables.', 'Family Meals', '/images/sample-recipe.jpg', '/pdfs/jollof-rice.pdf', 'https://www.youtube.com/watch?v=sample1'),
-('Creamy Chicken Alfredo', 'Tender chicken breast in a velvety parmesan cream sauce served over fresh fettuccine pasta.', 'International Cuisine', '/images/sample-recipe.jpg', '/pdfs/chicken-alfredo.pdf', 'https://www.youtube.com/watch?v=sample2'),
-('Baby-Friendly Veggie Puree', 'Nutritious blended vegetables perfect for introducing solids to babies 6+ months.', 'Baby-Friendly', '/images/sample-recipe.jpg', '/pdfs/veggie-puree.pdf', 'https://www.youtube.com/watch?v=sample3');
+INSERT INTO recipe_vault (title, description, recipe_suit, price, image_url, pdf_file, youtube_link) VALUES
+('Classic Jollof Rice', 'A beloved West African one-pot rice dish cooked in a rich tomato sauce with aromatic spices and vegetables.', 'Family Meals', 8500.00, '/images/sample-recipe.jpg', '/pdfs/jollof-rice.pdf', 'https://www.youtube.com/watch?v=sample1'),
+('Creamy Chicken Alfredo', 'Tender chicken breast in a velvety parmesan cream sauce served over fresh fettuccine pasta.', 'International Cuisine', 9200.00, '/images/sample-recipe.jpg', '/pdfs/chicken-alfredo.pdf', 'https://www.youtube.com/watch?v=sample2'),
+('Baby-Friendly Veggie Puree', 'Nutritious blended vegetables perfect for introducing solids to babies 6+ months.', 'Baby-Friendly', 6500.00, '/images/sample-recipe.jpg', '/pdfs/veggie-puree.pdf', 'https://www.youtube.com/watch?v=sample3');
